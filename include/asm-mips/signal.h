@@ -10,6 +10,7 @@
 #ifndef _ASM_SIGNAL_H
 #define _ASM_SIGNAL_H
 
+#include <linux/config.h>
 #include <linux/types.h>
 
 #define _NSIG		128
@@ -131,12 +132,14 @@ struct sigaction {
 	unsigned int	sa_flags;
 	__sighandler_t	sa_handler;
 	sigset_t	sa_mask;
-	void		(*sa_restorer)(void);
-	int		sa_resv[1];	/* reserved */
+	int		sa_resv[2];	/* reserved */
 };
 
 struct k_sigaction {
 	struct sigaction sa;
+#ifdef CONFIG_BINFMT_IRIX
+	void (*ka_restorer)(void);
+#endif
 };
 
 /* IRIX compatible stack_t  */
