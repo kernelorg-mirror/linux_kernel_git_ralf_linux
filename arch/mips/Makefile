@@ -1,4 +1,3 @@
-# $Id: Makefile,v 1.17.2.1 1999/08/18 23:11:26 ralf Exp $
 #
 # This file is subject to the terms and conditions of the GNU General Public
 # License.  See the file "COPYING" in the main directory of this archive
@@ -68,25 +67,25 @@ ifdef CONFIG_CPU_R3000
 CFLAGS		:= $(CFLAGS) -mcpu=r3000 -mips1
 endif
 ifdef CONFIG_CPU_R6000
-CFLAGS		:= $(CFLAGS) -mcpu=r6000 -mips2
+CFLAGS		:= $(CFLAGS) -mcpu=r6000 -mips2 -Wa,--trap
 endif
 ifdef CONFIG_CPU_R4300
-CFLAGS		:= $(CFLAGS) -mcpu=r4300 -mips2
+CFLAGS		:= $(CFLAGS) -mcpu=r4300 -mips2 -Wa,--trap
 endif
 ifdef CONFIG_CPU_R4X00
-CFLAGS		:= $(CFLAGS) -mcpu=r4600 -mips2
+CFLAGS		:= $(CFLAGS) -mcpu=r4600 -mips2 -Wa,--trap
 endif
 ifdef CONFIG_CPU_R5000
-CFLAGS		:= $(CFLAGS) -mcpu=r8000 -mips2
+CFLAGS		:= $(CFLAGS) -mcpu=r8000 -mips2 -Wa,--trap
 endif
 ifdef CONFIG_CPU_NEVADA
-CFLAGS		:= $(CFLAGS) -mcpu=r8000 -mips2 -mmad
+CFLAGS		:= $(CFLAGS) -mcpu=r8000 -mips2 -Wa,--trap -mmad
 endif
 ifdef CONFIG_CPU_R8000
-CFLAGS		:= $(CFLAGS) -mcpu=r8000 -mips2
+CFLAGS		:= $(CFLAGS) -mcpu=r8000 -mips2 -Wa,--trap
 endif
 ifdef CONFIG_CPU_R10000
-CFLAGS		:= $(CFLAGS) -mcpu=r8000 -mips2
+CFLAGS		:= $(CFLAGS) -mcpu=r8000 -mips2 -Wa,--trap
 endif
 
 #
