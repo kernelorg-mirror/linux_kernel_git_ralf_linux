@@ -1,11 +1,11 @@
-/* $Id: r2300_fpu.S,v 1.5 1999/05/01 22:40:36 ralf Exp $
+/*
  * r2300_fpu.S: Save/restore floating point context for signal handlers.
  *
  * This file is subject to the terms and conditions of the GNU General Public
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
  *
- * Copyright (C) 1996, 1998 by Ralf Baechle
+ * Copyright (C) 1996, 1998, 2001 by Ralf Baechle
  *
  * Multi-arch abstraction and asm macros for easier reading:
  * Copyright (C) 1996 David S. Miller (dm@engr.sgi.com)
@@ -119,6 +119,7 @@ LEAF(r2300_restore_fp_context)
 	jr	ra
 	 ctc1	t0,fcr31
 	END(r2300_restore_fp_context)
+	.set	reorder
 
 	.type	fault@function
 	.ent	fault

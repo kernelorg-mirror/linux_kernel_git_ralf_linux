@@ -5,12 +5,10 @@
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
  *
- * Copyright (C) 1996, 1998 by Ralf Baechle
+ * Copyright (C) 1996, 1998, 2001 by Ralf Baechle
  *
  * Multi-arch abstraction and asm macros for easier reading:
  * Copyright (C) 1996 David S. Miller (dm@engr.sgi.com)
- *
- * $Id: r4k_fpu.S,v 1.5.2.1 1999/08/18 23:11:27 ralf Exp $
  */
 #include <asm/asm.h>
 #include <asm/errno.h>
@@ -94,6 +92,7 @@ LEAF(r4k_restore_fp_context)
 	jr	ra
 	 ctc1	t0,fcr31
 	END(r4k_restore_fp_context)
+	.set	reorder
 
 	.type	fault@function
 	.ent	fault
