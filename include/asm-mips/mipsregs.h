@@ -1,14 +1,13 @@
-/* $Id: mipsregs.h,v 1.4 1998/08/25 09:21:57 ralf Exp $
- *
+/*
  * This file is subject to the terms and conditions of the GNU General Public
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
  *
- * Copyright (C) 1994, 1995, 1996, 1997 by Ralf Baechle
+ * Copyright (C) 1994, 1995, 1996, 1997, 2000 by Ralf Baechle
  * Modified for further R[236]000 support by Paul M. Antoine, 1996.
  */
-#ifndef __ASM_MIPS_MIPSREGS_H
-#define __ASM_MIPS_MIPSREGS_H
+#ifndef _ASM_MIPSREGS_H
+#define _ASM_MIPSREGS_H
 
 #include <linux/linkage.h>
 
@@ -179,42 +178,6 @@ __BUILD_SET_CP0(cause,CP0_CAUSE)
 __BUILD_SET_CP0(config,CP0_CONFIG)
 
 #endif /* defined (_LANGUAGE_ASSEMBLY) */
-
-/*
- * Inline code for use of the ll and sc instructions
- *
- * FIXME: This instruction is only available on MIPS ISA >=2.
- * Since these operations are only being used for atomic operations
- * the easiest workaround for the R[23]00 is to disable interrupts.
- * This fails for R3000 SMP machines which use that many different
- * technologies as replacement that it is difficult to create even
- * just a hook for for all machines to hook into.  The only good
- * thing is that there is currently no R3000 SMP machine on the
- * Linux/MIPS target list ...
- */
-#define load_linked(addr)                                       \
-({                                                              \
-	unsigned int __res;                                     \
-                                                                \
-	__asm__ __volatile__(                                   \
-	"ll\t%0,(%1)"                                           \
-	: "=r" (__res)                                          \
-	: "r" ((unsigned long) (addr)));                        \
-                                                                \
-	__res;                                                  \
-})
-
-#define store_conditional(addr,value)                           \
-({                                                              \
-	int	__res;                                          \
-                                                                \
-	__asm__ __volatile__(                                   \
-	"sc\t%0,(%2)"                                           \
-	: "=r" (__res)                                          \
-	: "0" (value), "r" (addr));                             \
-                                                                \
-	__res;                                                  \
-})
 
 /*
  * Bitfields in the R4xx0 cp0 status register
@@ -396,4 +359,4 @@ extern asmlinkage unsigned int read_perf_cntl(unsigned int counter);
 extern asmlinkage void write_perf_cntl(unsigned int counter, unsigned int val);
 #endif
 
-#endif /* __ASM_MIPS_MIPSREGS_H */
+#endif /* _ASM_MIPSREGS_H */
