@@ -20,7 +20,7 @@ tool-prefix	= mipsel-linux-
 ifdef CONFIG_MIPS_ECOFF
 oformat		= ecoff-littlemips
 else
-oformat		= elf32-littlemips
+oformat		= elf32-tradlittlemips
 endif
 else
 tool-prefix	= mips-linux-
@@ -28,7 +28,7 @@ unexport tool-prefix
 ifdef CONFIG_MIPS_ECOFF
 oformat		= ecoff-bigmips
 else
-oformat		= elf32-bigmips
+oformat		= elf32-tradbigmips
 endif
 endif
 
