@@ -1,5 +1,4 @@
-/* $Id: time.c,v 1.12 1999/06/13 16:30:34 ralf Exp $
- *
+/*
  *  Copyright (C) 1991, 1992, 1995  Linus Torvalds
  *  Copyright (C) 1996, 1997, 1998  Ralf Baechle
  *
@@ -449,7 +448,7 @@ static inline void init_cycle_counter(void)
 	case CPU_R3081E:
 	case CPU_R6000:
 	case CPU_R6000A:
-	case CPU_R8000:		/* Not shure about that one, play safe */
+	case CPU_R8000:		/* Not sure about that one, play safe */
 		cyclecounter_available = 0;
 		break;
 	case CPU_R4000PC:

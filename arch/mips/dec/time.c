@@ -353,7 +353,7 @@ static inline void init_cycle_counter(void)
 	case CPU_R3081E:
 	case CPU_R6000:
 	case CPU_R6000A:
-	case CPU_R8000:		/* Not shure about that one, play safe */
+	case CPU_R8000:		/* Not sure about that one, play safe */
 		cyclecounter_available = 0;
 		break;
 	case CPU_R4000PC:

@@ -1,5 +1,4 @@
-/* $Id: setup.c,v 1.15.2.1 1999/06/14 21:40:56 ralf Exp $
- *
+/*
  * This file is subject to the terms and conditions of the GNU General Public
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
@@ -204,7 +203,7 @@ __initfunc(void setup_arch(char **cmdline_p,
 	/*
 	 * Due to prefetching and similar mechanism the CPU sometimes
 	 * generates addresses beyond the end of memory.  We leave the size
-	 * of one cache line at the end of memory unused to make shure we
+	 * of one cache line at the end of memory unused to make sure we
 	 * don't catch this type of bus errors.
 	 */
 	memory_end -= 128;
