@@ -26,7 +26,7 @@ __sti(void)
 		".set\treorder"
 		: /* no outputs */
 		: /* no inputs */
-		: "$1", "memory");
+		: "memory");
 }
 
 /*
@@ -53,7 +53,7 @@ __cli(void)
 		".set\treorder"
 		: /* no outputs */
 		: /* no inputs */
-		: "$1", "memory");
+		: "memory");
 }
 
 #define __save_flags(x)							\
@@ -80,7 +80,7 @@ __asm__ __volatile__(							\
 	".set\treorder"							\
 	: "=r" (x)							\
 	: /* no inputs */						\
-	: "$1", "memory")
+	: "memory")
 
 #define __restore_flags(flags)						\
 do {									\
@@ -102,7 +102,7 @@ do {									\
 		".set\treorder"						\
 		: "=r" (__tmp1)						\
 		: "0" (flags)						\
-		: "$1", "memory");					\
+		: "memory");						\
 } while(0)
 
 /*

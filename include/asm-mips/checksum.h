@@ -63,8 +63,7 @@ static inline unsigned short int csum_fold(unsigned int sum)
 	xori	%0,0xffff
 	.set	at"
 	: "=r" (sum)
-	: "0" (sum)
-	: "$1");
+	: "0" (sum));
 
  	return sum;
 }
@@ -117,8 +116,7 @@ static inline unsigned short ip_fast_csum(unsigned char * iph,
 2:	.set	at
 	.set	reorder"
 	: "=&r" (sum), "=&r" (iph), "=&r" (ihl), "=&r" (dummy)
-	: "1" (iph), "2" (ihl)
-	: "$1");
+	: "1" (iph), "2" (ihl));
 
 	return csum_fold(sum);
 }
@@ -154,8 +152,7 @@ static inline unsigned long csum_tcpudp_nofold(unsigned long saddr,
 #else
 	    "r" (((proto)<<16)+len),
 #endif
-	    "r"(sum)
-	: "$1");
+	    "r"(sum));
 
 	return sum;
 }
@@ -240,8 +237,7 @@ static __inline__ unsigned short int csum_ipv6_magic(struct in6_addr *saddr,
 		.set	noat
 		.set	reorder"
 	: "=r" (sum), "=r" (proto) : "r" (saddr), "r" (daddr),
-	  "0" (htonl((__u32) (len))), "1" (htonl(proto)), "r"(sum)
-	: "$1");
+	  "0" (htonl((__u32) (len))), "1" (htonl(proto)), "r"(sum));
 
 	return csum_fold(sum);
 }

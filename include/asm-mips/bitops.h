@@ -324,8 +324,7 @@ extern __inline__ int find_first_zero_bit (void *addr, unsigned size)
 		: "0" ((signed int) 0),
 		  "1" ((unsigned int) 0xffffffff),
 		  "2" (addr),
-		  "r" (size)
-		: "$1");
+		  "r" (size));
 
 	return res;
 }
@@ -357,8 +356,7 @@ extern __inline__ int find_next_zero_bit (void * addr, int size, int offset)
 			  "=r" (dummy)
 			: "0" (0),
 			  "1" (1 << bit),
-			  "r" (*p)
-			: "$1");
+			  "r" (*p));
 		if (set < (32 - bit))
 			return set + offset;
 		set = 32 - bit;
@@ -395,8 +393,7 @@ extern __inline__ unsigned long ffz(unsigned long word)
 		".set\treorder\n"
 		"2:\n\t"
 		: "=&r" (__res), "=r" (mask)
-		: "r" (word), "1" (mask)
-		: "$1");
+		: "r" (word), "1" (mask));
 
 	return __res;
 }
