@@ -95,7 +95,48 @@ struct size_descriptor {
  *
  * The blocksize and sizes arrays _must_ match!
  */
-#if PAGE_SIZE == 4096
+#if PAGE_SIZE == 4096 && defined (__mips__)
+static const unsigned int blocksize[] = {
+	/*
+	 * For MIPS II and better we need this hacked descriptor table to get
+	 * doubleword alignment.  Otherwise the scheduler and other code
+	 * that use doublewords will bomb.
+	 */
+	32,
+	64,
+	128,
+	248,
+	504,
+	1016,
+	2040,
+	4096 - 16,
+	8192 - 16,
+	16384 - 16,
+	32768 - 16,
+	65536 - 16,
+	131072 - 16,
+	0
+};
+
+static struct size_descriptor sizes[] =
+{
+	{NULL, NULL, 127, 0, 0, 0, 0, 0},
+	{NULL, NULL, 63, 0, 0, 0, 0, 0},
+	{NULL, NULL, 31, 0, 0, 0, 0, 0},
+	{NULL, NULL, 16, 0, 0, 0, 0, 0},
+	{NULL, NULL, 8, 0, 0, 0, 0, 0},
+	{NULL, NULL, 4, 0, 0, 0, 0, 0},
+	{NULL, NULL, 2, 0, 0, 0, 0, 0},
+	{NULL, NULL, 1, 0, 0, 0, 0, 0},
+	{NULL, NULL, 1, 0, 0, 0, 0, 1},
+	{NULL, NULL, 1, 0, 0, 0, 0, 2},
+	{NULL, NULL, 1, 0, 0, 0, 0, 3},
+	{NULL, NULL, 1, 0, 0, 0, 0, 4},
+	{NULL, NULL, 1, 0, 0, 0, 0, 5},
+	{NULL, NULL, 0, 0, 0, 0, 0, 0}
+};
+
+#elif (PAGE_SIZE == 4096)
 static const unsigned int blocksize[] = {
 	32,
 	64,
