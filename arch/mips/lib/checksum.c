@@ -108,19 +108,3 @@ unsigned int csum_partial(const unsigned char *buff, int len, unsigned int sum)
 		result += 1;
 	return result;
 }
-
-/*
- * copy while checksumming, otherwise like csum_partial
- */
-unsigned int csum_partial_copy(const char *src, char *dst, 
-                               int len, unsigned int sum)
-{
-	/*
-	 * It's 2:30 am and I don't feel like doing it real ...
-	 * This is lots slower than the real thing (tm)
-	 */
-	sum = csum_partial(src, len, sum);
-	memcpy(dst, src, len);
-
-	return sum;
-}

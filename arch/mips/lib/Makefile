@@ -14,7 +14,8 @@
 	$(CC) $(CFLAGS) -c $< -o $*.o
 
 L_TARGET = lib.a
-L_OBJS	= beep.o checksum.o csum.o dump_tlb.o memset.o memcpy.o tags.o watch.o
+L_OBJS	= beep.o checksum.o csum.o csum_partial_copy.o dump_tlb.o memset.o \
+	  memcpy.o tags.o watch.o
 
 ifdef CONFIG_DECSTATION
 L_OBJS += pmaxcon.o pmaxio.o
