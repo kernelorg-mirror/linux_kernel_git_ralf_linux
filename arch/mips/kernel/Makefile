@@ -28,7 +28,8 @@ endif
 ifndef CONFIG_SGI
   ifndef CONFIG_DECSTATION
     ifndef CONFIG_BAGET_MIPS
-      O_OBJS += irq.o time.o
+      O_OBJS += time.o
+      OX_OBJS += irq.o
     endif
   endif
 endif
