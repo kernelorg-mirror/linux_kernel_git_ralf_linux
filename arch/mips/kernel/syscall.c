@@ -126,9 +126,7 @@ asmlinkage int sys_idle(void)
 			start_idle = jiffies;
 		}
 		if (wait_available && !current->need_resched)
-			__asm__(".set\tmips3\n\t"
-				"wait\n\t"
-				".set\tmips0");
+			(*wait_available)();
 		run_task_queue(&tq_scheduler);
 		if (current->need_resched)
 			start_idle = 0;

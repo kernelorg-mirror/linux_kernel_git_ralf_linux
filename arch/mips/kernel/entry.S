@@ -31,15 +31,16 @@
 #include <asm/regdef.h>
 #include <asm/fpregdef.h>
 #include <asm/unistd.h>
+#include <asm/isadep.h>
 
 /*
  * Heia ...  The %lo, %hi and %HI stuff is too strong for the ELF assembler
  * and the ABI to cope with ...
  */
 		.text
-		.set	noreorder
-		.set	mips3
 		.align 4
+		.set	push
+		.set	reorder
 EXPORT(handle_bottom_half)
 		jal	do_bottom_half
 		 nop
@@ -55,22 +56,20 @@ EXPORT(ret_from_irq)
 		lw	t1,bh_active		# unused delay slot
 		and	t0,t1
 		bnez	t0,handle_bottom_half
-9:		 lw	t0,PT_STATUS(sp)	# returning to kernel mode?
 
-		andi	t1, t0, 0x10
+9:		lw	t0,PT_STATUS(sp)	# returning to kernel mode?
+		lw	t2, TASK_NEED_RESCHED($28)
+		andi	t1, t0, KU_USER
 		beqz	t1, return		# -> yes
-		 lw	t1, TASK_NEED_RESCHED($28)
-		bnez	t1, reschedule
+		bnez	t2, reschedule
 		lw	v0, TASK_SIGPENDING($28)
 		 move	a0, zero
 		beqz	v0, return
-		 nop
-		jal	do_signal
 		 move	a1, sp
+		jal	do_signal
 
 EXPORT(return)	.set	noat
-		RESTORE_ALL
-		eret
+		RESTORE_ALL_AND_RET
 		.set	at
 
 /*
@@ -84,7 +83,9 @@ LEAF(spurious_interrupt)
 		 * couldn't find a cause for it.
 		 */
 		lui     t1,%hi(spurious_count)
+		.set	reorder
 		lw      t0,%lo(spurious_count)(t1)
+		.set	noreorder
 		addiu   t0,1
 		j	ret_from_irq
 		 sw      t0,%lo(spurious_count)(t1)
@@ -107,7 +108,9 @@ LEAF(spurious_interrupt)
 		ctc1	a2,fcr31;                                       \
 		STI
 #define __BUILD_clear_ade(exception)                                    \
+		.set	reorder;						\
 		MFC0	t0,CP0_BADVADDR;                                \
+		.set	noreorder;					\
 		REG_S	t0,PT_BVADDR(sp);                               \
 		KMODE
 #define __BUILD_silent(exception)
@@ -122,9 +125,9 @@ LEAF(spurious_interrupt)
 #define __BUILD_count(exception)                                        \
 		.set	reorder;                                        \
 		lw	t0,exception_count_##exception;                 \
+		.set	noreorder;                                      \
 		addiu	t0, 1;                                          \
 		sw	t0,exception_count_##exception;                 \
-		.set	noreorder;                                      \
 		.data;                                                  \
 EXPORT(exception_count_##exception);                                    \
 		.word	0;                                              \
@@ -155,6 +158,8 @@ EXPORT(exception_count_##exception);                                    \
 		BUILD_HANDLER(fpe,fpe,fpe,silent)		/* #15 */
 		BUILD_HANDLER(watch,watch,sti,verbose)		/* #23 */
 		BUILD_HANDLER(reserved,reserved,sti,verbose)	/* others */
+
+		.set	pop
 
 /*
  * Table of syscalls

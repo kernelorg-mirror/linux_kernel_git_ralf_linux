@@ -51,7 +51,7 @@ struct mips_cpuinfo boot_cpu_data = { NULL, NULL, 0 };
  * is set to true if it is available.  The wait instruction stops the
  * pipeline and reduces the power consumption of the CPU very much.
  */
-char wait_available;
+void (*wait_available)(void) = NULL;
 
 /*
  * Do we have a cyclecounter available?
@@ -167,7 +167,7 @@ __initfunc(void setup_arch(char **cmdline_p,
 	switch(mips_machgroup)
 	{
 #ifdef CONFIG_BAGET_MIPS
-	case MACH_GROUP_UNKNOWN: 
+	case MACH_GROUP_BAGET: 
 		baget_setup();
 		break;
 #endif
@@ -236,4 +236,17 @@ __initfunc(void setup_arch(char **cmdline_p,
 			*memory_start_p = initrd_end;
 	}
 #endif
+}
+
+void r3081_wait(void)
+{
+        unsigned long cfg = read_32bit_cp0_register(CP0_CONF);
+        write_32bit_cp0_register(CP0_CONF, cfg|CONF_HALT);
+}
+
+void r4k_wait(void)
+{
+        __asm__(".set\tmips3\n\t"
+                "wait\n\t"
+                ".set\tmips0");
 }

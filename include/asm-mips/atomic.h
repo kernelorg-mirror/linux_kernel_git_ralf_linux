@@ -43,7 +43,7 @@ extern __inline__ void atomic_add(int i, volatile atomic_t * v)
 	int	flags;
 
 	save_and_cli(flags);
-	*v += i;
+	v->counter += i;
 	restore_flags(flags);
 }
 
@@ -52,7 +52,7 @@ extern __inline__ void atomic_sub(int i, volatile atomic_t * v)
 	int	flags;
 
 	save_and_cli(flags);
-	*v -= i;
+	v->counter -= i;
 	restore_flags(flags);
 }
 
@@ -61,7 +61,7 @@ extern __inline__ void atomic_or(int i, volatile atomic_t * v)
 	int	flags;
 
 	save_and_cli(flags);
-	*v |= i;
+	v->counter |= i;
 	restore_flags(flags);
 }
 
@@ -70,7 +70,7 @@ extern __inline__ void atomic_and(int i, volatile atomic_t * v)
 	int	flags;
 
 	save_and_cli(flags);
-	*v &= i;
+	v->counter &= i;
 	restore_flags(flags);
 }
 
@@ -79,9 +79,9 @@ extern __inline__ int atomic_add_return(int i, atomic_t * v)
 	int	temp, flags;
 
 	save_and_cli(flags);
-	temp = *v;
+	temp = v->counter;
 	temp += i;
-	*v = temp;
+	v->counter = temp;
 	restore_flags(flags);
 
 	return temp;
@@ -92,9 +92,9 @@ extern __inline__ int atomic_sub_return(int i, atomic_t * v)
 	int	temp, flags;
 
 	save_and_cli(flags);
-	temp = *v;
+	temp = v->counter;
 	temp -= i;
-	*v = temp;
+	v->counter = temp;
 	restore_flags(flags);
 
 	return temp;
@@ -104,9 +104,9 @@ extern __inline__ int atomic_or_return(int i, atomic_t * v)
 	int	temp, flags;
 
 	save_and_cli(flags);
-	temp = *v;
+	temp = v->counter;
 	temp |= i;
-	*v = temp;
+	v->counter = temp;
 	restore_flags(flags);
 
 	return temp;
@@ -117,13 +117,29 @@ extern __inline__ int atomic_and_return(int i, atomic_t * v)
 	int	temp, flags;
 
 	save_and_cli(flags);
-	temp = *v;
+	temp = v->counter;
 	temp &= i;
-	*v = temp;
+	v->counter = temp;
 	restore_flags(flags);
 
 	return temp;
 }
+
+extern __inline__ void atomic_clear_mask(unsigned long mask, unsigned long * v)
+{
+        unsigned long temp;
+        int	flags;
+
+        save_flags(flags);
+        cli();
+        temp = *v;
+        temp &= ~mask;
+        *v = temp;
+        restore_flags(flags);
+
+        return;
+}
+
 #endif
 
 #if (_MIPS_ISA == _MIPS_ISA_MIPS2) || (_MIPS_ISA == _MIPS_ISA_MIPS3) || \

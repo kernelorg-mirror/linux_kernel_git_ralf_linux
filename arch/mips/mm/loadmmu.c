@@ -67,6 +67,7 @@ __initfunc(void loadmmu(void))
 	case CPU_R2000:
 	case CPU_R3000:
 	case CPU_R3000A:
+	case CPU_R3081E:
 		printk("Loading R[23]00 MMU routines.\n");
 		ld_mmu_r2300();
 		break;

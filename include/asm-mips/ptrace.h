@@ -12,6 +12,7 @@
 #ifndef __ASM_MIPS_PTRACE_H
 #define __ASM_MIPS_PTRACE_H
 
+#include <asm/isadep.h>
 #include <linux/types.h>
 
 /* 0 - 31 are integer registers, 32 - 63 are fp registers.  */
@@ -59,7 +60,7 @@ struct pt_regs {
 /*
  * Does the process account for user or for system time?
  */
-#define user_mode(regs) ((regs)->cp0_status & 0x10)
+#define user_mode(regs) ((regs)->cp0_status & KU_USER)
 
 #define instruction_pointer(regs) ((regs)->cp0_epc)
 

@@ -19,6 +19,12 @@ extern unsigned int local_bh_count[NR_CPUS];
 
 #define get_active_bhs()	(bh_mask & bh_active)
 
+#if (_MIPS_ISA == _MIPS_ISA_MIPS1)
+
+#define clear_active_bhs(x)     atomic_clear_mask((x),&bh_active)
+
+#else
+
 static inline void clear_active_bhs(unsigned long x)
 {
 	unsigned long temp;
@@ -33,6 +39,8 @@ static inline void clear_active_bhs(unsigned long x)
 		:"Ir" (~x),
 		 "m" (bh_active));
 }
+
+#endif
 
 /* These are for the irq's testing the lock */
 #define softirq_trylock(cpu)	(local_bh_count[cpu] ? 0 : (local_bh_count[cpu] = 1))

@@ -1,4 +1,4 @@
-/* $Id: bootinfo.h,v 1.6 1999/01/04 16:09:20 ralf Exp $
+/* $Id: bootinfo.h,v 1.2 1999/04/22 16:44:42 vladimir Exp $
  *
  * bootinfo.h -- Definition of the Linux/MIPS boot information structure
  *
@@ -26,9 +26,10 @@
 #define MACH_GROUP_ACN		5
 #define MACH_GROUP_SGI          6 /* Silicon Graphics workstations and servers */
 #define MACH_GROUP_COBALT       7 /* Cobalt servers		 	      */
+#define MACH_GROUP_BAGET        8 /* Baget */
 
 #define GROUP_NAMES { "unknown", "Jazz", "Digital", "ARC", \
-                      "SNI", "ACN", "SGI", "Cobalt" }
+                      "SNI", "ACN", "SGI", "Cobalt", "Baget" }
 
 /*
  * Valid machtype values for group unknown (low order halfword of mips_machtype)
@@ -100,6 +101,14 @@
 #define MACH_COBALT_27 		 0	/* Proto "27" hardware */
 
 #define GROUP_COBALT_NAMES { "Microserver 27" }
+
+/*
+ * Valid machtype for group BAGET
+ */
+#define MACH_BAGET201 		 0      /* BT23-201 */
+#define MACH_BAGET202 		 1	/* BT23-202 */
+
+#define GROUP_BAGET_NAMES { "BT23-201", "BT23-202" }
 
 /*
  * Valid cputype values

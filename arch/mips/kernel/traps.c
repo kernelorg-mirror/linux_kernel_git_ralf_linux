@@ -60,6 +60,15 @@ extern asmlinkage void handle_fpe(void);
 extern asmlinkage void handle_watch(void);
 extern asmlinkage void handle_reserved(void);
 
+extern asmlinkage void r4xx0_lazy_fpu_switch(struct task_struct *);
+extern asmlinkage void r4xx0_init_fpu(void);
+extern asmlinkage void r4xx0_save_fp(struct sigcontext *);
+extern asmlinkage void r2300_lazy_fpu_switch(struct task_struct *);
+extern asmlinkage void r2300_init_fpu(void);
+extern asmlinkage void r2300_save_fp(struct sigcontext *);
+
+extern asmlinkage void simfp(unsigned int);
+
 static char *cpu_names[] = CPU_NAMES;
 
 char watch_available = 0;
@@ -68,6 +77,10 @@ char vce_available = 0;
 
 void (*ibe_board_handler)(struct pt_regs *regs);
 void (*dbe_board_handler)(struct pt_regs *regs);
+
+static void (*lazy_fpu_switch)(struct task_struct *);
+static void (*init_fpu)(void);
+void (*save_fp)(struct sigcontext *);
 
 int kstack_depth_to_print = 24;
 
@@ -201,8 +214,10 @@ static void default_be_board_handler(struct pt_regs *regs)
 	/*
 	 * Assume it would be too dangerous to continue ...
 	 */
-	force_sig(SIGBUS, current);
+/* XXX */
+printk("Got Bus Error at %08x\n", (unsigned int)regs->cp0_epc);
 show_regs(regs); while(1);
+	force_sig(SIGBUS, current);
 }
 
 void do_ibe(struct pt_regs *regs)
@@ -324,7 +339,7 @@ void do_bp(struct pt_regs *regs)
 	/*
 	 * (A short test says that IRIX 5.3 sends SIGTRAP for all break
 	 * insns, even for break codes that indicate arithmetic failures.
-	 * Weird ...)
+	 * Wiered ...)
 	 */
 	force_sig(SIGTRAP, current);
 }
@@ -369,10 +384,10 @@ void do_cpu(struct pt_regs *regs)
 		return;
 
 	if (current->used_math) {		/* Using the FPU again.  */
-		r4xx0_lazy_fpu_switch(last_task_used_math);
+		lazy_fpu_switch(last_task_used_math);
 	} else {				/* First time FPU user.  */
 
-		r4xx0_init_fpu();
+		init_fpu();
 		current->used_math = 1;
 	}
 	last_task_used_math = current;
@@ -547,6 +562,9 @@ __initfunc(void trap_init(void))
 
 		save_fp_context = r4k_save_fp_context;
 		restore_fp_context = r4k_restore_fp_context;
+		lazy_fpu_switch = r4xx0_lazy_fpu_switch;
+		init_fpu = r4xx0_init_fpu;
+		save_fp = r4xx0_save_fp;
 		resume = r4xx0_resume;
 		set_except_vector(1, r4k_handle_mod);
 		set_except_vector(2, r4k_handle_tlbl);
@@ -590,9 +608,18 @@ __initfunc(void trap_init(void))
 	case CPU_R2000:
 	case CPU_R3000:
 	case CPU_R3000A:
+	case CPU_R3041:
+	case CPU_R3051:
+	case CPU_R3052:
+	case CPU_R3081:
+	case CPU_R3081E:
 		memcpy((void *)KSEG0, &except_vec0_r2300, 0x80);
+		memcpy((void *)(KSEG0 + 0x80), &except_vec3_generic, 0x80);
 		save_fp_context = r2300_save_fp_context;
 		restore_fp_context = r2300_restore_fp_context;
+		lazy_fpu_switch = r2300_lazy_fpu_switch;
+		init_fpu = r2300_init_fpu;
+		save_fp = r2300_save_fp;
 		resume = r2300_resume;
 		set_except_vector(1, r2300_handle_mod);
 		set_except_vector(2, r2300_handle_tlbl);
@@ -617,11 +644,6 @@ __initfunc(void trap_init(void))
 		set_except_vector(13, handle_tr);
 		set_except_vector(15, handle_fpe);
 		break;
-	case CPU_R3041:
-	case CPU_R3051:
-	case CPU_R3052:
-	case CPU_R3081:
-	case CPU_R3081E:
 	case CPU_R8000:
 		printk("Detected unsupported CPU type %s.\n",
 			cpu_names[mips_cputype]);

@@ -105,7 +105,11 @@ strncmp(__const__ char *__cs, __const__ char *__ct, size_t __count)
 	"addiu\t%0,1\n\t"
 	"bnez\t%3,1b\n\t"
 	"addiu\t%1,1\n"
-	"2:\tmove\t%3,$1\n"
+	"2:\n\t"
+#if _MIPS_ISA == _MIPS_ISA_MIPS1
+	"nop\n\t"
+#endif
+	"move\t%3,$1\n"
 	"3:\tsubu\t%3,$1\n\t"
 	".set\tat\n\t"
 	".set\treorder"

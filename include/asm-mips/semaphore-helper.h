@@ -80,6 +80,66 @@ static inline int waking_non_zero_trylock(struct semaphore *sem)
 
 #else /* CONFIG_CPU_HAS_LLSC  */
 
+#if (_MIPS_ISA == _MIPS_ISA_MIPS1)
+
+/*
+ * It doesn't make sense, IMHO, to endlessly turn interrupts off and on again.
+ * Do it once and that's it. ll/sc *has* it's advantages. HK
+ */
+#define read(a) ((a)->counter)
+#define inc(a) (((a)->counter)++)
+#define dec(a) (((a)->counter)--)
+
+static inline int waking_non_zero(struct semaphore *sem)
+{
+	unsigned long flags;
+	int ret = 0;
+
+	spin_lock_irqsave(&semaphore_wake_lock, flags);
+	if (read(&sem->waking) > 0) {
+		dec(&sem->waking);
+		ret = 1;
+	}
+	spin_unlock_irqrestore(&semaphore_wake_lock, flags);
+	return ret;
+}
+
+static inline int waking_non_zero_interruptible(struct semaphore *sem,
+						struct task_struct *tsk)
+{
+	int ret = 0;
+	unsigned long flags;
+
+	spin_lock_irqsave(&semaphore_wake_lock, flags);
+	if (read(&sem->waking) > 0) {
+		dec(&sem->waking);
+		ret = 1;
+	} else if (signal_pending(tsk)) {
+		inc(&sem->count);
+		ret = -EINTR;
+	}
+	spin_unlock_irqrestore(&semaphore_wake_lock, flags);
+	return ret;
+}
+
+static inline int waking_non_zero_trylock(struct semaphore *sem)
+{
+        int ret = 1;
+	unsigned long flags;
+
+	spin_lock_irqsave(&semaphore_wake_lock, flags);
+	if (read(&sem->waking) <= 0)
+		inc(&sem->count);
+	else {
+		dec(&sem->waking);
+		ret = 0;
+	}
+	spin_unlock_irqrestore(&semaphore_wake_lock, flags);
+	return ret;
+}
+
+#else
+
 static inline int
 waking_non_zero(struct semaphore *sem)
 {
@@ -201,6 +261,7 @@ waking_non_zero_interruptible(struct semaphore *sem, struct task_struct *tsk)
 
 	return ret;
 }
+#endif
 
 /*
  * waking_non_zero_trylock is unused.  we do everything in 

@@ -293,6 +293,7 @@ asmlinkage int sys_ptrace(long request, long pid, long addr, long data)
 	struct task_struct *child;
 	unsigned int flags;
 	int res;
+	extern void (*save_fp)(struct sigcontext *);
 
 	lock_kernel();
 #if 0
@@ -400,7 +401,7 @@ asmlinkage int sys_ptrace(long request, long pid, long addr, long data)
 			if (child->used_math) {
 				if (last_task_used_math == child) {
 					enable_cp1();
-					r4xx0_save_fp(child);
+					save_fp(child);
 					disable_cp1();
 					last_task_used_math = NULL;
 				}
@@ -467,7 +468,7 @@ asmlinkage int sys_ptrace(long request, long pid, long addr, long data)
 			if (child->used_math) {
 				if (last_task_used_math == child) {
 					enable_cp1();
-					r4xx0_save_fp(child);
+					save_fp(child);
 					disable_cp1();
 					last_task_used_math = NULL;
 					regs->cp0_status &= ~ST0_CU1;

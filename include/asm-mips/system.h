@@ -167,6 +167,8 @@ extern __inline__ unsigned long xchg_u32(volatile int * m, unsigned long val)
 		: "=r" (val), "=o" (*m), "=r" (dummy)
 		: "o" (*m), "2" (val)
 		: "memory");
+
+	return val;
 #else
 	unsigned long flags, retval;
 
@@ -175,9 +177,9 @@ extern __inline__ unsigned long xchg_u32(volatile int * m, unsigned long val)
 	retval = *m;
 	*m = val;
 	restore_flags(flags);
+	return retval;	
 
 #endif /* Processor-dependent optimization */
-	return val;
 }
 
 #define xchg(ptr,x) ((__typeof__(*(ptr)))__xchg((unsigned long)(x),(ptr),sizeof(*(ptr))))

@@ -110,6 +110,20 @@ extern void (*add_wired_entry)(unsigned long entrylo0, unsigned long entrylo1,
 #define _PAGE_WRITE                 (1<<2)  /* implemented in software */
 #define _PAGE_ACCESSED              (1<<3)  /* implemented in software */
 #define _PAGE_MODIFIED              (1<<4)  /* implemented in software */
+
+#if (_MIPS_ISA == _MIPS_ISA_MIPS1)
+
+#define _PAGE_GLOBAL                (1<<8)
+#define _PAGE_VALID                 (1<<9)
+#define _PAGE_SILENT_READ           (1<<9)  /* synonym                 */
+#define _PAGE_DIRTY                 (1<<10) /* The MIPS dirty bit      */
+#define _PAGE_SILENT_WRITE          (1<<10)
+#define _CACHE_UNCACHED             (1<<11) /* R4[0246]00              */
+#define _CACHE_MASK                 (1<<11)
+#define _CACHE_CACHABLE_NONCOHERENT 0
+
+#else
+
 #define _PAGE_R4KBUG                (1<<5)  /* workaround for r4k bug  */
 #define _PAGE_GLOBAL                (1<<6)
 #define _PAGE_VALID                 (1<<7)
@@ -125,6 +139,8 @@ extern void (*add_wired_entry)(unsigned long entrylo0, unsigned long entrylo1,
 #define _CACHE_CACHABLE_CUW         (6<<9)  /* R4[04]00 only           */
 #define _CACHE_CACHABLE_ACCELERATED (7<<9)  /* R10000 only             */
 #define _CACHE_MASK                 (7<<9)
+
+#endif
 
 #define __READABLE	(_PAGE_READ | _PAGE_SILENT_READ | _PAGE_ACCESSED)
 #define __WRITEABLE	(_PAGE_WRITE | _PAGE_SILENT_WRITE | _PAGE_MODIFIED)
@@ -356,7 +372,7 @@ extern inline pte_t mk_pte(unsigned long page, pgprot_t pgprot)
 
 extern inline pte_t mk_pte_phys(unsigned long physpage, pgprot_t pgprot)
 {
-	return __pte(physpage | pgprot_val(pgprot));
+	return __pte(((physpage & PAGE_MASK) - PAGE_OFFSET) | pgprot_val(pgprot));
 }
 
 extern inline pte_t pte_modify(pte_t pte, pgprot_t newprot)

@@ -20,12 +20,15 @@
 #include <asm/system.h>
 #include <asm/sgialib.h>
 #include <asm/mipsregs.h>
+#include <asm/isadep.h>
 #include <asm/io.h>
-/*
- * Temporarily disabled
- *
 #include <asm/wbflush.h>
- */
+#include <asm/bootinfo.h>
+
+/* CP0 hazard avoidance. */
+#define BARRIER __asm__ __volatile__(".set noreorder\n\t" \
+                                     "nop; nop; nop; nop; nop; nop;\n\t" \
+                                     ".set reorder\n\t")
 
 /*
  * According to the paper written by D. Miller about Linux cache & TLB
@@ -33,7 +36,7 @@
  * driver layer.  Thus, normally, we don't need flush dcache for R3000.
  * Define this if driver does not handle cache consistency during DMA ops.
  */
-#undef DO_DCACHE_FLUSH
+#define DO_DCACHE_FLUSH
 
 /*
  *  Unified cache space description structure
@@ -161,6 +164,30 @@ __initfunc(static unsigned long size_cache(unsigned long ca_flags))
 	return size * sizeof(*p);
 }
 
+static inline int cpu_has_cp0_r3k_config(void)
+{
+	unsigned long size, cfg = read_32bit_cp0_register(CP0_CONF);
+
+	write_32bit_cp0_register(CP0_CONF, cfg|CONF_AC);
+	size = size_cache(ST0_DE);
+	write_32bit_cp0_register(CP0_CONF, cfg&~CONF_AC);
+	return size != size_cache(ST0_DE);
+}
+
+/*
+ * Identification of CPUs inside R3000A family: R3051, R3052, R3071, R3081.
+ * Only identification of R3081 is implemented. R3081E assumed because
+ * Linux requires MMU in order to operate.
+ */
+
+__initfunc(void r3k_fix_cputype(void))
+{
+	if (mips_cputype != CPU_R3000A)
+		return;
+
+	if (cpu_has_cp0_r3k_config())
+		mips_cputype = CPU_R3081E;
+}
 __initfunc(static void probe_dcache(void))
 {
 	dcache.size = size_cache(dcache.ca_flags = ST0_DE);
@@ -374,10 +401,7 @@ static void r3k_dma_cache_wback_inv(unsigned long start, unsigned long size)
 	register unsigned long i, flags;
 	register volatile unsigned char *p = (volatile unsigned char*) start;
 
-/*
- * Temporarily disabled
 	wbflush();
-	 */
 
 	/*
 	 * Invalidate dcache
@@ -446,11 +470,15 @@ static inline void r2300_flush_tlb_all(void)
 
 	save_and_cli(flags);
 	old_ctx = (get_entryhi() & 0xfc0);
-	write_32bit_cp0_register(CP0_ENTRYLO0, 0);
+	set_entrylo0(0);
+	BARRIER;
 	for(entry = 0; entry < NTLB_ENTRIES; entry++) {
-		write_32bit_cp0_register(CP0_INDEX, entry << 8);
-		write_32bit_cp0_register(CP0_ENTRYHI, ((entry | 0x80000) << 12));
-		__asm__ __volatile__("tlbwi");
+		set_index(entry << 8);
+		BARRIER;
+		set_entryhi(((entry | 0x80000) << 12));
+		BARRIER;
+		tlb_write_indexed();
+		BARRIER;
 	}
 	set_entryhi(old_ctx);
 	restore_flags(flags);
@@ -497,13 +525,17 @@ static void r2300_flush_tlb_range(struct mm_struct *mm, unsigned long start,
 
 				set_entryhi(start | newpid);
 				start += PAGE_SIZE;
+				BARRIER;
 				tlb_probe();
+				BARRIER;
 				idx = get_index();
 				set_entrylo0(0);
 				set_entryhi(KSEG0);
+				BARRIER;
 				if(idx < 0)
 					continue;
 				tlb_write_indexed();
+				BARRIER;
 			}
 			set_entryhi(oldpid);
 		} else {
@@ -529,15 +561,19 @@ static void r2300_flush_tlb_page(struct vm_area_struct *vma, unsigned long page)
 		save_and_cli(flags);
 		oldpid = (get_entryhi() & 0xfc0);
 		set_entryhi(page | newpid);
+		BARRIER;
 		tlb_probe();
+		BARRIER;
 		idx = get_index();
 		set_entrylo0(0);
 		set_entryhi(KSEG0);
 		if(idx < 0)
 			goto finish;
+		BARRIER;
 		tlb_write_indexed();
 
 finish:
+		BARRIER;
 		set_entryhi(oldpid);
 		restore_flags(flags);
 	}
@@ -602,12 +638,15 @@ static void r2300_update_mmu_cache(struct vm_area_struct * vma,
 	address &= PAGE_MASK;
 	set_entryhi(address | (pid));
 	pgdp = pgd_offset(vma->vm_mm, address);
+	BARRIER;
 	tlb_probe();
+	BARRIER;
 	pmdp = pmd_offset(pgdp, address);
 	idx = get_index();
 	ptep = pte_offset(pmdp, address);
 	set_entrylo0(pte_val(*ptep));
 	set_entryhi(address | (pid));
+	BARRIER;
 	if(idx < 0) {
 		tlb_write_random();
 #if 0
@@ -632,7 +671,9 @@ static void r2300_update_mmu_cache(struct vm_area_struct * vma,
 		printk(">\n");
 	}
 #endif
+	BARRIER;
 	set_entryhi(pid);
+	BARRIER;
 	restore_flags(flags);
 }
 
@@ -680,7 +721,7 @@ printk("r2300_add_wired_entry");
 
 static int r2300_user_mode(struct pt_regs *regs)
 {
-	return !(regs->cp0_status & ST0_KUP);
+	return !(regs->cp0_status & KU_USER);
 }
 
 __initfunc(void ld_mmu_r2300(void))
