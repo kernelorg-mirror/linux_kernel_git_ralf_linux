@@ -57,52 +57,54 @@ __cli(void)
 		: "$1", "memory");
 }
 
-#define __save_flags(x)                  \
-__asm__ __volatile__(                    \
-	".set\tnoreorder\n\t"            \
-	"mfc0\t%0,$12\n\t"               \
-	".set\treorder"                  \
-	: "=r" (x)                       \
-	: /* no inputs */                \
+#define __save_flags(x)							\
+__asm__ __volatile__(							\
+	".set\tnoreorder\n\t"						\
+	"mfc0\t%0,$12\n\t"						\
+	".set\treorder"							\
+	: "=r" (x)							\
+	: /* no inputs */						\
 	: "memory")
 
-#define __save_and_cli(x)                \
-__asm__ __volatile__(                    \
-	".set\tnoreorder\n\t"            \
-	".set\tnoat\n\t"                 \
-	"mfc0\t%0,$12\n\t"               \
-	"ori\t$1,%0,1\n\t"               \
-	"xori\t$1,1\n\t"                 \
-	"mtc0\t$1,$12\n\t"               \
-	"nop\n\t"                        \
-	"nop\n\t"                        \
-	"nop\n\t"                        \
-	".set\tat\n\t"                   \
-	".set\treorder"                  \
-	: "=r" (x)                       \
-	: /* no inputs */                \
+#define __save_and_cli(x)						\
+__asm__ __volatile__(							\
+	".set\tnoreorder\n\t"						\
+	".set\tnoat\n\t"						\
+	"mfc0\t%0,$12\n\t"						\
+	"ori\t$1,%0,1\n\t"						\
+	"xori\t$1,1\n\t"						\
+	"mtc0\t$1,$12\n\t"						\
+	"nop\n\t"							\
+	"nop\n\t"							\
+	"nop\n\t"							\
+	".set\tat\n\t"							\
+	".set\treorder"							\
+	: "=r" (x)							\
+	: /* no inputs */						\
 	: "$1", "memory")
 
-extern void __inline__
-__restore_flags(int flags)
-{
-	__asm__ __volatile__(
-		".set\tnoreorder\n\t"
-		"mfc0\t$8,$12\n\t"
-		"li\t$9,0xff00\n\t"
-		"and\t$8,$9\n\t"
-		"nor\t$9,$0,$9\n\t"
-		"and\t%0,$9\n\t"
-		"or\t%0,$8\n\t"
-		"mtc0\t%0,$12\n\t"
-		"nop\n\t"
-		"nop\n\t"
-		"nop\n\t"
-		".set\treorder"
-		: /* no output */
-		: "r" (flags)
-		: "$8", "$9", "memory");
-}
+#define __restore_flags(flags)						\
+do {									\
+	unsigned long __tmp1;						\
+									\
+	__asm__ __volatile__(						\
+		".set\tnoreorder\t\t\t# __restore_flags\n\t"		\
+		".set\tnoat\n\t"					\
+		"mfc0\t$1, $12\n\t"					\
+		"andi\t%0, 1\n\t"					\
+		"ori\t$1, 1\n\t"					\
+		"xori\t$1, 1\n\t"					\
+		"or\t%0, $1\n\t"					\
+		"mtc0\t%0, $12\n\t"					\
+		"nop\n\t"						\
+		"nop\n\t"						\
+		"nop\n\t"						\
+		".set\tat\n\t"						\
+		".set\treorder"						\
+		: "=r" (__tmp1)						\
+		: "0" (flags)						\
+		: "$1", "memory");					\
+} while(0)
 
 /*
  * Non-SMP versions ...
@@ -143,7 +145,7 @@ do { \
 } while(0)
 
 /*
- * For 32 and 64 bit operands we can take advantage of ll and sc.
+ * For 32-bit operands we can take advantage of ll and sc.
  * FIXME: This doesn't work for R3000 machines.
  */
 extern __inline__ unsigned long xchg_u32(volatile int * m, unsigned long val)
@@ -153,17 +155,17 @@ extern __inline__ unsigned long xchg_u32(volatile int * m, unsigned long val)
 	unsigned long dummy;
 
 	__asm__ __volatile__(
-		".set\tnoreorder\n\t"
+		".set\tnoreorder\t\t\t# xchg_u32\n\t"
 		".set\tnoat\n\t"
-		"ll\t%0,(%1)\n"
-		"1:\tmove\t$1,%2\n\t"
-		"sc\t$1,(%1)\n\t"
-		"beqzl\t$1,1b\n\t"
-		"ll\t%0,(%1)\n\t"
+		"ll\t%0, %3\n"
+		"1:\tmove\t$1, %2\n\t"
+		"sc\t$1, %1\n\t"
+		"beqzl\t$1, 1b\n\t"
+		" ll\t%0, %3\n\t"
 		".set\tat\n\t"
 		".set\treorder"
-		: "=r" (val), "=r" (m), "=r" (dummy)
-		: "1" (m), "2" (val)
+		: "=r" (val), "=o" (*m), "=r" (dummy)
+		: "o" (*m), "2" (val)
 		: "memory");
 #else
 	unsigned long flags, retval;
@@ -178,54 +180,16 @@ extern __inline__ unsigned long xchg_u32(volatile int * m, unsigned long val)
 	return val;
 }
 
-/*
- * Only used for 64 bit kernel.
- */
-extern __inline__ unsigned long xchg_u64(volatile long * m, unsigned long val)
-{
-	unsigned long dummy;
-
-	__asm__ __volatile__(
-		".set\tnoreorder\n\t"
-		".set\tnoat\n\t"
-		"lld\t%0,(%1)\n"
-		"1:\tmove\t$1,%2\n\t"
-		"scd\t$1,(%1)\n\t"
-		"beqzl\t$1,1b\n\t"
-		"ll\t%0,(%1)\n\t"
-		".set\tat\n\t"
-		".set\treorder"
-		: "=r" (val), "=r" (m), "=r" (dummy)
-		: "1" (m), "2" (val)
-		: "memory");
-
-	return val;
-}
-
 #define xchg(ptr,x) ((__typeof__(*(ptr)))__xchg((unsigned long)(x),(ptr),sizeof(*(ptr))))
 #define tas(ptr) (xchg((ptr),1))
 
-/*
- * This function doesn't exist, so you'll get a linker error
- * if something tries to do an invalid xchg().
- *
- * This only works if the compiler isn't horribly bad at optimizing.
- * gcc-2.5.8 reportedly can't handle this, but I define that one to
- * be dead anyway.
- */
-extern void __xchg_called_with_bad_pointer(void);
-
-static __inline__ unsigned long __xchg(unsigned long x, volatile void * ptr, int size)
+static __inline__ unsigned long
+__xchg(unsigned long x, volatile void * ptr, int size)
 {
 	switch (size) {
 		case 4:
 			return xchg_u32(ptr, x);
-#if defined(__mips64)
-		case 8:
-			return xchg_u64(ptr, x);
-#endif
 	}
-	__xchg_called_with_bad_pointer();
 	return x;
 }
 
