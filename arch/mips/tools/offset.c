@@ -1,5 +1,4 @@
-/* $Id: offset.c,v 1.9.2.1 1999/08/18 23:11:28 ralf Exp $
- *
+/*
  * offset.c: Calculate pt_regs and task_struct offsets.
  *
  * Copyright (C) 1996 David S. Miller
@@ -30,6 +29,9 @@ linefeed;
 void output_ptreg_defines(void)
 {
 	text("/* MIPS pt_regs offsets. */");
+	offset("#define PT_SCRATCH0 ", struct pt_regs, pad0[4]);
+	offset("#define PT_SCRATCH1 ", struct pt_regs, pad0[5]);
+
 	offset("#define PT_R0     ", struct pt_regs, regs[0]);
 	offset("#define PT_R1     ", struct pt_regs, regs[1]);
 	offset("#define PT_R2     ", struct pt_regs, regs[2]);

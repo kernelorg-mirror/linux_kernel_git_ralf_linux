@@ -1,10 +1,9 @@
-/* $Id: scall_o32.S,v 1.4 1998/06/25 20:01:01 ralf Exp $
- *
+/*
  * This file is subject to the terms and conditions of the GNU General Public
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
  *
- * Copyright (C) 1997, 1998 by Ralf Baechle
+ * Copyright (C) 1997, 1998, 2004 by Ralf Baechle
  */
 #include <asm/asm.h>
 #include <linux/errno.h>
@@ -99,9 +98,9 @@ o32_reschedule:
 
 trace_a_syscall:
 	SAVE_STATIC
-	sw	t2,PT_R1(sp)
+	sw	t2, PT_SCRATCH0(sp)
 	jal	syscall_trace
-	lw	t2,PT_R1(sp)
+	lw	t2, PT_SCRATCH0(sp)
 
 	lw	a0, PT_R4(sp)		# Restore argument registers
 	lw	a1, PT_R5(sp)
