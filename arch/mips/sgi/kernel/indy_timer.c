@@ -1,5 +1,4 @@
-/* $Id: indy_timer.c,v 1.11 1999/01/04 16:03:56 ralf Exp $
- *
+/*
  * indy_timer.c: Setting up the clock on the INDY 8254 controller.
  *
  * Copyright (C) 1996 David S. Miller (dm@engr.sgi.com)
@@ -26,8 +25,10 @@
 #include <asm/sgihpc.h>
 #include <asm/sgint23.h>
 
+extern rwlock_t xtime_lock;
 
-/* Because of a bug in the i8254 timer we need to use the onchip r4k
+/*
+ * Because of a bug in the i8254 timer we need to use the onchip r4k
  * counter as our system wide timer interrupt running at 100HZ.
  */
 static unsigned long r4k_offset; /* Amount to increment compare reg each time */
@@ -274,17 +275,18 @@ void do_gettimeofday(struct timeval *tv)
 {
 	unsigned long flags;
 
-	save_and_cli(flags);
+	read_lock_irqsave(&xtime_lock, flags);
 	*tv = xtime;
-	restore_flags(flags);
+	read_unlock_irqrestore(&xtime_lock, flags);
 }
 
 void do_settimeofday(struct timeval *tv)
 {
-	cli();
+	write_lock_irq(&xtime_lock);
 	xtime = *tv;
-	time_state = TIME_BAD;
-	time_maxerror = MAXPHASE;
-	time_esterror = MAXPHASE;
-	sti();
+	time_adjust = 0;			/* stop active adjtime() */
+	time_status |= STA_UNSYNC;
+	time_maxerror = NTP_PHASE_LIMIT;
+	time_esterror = NTP_PHASE_LIMIT;
+	write_unlock_irq(&xtime_lock);
 }
