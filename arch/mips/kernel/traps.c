@@ -386,6 +386,7 @@ void do_cpu(struct pt_regs *regs)
 	return;
 
 bad_cid:
+	compute_return_epc(regs);
 	force_sig(SIGILL, current);
 }
 
