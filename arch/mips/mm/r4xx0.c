@@ -1,5 +1,4 @@
-/* $Id: r4xx0.c,v 1.21.2.2 1999/06/17 12:06:42 ralf Exp $
- *
+/*
  * This file is subject to the terms and conditions of the GNU General Public
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
@@ -212,7 +211,7 @@ static void r4k_clear_page_r4600_v2(unsigned long page)
 {
 	unsigned int flags;
 
-	save_and_cli(flags);
+	__save_and_cli(flags);
 	*(volatile unsigned int *)KSEG1;
 	__asm__ __volatile__(
 		".set\tnoreorder\n\t"
@@ -239,7 +238,7 @@ static void r4k_clear_page_r4600_v2(unsigned long page)
 		 "I" (PAGE_SIZE),
 		 "i" (Create_Dirty_Excl_D)
 		:"$1","memory");
-	restore_flags(flags);
+	__restore_flags(flags);
 }
 
 /*
@@ -630,7 +629,7 @@ static void r4k_copy_page_r4600_v2(unsigned long to, unsigned long from)
 		:"0" (to), "1" (from),
 		 "I" (PAGE_SIZE),
 		 "i" (Create_Dirty_Excl_D));
-	restore_flags(flags);
+	__restore_flags(flags);
 }
 
 /*
@@ -912,83 +911,47 @@ static void r4k_copy_page_s128(unsigned long to, unsigned long from)
 
 static inline void r4k_flush_cache_all_s16d16i16(void)
 {
-	unsigned long flags;
-
-	save_and_cli(flags);
 	blast_dcache16(); blast_icache16(); blast_scache16();
-	restore_flags(flags);
 }
 
 static inline void r4k_flush_cache_all_s32d16i16(void)
 {
-	unsigned long flags;
-
-	save_and_cli(flags);
 	blast_dcache16(); blast_icache16(); blast_scache32();
-	restore_flags(flags);
 }
 
 static inline void r4k_flush_cache_all_s64d16i16(void)
 {
-	unsigned long flags;
-
-	save_and_cli(flags);
 	blast_dcache16(); blast_icache16(); blast_scache64();
-	restore_flags(flags);
 }
 
 static inline void r4k_flush_cache_all_s128d16i16(void)
 {
-	unsigned long flags;
-
-	save_and_cli(flags);
 	blast_dcache16(); blast_icache16(); blast_scache128();
-	restore_flags(flags);
 }
 
 static inline void r4k_flush_cache_all_s32d32i32(void)
 {
-	unsigned long flags;
-
-	save_and_cli(flags);
 	blast_dcache32(); blast_icache32(); blast_scache32();
-	restore_flags(flags);
 }
 
 static inline void r4k_flush_cache_all_s64d32i32(void)
 {
-	unsigned long flags;
-
-	save_and_cli(flags);
 	blast_dcache32(); blast_icache32(); blast_scache64();
-	restore_flags(flags);
 }
 
 static inline void r4k_flush_cache_all_s128d32i32(void)
 {
-	unsigned long flags;
-
-	save_and_cli(flags);
 	blast_dcache32(); blast_icache32(); blast_scache128();
-	restore_flags(flags);
 }
 
 static inline void r4k_flush_cache_all_d16i16(void)
 {
-	unsigned long flags;
-
-	save_and_cli(flags);
 	blast_dcache16(); blast_icache16();
-	restore_flags(flags);
 }
 
 static inline void r4k_flush_cache_all_d32i32(void)
 {
-	unsigned long flags;
-
-	save_and_cli(flags);
 	blast_dcache32(); blast_icache32();
-	restore_flags(flags);
 }
 
 static void
@@ -997,9 +960,8 @@ r4k_flush_cache_range_s16d16i16(struct mm_struct *mm,
                                 unsigned long end)
 {
 	struct vm_area_struct *vma;
-	unsigned long flags;
 
-	if(mm->context == 0)
+	if (mm->context == 0)
 		return;
 
 	start &= PAGE_MASK;
@@ -1007,8 +969,8 @@ r4k_flush_cache_range_s16d16i16(struct mm_struct *mm,
 	printk("crange[%d,%08lx,%08lx]", (int)mm->context, start, end);
 #endif
 	vma = find_vma(mm, start);
-	if(vma) {
-		if(mm->context != current->mm->context) {
+	if (vma) {
+		if (mm->context != current->mm->context) {
 			r4k_flush_cache_all_s16d16i16();
 		} else {
 			pgd_t *pgd;
@@ -1016,18 +978,16 @@ r4k_flush_cache_range_s16d16i16(struct mm_struct *mm,
 			pte_t *pte;
 			int text;
 
-			save_and_cli(flags);
 			text = vma->vm_flags & VM_EXEC;
-			while(start < end) {
+			while (start < end) {
 				pgd = pgd_offset(mm, start);
 				pmd = pmd_offset(pgd, start);
 				pte = pte_offset(pmd, start);
 
-				if(pte_val(*pte) & _PAGE_VALID)
+				if (pte_val(*pte) & _PAGE_VALID)
 					blast_scache16_page(start);
 				start += PAGE_SIZE;
 			}
-			restore_flags(flags);
 		}
 	}
 }
@@ -1038,9 +998,8 @@ r4k_flush_cache_range_s32d16i16(struct mm_struct *mm,
                                 unsigned long end)
 {
 	struct vm_area_struct *vma;
-	unsigned long flags;
 
-	if(mm->context == 0)
+	if (mm->context == 0)
 		return;
 
 	start &= PAGE_MASK;
@@ -1048,8 +1007,8 @@ r4k_flush_cache_range_s32d16i16(struct mm_struct *mm,
 	printk("crange[%d,%08lx,%08lx]", (int)mm->context, start, end);
 #endif
 	vma = find_vma(mm, start);
-	if(vma) {
-		if(mm->context != current->mm->context) {
+	if (vma) {
+		if (mm->context != current->mm->context) {
 			r4k_flush_cache_all_s32d16i16();
 		} else {
 			pgd_t *pgd;
@@ -1057,18 +1016,16 @@ r4k_flush_cache_range_s32d16i16(struct mm_struct *mm,
 			pte_t *pte;
 			int text;
 
-			save_and_cli(flags);
 			text = vma->vm_flags & VM_EXEC;
-			while(start < end) {
+			while (start < end) {
 				pgd = pgd_offset(mm, start);
 				pmd = pmd_offset(pgd, start);
 				pte = pte_offset(pmd, start);
 
-				if(pte_val(*pte) & _PAGE_VALID)
+				if (pte_val(*pte) & _PAGE_VALID)
 					blast_scache32_page(start);
 				start += PAGE_SIZE;
 			}
-			restore_flags(flags);
 		}
 	}
 }
@@ -1078,9 +1035,8 @@ static void r4k_flush_cache_range_s64d16i16(struct mm_struct *mm,
 					    unsigned long end)
 {
 	struct vm_area_struct *vma;
-	unsigned long flags;
 
-	if(mm->context == 0)
+	if (mm->context == 0)
 		return;
 
 	start &= PAGE_MASK;
@@ -1088,8 +1044,8 @@ static void r4k_flush_cache_range_s64d16i16(struct mm_struct *mm,
 	printk("crange[%d,%08lx,%08lx]", (int)mm->context, start, end);
 #endif
 	vma = find_vma(mm, start);
-	if(vma) {
-		if(mm->context != current->mm->context) {
+	if (vma) {
+		if (mm->context != current->mm->context) {
 			r4k_flush_cache_all_s64d16i16();
 		} else {
 			pgd_t *pgd;
@@ -1097,18 +1053,16 @@ static void r4k_flush_cache_range_s64d16i16(struct mm_struct *mm,
 			pte_t *pte;
 			int text;
 
-			save_and_cli(flags);
 			text = vma->vm_flags & VM_EXEC;
-			while(start < end) {
+			while (start < end) {
 				pgd = pgd_offset(mm, start);
 				pmd = pmd_offset(pgd, start);
 				pte = pte_offset(pmd, start);
 
-				if(pte_val(*pte) & _PAGE_VALID)
+				if (pte_val(*pte) & _PAGE_VALID)
 					blast_scache64_page(start);
 				start += PAGE_SIZE;
 			}
-			restore_flags(flags);
 		}
 	}
 }
@@ -1118,9 +1072,8 @@ static void r4k_flush_cache_range_s128d16i16(struct mm_struct *mm,
 					     unsigned long end)
 {
 	struct vm_area_struct *vma;
-	unsigned long flags;
 
-	if(mm->context == 0)
+	if (mm->context == 0)
 		return;
 
 	start &= PAGE_MASK;
@@ -1128,8 +1081,8 @@ static void r4k_flush_cache_range_s128d16i16(struct mm_struct *mm,
 	printk("crange[%d,%08lx,%08lx]", (int)mm->context, start, end);
 #endif
 	vma = find_vma(mm, start);
-	if(vma) {
-		if(mm->context != current->mm->context) {
+	if (vma) {
+		if (mm->context != current->mm->context) {
 			r4k_flush_cache_all_s128d16i16();
 		} else {
 			pgd_t *pgd;
@@ -1137,18 +1090,16 @@ static void r4k_flush_cache_range_s128d16i16(struct mm_struct *mm,
 			pte_t *pte;
 			int text;
 
-			save_and_cli(flags);
 			text = vma->vm_flags & VM_EXEC;
-			while(start < end) {
+			while (start < end) {
 				pgd = pgd_offset(mm, start);
 				pmd = pmd_offset(pgd, start);
 				pte = pte_offset(pmd, start);
 
-				if(pte_val(*pte) & _PAGE_VALID)
+				if (pte_val(*pte) & _PAGE_VALID)
 					blast_scache128_page(start);
 				start += PAGE_SIZE;
 			}
-			restore_flags(flags);
 		}
 	}
 }
@@ -1158,9 +1109,8 @@ static void r4k_flush_cache_range_s32d32i32(struct mm_struct *mm,
 					    unsigned long end)
 {
 	struct vm_area_struct *vma;
-	unsigned long flags;
 
-	if(mm->context == 0)
+	if (mm->context == 0)
 		return;
 
 	start &= PAGE_MASK;
@@ -1168,8 +1118,8 @@ static void r4k_flush_cache_range_s32d32i32(struct mm_struct *mm,
 	printk("crange[%d,%08lx,%08lx]", (int)mm->context, start, end);
 #endif
 	vma = find_vma(mm, start);
-	if(vma) {
-		if(mm->context != current->mm->context) {
+	if (vma) {
+		if (mm->context != current->mm->context) {
 			r4k_flush_cache_all_s32d32i32();
 		} else {
 			pgd_t *pgd;
@@ -1177,18 +1127,16 @@ static void r4k_flush_cache_range_s32d32i32(struct mm_struct *mm,
 			pte_t *pte;
 			int text;
 
-			save_and_cli(flags);
 			text = vma->vm_flags & VM_EXEC;
-			while(start < end) {
+			while (start < end) {
 				pgd = pgd_offset(mm, start);
 				pmd = pmd_offset(pgd, start);
 				pte = pte_offset(pmd, start);
 
-				if(pte_val(*pte) & _PAGE_VALID)
+				if (pte_val(*pte) & _PAGE_VALID)
 					blast_scache32_page(start);
 				start += PAGE_SIZE;
 			}
-			restore_flags(flags);
 		}
 	}
 }
@@ -1198,9 +1146,8 @@ static void r4k_flush_cache_range_s64d32i32(struct mm_struct *mm,
 					    unsigned long end)
 {
 	struct vm_area_struct *vma;
-	unsigned long flags;
 
-	if(mm->context == 0)
+	if (mm->context == 0)
 		return;
 
 	start &= PAGE_MASK;
@@ -1208,8 +1155,8 @@ static void r4k_flush_cache_range_s64d32i32(struct mm_struct *mm,
 	printk("crange[%d,%08lx,%08lx]", (int)mm->context, start, end);
 #endif
 	vma = find_vma(mm, start);
-	if(vma) {
-		if(mm->context != current->mm->context) {
+	if (vma) {
+		if (mm->context != current->mm->context) {
 			r4k_flush_cache_all_s64d32i32();
 		} else {
 			pgd_t *pgd;
@@ -1217,18 +1164,16 @@ static void r4k_flush_cache_range_s64d32i32(struct mm_struct *mm,
 			pte_t *pte;
 			int text;
 
-			save_and_cli(flags);
 			text = vma->vm_flags & VM_EXEC;
-			while(start < end) {
+			while (start < end) {
 				pgd = pgd_offset(mm, start);
 				pmd = pmd_offset(pgd, start);
 				pte = pte_offset(pmd, start);
 
-				if(pte_val(*pte) & _PAGE_VALID)
+				if (pte_val(*pte) & _PAGE_VALID)
 					blast_scache64_page(start);
 				start += PAGE_SIZE;
 			}
-			restore_flags(flags);
 		}
 	}
 }
@@ -1240,7 +1185,7 @@ static void r4k_flush_cache_range_s128d32i32(struct mm_struct *mm,
 	struct vm_area_struct *vma;
 	unsigned long flags;
 
-	if(mm->context == 0)
+	if (mm->context == 0)
 		return;
 
 	start &= PAGE_MASK;
@@ -1248,8 +1193,8 @@ static void r4k_flush_cache_range_s128d32i32(struct mm_struct *mm,
 	printk("crange[%d,%08lx,%08lx]", (int)mm->context, start, end);
 #endif
 	vma = find_vma(mm, start);
-	if(vma) {
-		if(mm->context != current->mm->context) {
+	if (vma) {
+		if (mm->context != current->mm->context) {
 			r4k_flush_cache_all_s128d32i32();
 		} else {
 			pgd_t *pgd;
@@ -1257,18 +1202,16 @@ static void r4k_flush_cache_range_s128d32i32(struct mm_struct *mm,
 			pte_t *pte;
 			int text;
 
-			save_and_cli(flags);
 			text = vma->vm_flags & VM_EXEC;
-			while(start < end) {
+			while (start < end) {
 				pgd = pgd_offset(mm, start);
 				pmd = pmd_offset(pgd, start);
 				pte = pte_offset(pmd, start);
 
-				if(pte_val(*pte) & _PAGE_VALID)
+				if (pte_val(*pte) & _PAGE_VALID)
 					blast_scache128_page(start);
 				start += PAGE_SIZE;
 			}
-			restore_flags(flags);
 		}
 	}
 }
@@ -1277,15 +1220,11 @@ static void r4k_flush_cache_range_d16i16(struct mm_struct *mm,
 					 unsigned long start,
 					 unsigned long end)
 {
-	if(mm->context != 0) {
-		unsigned long flags;
-
+	if (mm->context != 0) {
 #ifdef DEBUG_CACHE
 		printk("crange[%d,%08lx,%08lx]", (int)mm->context, start, end);
 #endif
-		save_and_cli(flags);
 		blast_dcache16(); blast_icache16();
-		restore_flags(flags);
 	}
 }
 
@@ -1293,15 +1232,11 @@ static void r4k_flush_cache_range_d32i32(struct mm_struct *mm,
 					 unsigned long start,
 					 unsigned long end)
 {
-	if(mm->context != 0) {
-		unsigned long flags;
-
+	if (mm->context != 0) {
 #ifdef DEBUG_CACHE
 		printk("crange[%d,%08lx,%08lx]", (int)mm->context, start, end);
 #endif
-		save_and_cli(flags);
 		blast_dcache32(); blast_icache32();
-		restore_flags(flags);
 	}
 }
 
@@ -1312,7 +1247,7 @@ static void r4k_flush_cache_range_d32i32(struct mm_struct *mm,
  */
 static void r4k_flush_cache_mm_s16d16i16(struct mm_struct *mm)
 {
-	if(mm->context != 0) {
+	if (mm->context != 0) {
 #ifdef DEBUG_CACHE
 		printk("cmm[%d]", (int)mm->context);
 #endif
@@ -1322,7 +1257,7 @@ static void r4k_flush_cache_mm_s16d16i16(struct mm_struct *mm)
 
 static void r4k_flush_cache_mm_s32d16i16(struct mm_struct *mm)
 {
-	if(mm->context != 0) {
+	if (mm->context != 0) {
 #ifdef DEBUG_CACHE
 		printk("cmm[%d]", (int)mm->context);
 #endif
@@ -1332,7 +1267,7 @@ static void r4k_flush_cache_mm_s32d16i16(struct mm_struct *mm)
 
 static void r4k_flush_cache_mm_s64d16i16(struct mm_struct *mm)
 {
-	if(mm->context != 0) {
+	if (mm->context != 0) {
 #ifdef DEBUG_CACHE
 		printk("cmm[%d]", (int)mm->context);
 #endif
@@ -1342,7 +1277,7 @@ static void r4k_flush_cache_mm_s64d16i16(struct mm_struct *mm)
 
 static void r4k_flush_cache_mm_s128d16i16(struct mm_struct *mm)
 {
-	if(mm->context != 0) {
+	if (mm->context != 0) {
 #ifdef DEBUG_CACHE
 		printk("cmm[%d]", (int)mm->context);
 #endif
@@ -1352,7 +1287,7 @@ static void r4k_flush_cache_mm_s128d16i16(struct mm_struct *mm)
 
 static void r4k_flush_cache_mm_s32d32i32(struct mm_struct *mm)
 {
-	if(mm->context != 0) {
+	if (mm->context != 0) {
 #ifdef DEBUG_CACHE
 		printk("cmm[%d]", (int)mm->context);
 #endif
@@ -1362,7 +1297,7 @@ static void r4k_flush_cache_mm_s32d32i32(struct mm_struct *mm)
 
 static void r4k_flush_cache_mm_s64d32i32(struct mm_struct *mm)
 {
-	if(mm->context != 0) {
+	if (mm->context != 0) {
 #ifdef DEBUG_CACHE
 		printk("cmm[%d]", (int)mm->context);
 #endif
@@ -1372,7 +1307,7 @@ static void r4k_flush_cache_mm_s64d32i32(struct mm_struct *mm)
 
 static void r4k_flush_cache_mm_s128d32i32(struct mm_struct *mm)
 {
-	if(mm->context != 0) {
+	if (mm->context != 0) {
 #ifdef DEBUG_CACHE
 		printk("cmm[%d]", (int)mm->context);
 #endif
@@ -1382,7 +1317,7 @@ static void r4k_flush_cache_mm_s128d32i32(struct mm_struct *mm)
 
 static void r4k_flush_cache_mm_d16i16(struct mm_struct *mm)
 {
-	if(mm->context != 0) {
+	if (mm->context != 0) {
 #ifdef DEBUG_CACHE
 		printk("cmm[%d]", (int)mm->context);
 #endif
@@ -1392,7 +1327,7 @@ static void r4k_flush_cache_mm_d16i16(struct mm_struct *mm)
 
 static void r4k_flush_cache_mm_d32i32(struct mm_struct *mm)
 {
-	if(mm->context != 0) {
+	if (mm->context != 0) {
 #ifdef DEBUG_CACHE
 		printk("cmm[%d]", (int)mm->context);
 #endif
@@ -1404,7 +1339,6 @@ static void r4k_flush_cache_page_s16d16i16(struct vm_area_struct *vma,
 					   unsigned long page)
 {
 	struct mm_struct *mm = vma->vm_mm;
-	unsigned long flags;
 	pgd_t *pgdp;
 	pmd_t *pmdp;
 	pte_t *ptep;
@@ -1414,13 +1348,12 @@ static void r4k_flush_cache_page_s16d16i16(struct vm_area_struct *vma,
 	 * If ownes no valid ASID yet, cannot possibly have gotten
 	 * this page into the cache.
 	 */
-	if(mm->context == 0)
+	if (mm->context == 0)
 		return;
 
 #ifdef DEBUG_CACHE
 	printk("cpage[%d,%08lx]", (int)mm->context, page);
 #endif
-	save_and_cli(flags);
 	page &= PAGE_MASK;
 	pgdp = pgd_offset(mm, page);
 	pmdp = pmd_offset(pgdp, page);
@@ -1430,8 +1363,8 @@ static void r4k_flush_cache_page_s16d16i16(struct vm_area_struct *vma,
 	 * If the page isn't marked valid, the page cannot possibly be
 	 * in the cache.
 	 */
-	if(!(pte_val(*ptep) & _PAGE_VALID))
-		goto out;
+	if (!(pte_val(*ptep) & _PAGE_VALID))
+		return;
 
 	text = (vma->vm_flags & VM_EXEC);
 	/* Doing flushes for another ASID than the current one is
@@ -1439,26 +1372,23 @@ static void r4k_flush_cache_page_s16d16i16(struct vm_area_struct *vma,
 	 * for every cache flush operation.  So we do indexed flushes
 	 * in that case, which doesn't overly flush the cache too much.
 	 */
-	if(mm->context != current->mm->context) {
+	if (mm->context != current->mm->context) {
 		/* Do indexed flush, too much work to get the (possible)
 		 * tlb refills to work correctly.
 		 */
 		page = (KSEG0 + (page & (scache_size - 1)));
 		blast_dcache16_page_indexed(page);
-		if(text)
+		if (text)
 			blast_icache16_page_indexed(page);
 		blast_scache16_page_indexed(page);
 	} else
 		blast_scache16_page(page);
-out:
-	restore_flags(flags);
 }
 
 static void r4k_flush_cache_page_s32d16i16(struct vm_area_struct *vma,
 					   unsigned long page)
 {
 	struct mm_struct *mm = vma->vm_mm;
-	unsigned long flags;
 	pgd_t *pgdp;
 	pmd_t *pmdp;
 	pte_t *ptep;
@@ -1468,13 +1398,12 @@ static void r4k_flush_cache_page_s32d16i16(struct vm_area_struct *vma,
 	 * If ownes no valid ASID yet, cannot possibly have gotten
 	 * this page into the cache.
 	 */
-	if(mm->context == 0)
+	if (mm->context == 0)
 		return;
 
 #ifdef DEBUG_CACHE
 	printk("cpage[%d,%08lx]", (int)mm->context, page);
 #endif
-	save_and_cli(flags);
 	page &= PAGE_MASK;
 	pgdp = pgd_offset(mm, page);
 	pmdp = pmd_offset(pgdp, page);
@@ -1483,8 +1412,8 @@ static void r4k_flush_cache_page_s32d16i16(struct vm_area_struct *vma,
 	/* If the page isn't marked valid, the page cannot possibly be
 	 * in the cache.
 	 */
-	if(!(pte_val(*ptep) & _PAGE_VALID))
-		goto out;
+	if (!(pte_val(*ptep) & _PAGE_VALID))
+		return;
 
 	text = (vma->vm_flags & VM_EXEC);
 	/* Doing flushes for another ASID than the current one is
@@ -1492,26 +1421,23 @@ static void r4k_flush_cache_page_s32d16i16(struct vm_area_struct *vma,
 	 * for every cache flush operation.  So we do indexed flushes
 	 * in that case, which doesn't overly flush the cache too much.
 	 */
-	if(mm->context != current->mm->context) {
+	if (mm->context != current->mm->context) {
 		/* Do indexed flush, too much work to get the (possible)
 		 * tlb refills to work correctly.
 		 */
 		page = (KSEG0 + (page & (scache_size - 1)));
 		blast_dcache16_page_indexed(page);
-		if(text)
+		if (text)
 			blast_icache16_page_indexed(page);
 		blast_scache32_page_indexed(page);
 	} else
 		blast_scache32_page(page);
-out:
-	restore_flags(flags);
 }
 
 static void r4k_flush_cache_page_s64d16i16(struct vm_area_struct *vma,
 					   unsigned long page)
 {
 	struct mm_struct *mm = vma->vm_mm;
-	unsigned long flags;
 	pgd_t *pgdp;
 	pmd_t *pmdp;
 	pte_t *ptep;
@@ -1521,13 +1447,12 @@ static void r4k_flush_cache_page_s64d16i16(struct vm_area_struct *vma,
 	 * If ownes no valid ASID yet, cannot possibly have gotten
 	 * this page into the cache.
 	 */
-	if(mm->context == 0)
+	if (mm->context == 0)
 		return;
 
 #ifdef DEBUG_CACHE
 	printk("cpage[%d,%08lx]", (int)mm->context, page);
 #endif
-	save_and_cli(flags);
 	page &= PAGE_MASK;
 	pgdp = pgd_offset(mm, page);
 	pmdp = pmd_offset(pgdp, page);
@@ -1536,8 +1461,8 @@ static void r4k_flush_cache_page_s64d16i16(struct vm_area_struct *vma,
 	/* If the page isn't marked valid, the page cannot possibly be
 	 * in the cache.
 	 */
-	if(!(pte_val(*ptep) & _PAGE_VALID))
-		goto out;
+	if (!(pte_val(*ptep) & _PAGE_VALID))
+		return;
 
 	text = (vma->vm_flags & VM_EXEC);
 	/*
@@ -1546,26 +1471,23 @@ static void r4k_flush_cache_page_s64d16i16(struct vm_area_struct *vma,
 	 * for every cache flush operation.  So we do indexed flushes
 	 * in that case, which doesn't overly flush the cache too much.
 	 */
-	if(mm->context != current->mm->context) {
+	if (mm->context != current->mm->context) {
 		/* Do indexed flush, too much work to get the (possible)
 		 * tlb refills to work correctly.
 		 */
 		page = (KSEG0 + (page & (scache_size - 1)));
 		blast_dcache16_page_indexed(page);
-		if(text)
+		if (text)
 			blast_icache16_page_indexed(page);
 		blast_scache64_page_indexed(page);
 	} else
 		blast_scache64_page(page);
-out:
-	restore_flags(flags);
 }
 
 static void r4k_flush_cache_page_s128d16i16(struct vm_area_struct *vma,
 					    unsigned long page)
 {
 	struct mm_struct *mm = vma->vm_mm;
-	unsigned long flags;
 	pgd_t *pgdp;
 	pmd_t *pmdp;
 	pte_t *ptep;
@@ -1575,13 +1497,12 @@ static void r4k_flush_cache_page_s128d16i16(struct vm_area_struct *vma,
 	 * If ownes no valid ASID yet, cannot possibly have gotten
 	 * this page into the cache.
 	 */
-	if(mm->context == 0)
+	if (mm->context == 0)
 		return;
 
 #ifdef DEBUG_CACHE
 	printk("cpage[%d,%08lx]", (int)mm->context, page);
 #endif
-	save_and_cli(flags);
 	page &= PAGE_MASK;
 	pgdp = pgd_offset(mm, page);
 	pmdp = pmd_offset(pgdp, page);
@@ -1591,8 +1512,8 @@ static void r4k_flush_cache_page_s128d16i16(struct vm_area_struct *vma,
 	 * If the page isn't marked valid, the page cannot possibly be
 	 * in the cache.
 	 */
-	if(!(pte_val(*ptep) & _PAGE_VALID))
-		goto out;
+	if (!(pte_val(*ptep) & _PAGE_VALID))
+		return;
 
 	text = (vma->vm_flags & VM_EXEC);
 	/* Doing flushes for another ASID than the current one is
@@ -1600,27 +1521,24 @@ static void r4k_flush_cache_page_s128d16i16(struct vm_area_struct *vma,
 	 * for every cache flush operation.  So we do indexed flushes
 	 * in that case, which doesn't overly flush the cache too much.
 	 */
-	if(mm->context != current->mm->context) {
+	if (mm->context != current->mm->context) {
 		/*
 		 * Do indexed flush, too much work to get the (possible)
 		 * tlb refills to work correctly.
 		 */
 		page = (KSEG0 + (page & (scache_size - 1)));
 		blast_dcache16_page_indexed(page);
-		if(text)
+		if (text)
 			blast_icache16_page_indexed(page);
 		blast_scache128_page_indexed(page);
 	} else
 		blast_scache128_page(page);
-out:
-	restore_flags(flags);
 }
 
 static void r4k_flush_cache_page_s32d32i32(struct vm_area_struct *vma,
 					   unsigned long page)
 {
 	struct mm_struct *mm = vma->vm_mm;
-	unsigned long flags;
 	pgd_t *pgdp;
 	pmd_t *pmdp;
 	pte_t *ptep;
@@ -1630,13 +1548,12 @@ static void r4k_flush_cache_page_s32d32i32(struct vm_area_struct *vma,
 	 * If ownes no valid ASID yet, cannot possibly have gotten
 	 * this page into the cache.
 	 */
-	if(mm->context == 0)
+	if (mm->context == 0)
 		return;
 
 #ifdef DEBUG_CACHE
 	printk("cpage[%d,%08lx]", (int)mm->context, page);
 #endif
-	save_and_cli(flags);
 	page &= PAGE_MASK;
 	pgdp = pgd_offset(mm, page);
 	pmdp = pmd_offset(pgdp, page);
@@ -1646,8 +1563,8 @@ static void r4k_flush_cache_page_s32d32i32(struct vm_area_struct *vma,
 	 * If the page isn't marked valid, the page cannot possibly be
 	 * in the cache.
 	 */
-	if(!(pte_val(*ptep) & _PAGE_VALID))
-		goto out;
+	if (!(pte_val(*ptep) & _PAGE_VALID))
+		return;
 
 	text = (vma->vm_flags & VM_EXEC);
 	/*
@@ -1656,27 +1573,24 @@ static void r4k_flush_cache_page_s32d32i32(struct vm_area_struct *vma,
 	 * for every cache flush operation.  So we do indexed flushes
 	 * in that case, which doesn't overly flush the cache too much.
 	 */
-	if(mm->context != current->mm->context) {
+	if (mm->context != current->mm->context) {
 		/*
 		 * Do indexed flush, too much work to get the (possible)
 		 * tlb refills to work correctly.
 		 */
 		page = (KSEG0 + (page & (scache_size - 1)));
 		blast_dcache32_page_indexed(page);
-		if(text)
+		if (text)
 			blast_icache32_page_indexed(page);
 		blast_scache32_page_indexed(page);
 	} else
 		blast_scache32_page(page);
-out:
-	restore_flags(flags);
 }
 
 static void r4k_flush_cache_page_s64d32i32(struct vm_area_struct *vma,
 					   unsigned long page)
 {
 	struct mm_struct *mm = vma->vm_mm;
-	unsigned long flags;
 	pgd_t *pgdp;
 	pmd_t *pmdp;
 	pte_t *ptep;
@@ -1686,13 +1600,12 @@ static void r4k_flush_cache_page_s64d32i32(struct vm_area_struct *vma,
 	 * If ownes no valid ASID yet, cannot possibly have gotten
 	 * this page into the cache.
 	 */
-	if(mm->context == 0)
+	if (mm->context == 0)
 		return;
 
 #ifdef DEBUG_CACHE
 	printk("cpage[%d,%08lx]", (int)mm->context, page);
 #endif
-	save_and_cli(flags);
 	page &= PAGE_MASK;
 	pgdp = pgd_offset(mm, page);
 	pmdp = pmd_offset(pgdp, page);
@@ -1702,8 +1615,8 @@ static void r4k_flush_cache_page_s64d32i32(struct vm_area_struct *vma,
 	 * If the page isn't marked valid, the page cannot possibly be
 	 * in the cache.
 	 */
-	if(!(pte_val(*ptep) & _PAGE_VALID))
-		goto out;
+	if (!(pte_val(*ptep) & _PAGE_VALID))
+		return;
 
 	text = (vma->vm_flags & VM_EXEC);
 	/*
@@ -1712,27 +1625,24 @@ static void r4k_flush_cache_page_s64d32i32(struct vm_area_struct *vma,
 	 * for every cache flush operation.  So we do indexed flushes
 	 * in that case, which doesn't overly flush the cache too much.
 	 */
-	if(mm->context != current->mm->context) {
+	if (mm->context != current->mm->context) {
 		/*
 		 * Do indexed flush, too much work to get the (possible)
 		 * tlb refills to work correctly.
 		 */
 		page = (KSEG0 + (page & (scache_size - 1)));
 		blast_dcache32_page_indexed(page);
-		if(text)
+		if (text)
 			blast_icache32_page_indexed(page);
 		blast_scache64_page_indexed(page);
 	} else
 		blast_scache64_page(page);
-out:
-	restore_flags(flags);
 }
 
 static void r4k_flush_cache_page_s128d32i32(struct vm_area_struct *vma,
 					    unsigned long page)
 {
 	struct mm_struct *mm = vma->vm_mm;
-	unsigned long flags;
 	pgd_t *pgdp;
 	pmd_t *pmdp;
 	pte_t *ptep;
@@ -1742,13 +1652,12 @@ static void r4k_flush_cache_page_s128d32i32(struct vm_area_struct *vma,
 	 * If ownes no valid ASID yet, cannot possibly have gotten
 	 * this page into the cache.
 	 */
-	if(mm->context == 0)
+	if (mm->context == 0)
 		return;
 
 #ifdef DEBUG_CACHE
 	printk("cpage[%d,%08lx]", (int)mm->context, page);
 #endif
-	save_and_cli(flags);
 	page &= PAGE_MASK;
 	pgdp = pgd_offset(mm, page);
 	pmdp = pmd_offset(pgdp, page);
@@ -1757,8 +1666,8 @@ static void r4k_flush_cache_page_s128d32i32(struct vm_area_struct *vma,
 	/* If the page isn't marked valid, the page cannot possibly be
 	 * in the cache.
 	 */
-	if(!(pte_val(*ptep) & _PAGE_VALID))
-		goto out;
+	if (!(pte_val(*ptep) & _PAGE_VALID))
+		return;
 
 	text = (vma->vm_flags & VM_EXEC);
 	/*
@@ -1767,26 +1676,23 @@ static void r4k_flush_cache_page_s128d32i32(struct vm_area_struct *vma,
 	 * for every cache flush operation.  So we do indexed flushes
 	 * in that case, which doesn't overly flush the cache too much.
 	 */
-	if(mm->context != current->mm->context) {
+	if (mm->context != current->mm->context) {
 		/* Do indexed flush, too much work to get the (possible)
 		 * tlb refills to work correctly.
 		 */
 		page = (KSEG0 + (page & (scache_size - 1)));
 		blast_dcache32_page_indexed(page);
-		if(text)
+		if (text)
 			blast_icache32_page_indexed(page);
 		blast_scache128_page_indexed(page);
 	} else
 		blast_scache128_page(page);
-out:
-	restore_flags(flags);
 }
 
 static void r4k_flush_cache_page_d16i16(struct vm_area_struct *vma,
 					unsigned long page)
 {
 	struct mm_struct *mm = vma->vm_mm;
-	unsigned long flags;
 	pgd_t *pgdp;
 	pmd_t *pmdp;
 	pte_t *ptep;
@@ -1796,13 +1702,12 @@ static void r4k_flush_cache_page_d16i16(struct vm_area_struct *vma,
 	 * If ownes no valid ASID yet, cannot possibly have gotten
 	 * this page into the cache.
 	 */
-	if(mm->context == 0)
+	if (mm->context == 0)
 		return;
 
 #ifdef DEBUG_CACHE
 	printk("cpage[%d,%08lx]", (int)mm->context, page);
 #endif
-	save_and_cli(flags);
 	page &= PAGE_MASK;
 	pgdp = pgd_offset(mm, page);
 	pmdp = pmd_offset(pgdp, page);
@@ -1811,8 +1716,8 @@ static void r4k_flush_cache_page_d16i16(struct vm_area_struct *vma,
 	/* If the page isn't marked valid, the page cannot possibly be
 	 * in the cache.
 	 */
-	if(!(pte_val(*ptep) & _PAGE_VALID))
-		goto out;
+	if (!(pte_val(*ptep) & _PAGE_VALID))
+		return;
 
 	text = (vma->vm_flags & VM_EXEC);
 	/*
@@ -1821,9 +1726,9 @@ static void r4k_flush_cache_page_d16i16(struct vm_area_struct *vma,
 	 * for every cache flush operation.  So we do indexed flushes
 	 * in that case, which doesn't overly flush the cache too much.
 	 */
-	if(mm == current->mm) {
+	if (mm == current->mm) {
 		blast_dcache16_page(page);
-		if(text)
+		if (text)
 			blast_icache16_page(page);
 	} else {
 		/* Do indexed flush, too much work to get the (possible)
@@ -1831,18 +1736,15 @@ static void r4k_flush_cache_page_d16i16(struct vm_area_struct *vma,
 		 */
 		page = (KSEG0 + (page & (dcache_size - 1)));
 		blast_dcache16_page_indexed(page);
-		if(text)
+		if (text)
 			blast_icache16_page_indexed(page);
 	}
-out:
-	restore_flags(flags);
 }
 
 static void r4k_flush_cache_page_d32i32(struct vm_area_struct *vma,
 					unsigned long page)
 {
 	struct mm_struct *mm = vma->vm_mm;
-	unsigned long flags;
 	pgd_t *pgdp;
 	pmd_t *pmdp;
 	pte_t *ptep;
@@ -1852,13 +1754,12 @@ static void r4k_flush_cache_page_d32i32(struct vm_area_struct *vma,
 	 * If ownes no valid ASID yet, cannot possibly have gotten
 	 * this page into the cache.
 	 */
-	if(mm->context == 0)
+	if (mm->context == 0)
 		return;
 
 #ifdef DEBUG_CACHE
 	printk("cpage[%d,%08lx]", (int)mm->context, page);
 #endif
-	save_and_cli(flags);
 	page &= PAGE_MASK;
 	pgdp = pgd_offset(mm, page);
 	pmdp = pmd_offset(pgdp, page);
@@ -1868,8 +1769,8 @@ static void r4k_flush_cache_page_d32i32(struct vm_area_struct *vma,
 	 * If the page isn't marked valid, the page cannot possibly be
 	 * in the cache.
 	 */
-	if(!(pte_val(*ptep) & _PAGE_PRESENT))
-		goto out;
+	if (!(pte_val(*ptep) & _PAGE_PRESENT))
+		return;
 
 	text = (vma->vm_flags & VM_EXEC);
 	/*
@@ -1878,9 +1779,9 @@ static void r4k_flush_cache_page_d32i32(struct vm_area_struct *vma,
 	 * for every cache flush operation.  So we do indexed flushes
 	 * in that case, which doesn't overly flush the cache too much.
 	 */
-	if((mm == current->mm) && (pte_val(*ptep) & _PAGE_VALID)) {
+	if ((mm == current->mm) && (pte_val(*ptep) & _PAGE_VALID)) {
 		blast_dcache32_page(page);
-		if(text)
+		if (text)
 			blast_icache32_page(page);
 	} else {
 		/*
@@ -1889,18 +1790,15 @@ static void r4k_flush_cache_page_d32i32(struct vm_area_struct *vma,
 		 */
 		page = (KSEG0 + (page & (dcache_size - 1)));
 		blast_dcache32_page_indexed(page);
-		if(text)
+		if (text)
 			blast_icache32_page_indexed(page);
 	}
-out:
-	restore_flags(flags);
 }
 
 static void r4k_flush_cache_page_d32i32_r4600(struct vm_area_struct *vma,
 					      unsigned long page)
 {
 	struct mm_struct *mm = vma->vm_mm;
-	unsigned long flags;
 	pgd_t *pgdp;
 	pmd_t *pmdp;
 	pte_t *ptep;
@@ -1910,13 +1808,12 @@ static void r4k_flush_cache_page_d32i32_r4600(struct vm_area_struct *vma,
 	 * If ownes no valid ASID yet, cannot possibly have gotten
 	 * this page into the cache.
 	 */
-	if(mm->context == 0)
+	if (mm->context == 0)
 		return;
 
 #ifdef DEBUG_CACHE
 	printk("cpage[%d,%08lx]", (int)mm->context, page);
 #endif
-	save_and_cli(flags);
 	page &= PAGE_MASK;
 	pgdp = pgd_offset(mm, page);
 	pmdp = pmd_offset(pgdp, page);
@@ -1926,8 +1823,8 @@ static void r4k_flush_cache_page_d32i32_r4600(struct vm_area_struct *vma,
 	 * If the page isn't marked valid, the page cannot possibly be
 	 * in the cache.
 	 */
-	if(!(pte_val(*ptep) & _PAGE_PRESENT))
-		goto out;
+	if (!(pte_val(*ptep) & _PAGE_PRESENT))
+		return;
 
 	text = (vma->vm_flags & VM_EXEC);
 	/*
@@ -1936,9 +1833,9 @@ static void r4k_flush_cache_page_d32i32_r4600(struct vm_area_struct *vma,
 	 * for every cache flush operation.  So we do indexed flushes
 	 * in that case, which doesn't overly flush the cache too much.
 	 */
-	if((mm == current->mm) && (pte_val(*ptep) & _PAGE_VALID)) {
+	if ((mm == current->mm) && (pte_val(*ptep) & _PAGE_VALID)) {
 		blast_dcache32_page(page);
-		if(text)
+		if (text)
 			blast_icache32_page(page);
 	} else {
 		/* Do indexed flush, too much work to get the (possible)
@@ -1947,13 +1844,11 @@ static void r4k_flush_cache_page_d32i32_r4600(struct vm_area_struct *vma,
 		page = (KSEG0 + (page & (dcache_size - 1)));
 		blast_dcache32_page_indexed(page);
 		blast_dcache32_page_indexed(page ^ dcache_waybit);
-		if(text) {
+		if (text) {
 			blast_icache32_page_indexed(page);
 			blast_icache32_page_indexed(page ^ icache_waybit);
 		}
 	}
-out:
-	restore_flags(flags);
 }
 
 /* If the addresses passed to these routines are valid, they are
@@ -1968,7 +1863,7 @@ out:
 static void r4k_flush_page_to_ram_s16d16i16(unsigned long page)
 {
 	page &= PAGE_MASK;
-	if((page >= KSEG0 && page < KSEG1) || (page >= KSEG2)) {
+	if ((page >= KSEG0 && page < KSEG1) || (page >= KSEG2)) {
 #ifdef DEBUG_CACHE
 		printk("cram[%08lx]", page);
 #endif
@@ -1979,7 +1874,7 @@ static void r4k_flush_page_to_ram_s16d16i16(unsigned long page)
 static void r4k_flush_page_to_ram_s32d16i16(unsigned long page)
 {
 	page &= PAGE_MASK;
-	if((page >= KSEG0 && page < KSEG1) || (page >= KSEG2)) {
+	if ((page >= KSEG0 && page < KSEG1) || (page >= KSEG2)) {
 #ifdef DEBUG_CACHE
 		printk("cram[%08lx]", page);
 #endif
@@ -1990,7 +1885,7 @@ static void r4k_flush_page_to_ram_s32d16i16(unsigned long page)
 static void r4k_flush_page_to_ram_s64d16i16(unsigned long page)
 {
 	page &= PAGE_MASK;
-	if((page >= KSEG0 && page < KSEG1) || (page >= KSEG2)) {
+	if ((page >= KSEG0 && page < KSEG1) || (page >= KSEG2)) {
 #ifdef DEBUG_CACHE
 		printk("cram[%08lx]", page);
 #endif
@@ -2001,7 +1896,7 @@ static void r4k_flush_page_to_ram_s64d16i16(unsigned long page)
 static void r4k_flush_page_to_ram_s128d16i16(unsigned long page)
 {
 	page &= PAGE_MASK;
-	if((page >= KSEG0 && page < KSEG1) || (page >= KSEG2)) {
+	if ((page >= KSEG0 && page < KSEG1) || (page >= KSEG2)) {
 #ifdef DEBUG_CACHE
 		printk("cram[%08lx]", page);
 #endif
@@ -2012,7 +1907,7 @@ static void r4k_flush_page_to_ram_s128d16i16(unsigned long page)
 static void r4k_flush_page_to_ram_s32d32i32(unsigned long page)
 {
 	page &= PAGE_MASK;
-	if((page >= KSEG0 && page < KSEG1) || (page >= KSEG2)) {
+	if ((page >= KSEG0 && page < KSEG1) || (page >= KSEG2)) {
 #ifdef DEBUG_CACHE
 		printk("cram[%08lx]", page);
 #endif
@@ -2023,7 +1918,7 @@ static void r4k_flush_page_to_ram_s32d32i32(unsigned long page)
 static void r4k_flush_page_to_ram_s64d32i32(unsigned long page)
 {
 	page &= PAGE_MASK;
-	if((page >= KSEG0 && page < KSEG1) || (page >= KSEG2)) {
+	if ((page >= KSEG0 && page < KSEG1) || (page >= KSEG2)) {
 #ifdef DEBUG_CACHE
 		printk("cram[%08lx]", page);
 #endif
@@ -2034,7 +1929,7 @@ static void r4k_flush_page_to_ram_s64d32i32(unsigned long page)
 static void r4k_flush_page_to_ram_s128d32i32(unsigned long page)
 {
 	page &= PAGE_MASK;
-	if((page >= KSEG0 && page < KSEG1) || (page >= KSEG2)) {
+	if ((page >= KSEG0 && page < KSEG1) || (page >= KSEG2)) {
 #ifdef DEBUG_CACHE
 		printk("cram[%08lx]", page);
 #endif
@@ -2045,30 +1940,30 @@ static void r4k_flush_page_to_ram_s128d32i32(unsigned long page)
 static void r4k_flush_page_to_ram_d16i16(unsigned long page)
 {
 	page &= PAGE_MASK;
-	if((page >= KSEG0 && page < KSEG1) || (page >= KSEG2)) {
+	if ((page >= KSEG0 && page < KSEG1) || (page >= KSEG2)) {
 		unsigned long flags;
 
 #ifdef DEBUG_CACHE
 		printk("cram[%08lx]", page);
 #endif
-		save_and_cli(flags);
+		__save_and_cli(flags);
 		blast_dcache16_page(page);
-		restore_flags(flags);
+		__restore_flags(flags);
 	}
 }
 
 static void r4k_flush_page_to_ram_d32i32(unsigned long page)
 {
 	page &= PAGE_MASK;
-	if((page >= KSEG0 && page < KSEG1) || (page >= KSEG2)) {
+	if ((page >= KSEG0 && page < KSEG1) || (page >= KSEG2)) {
 		unsigned long flags;
 
 #ifdef DEBUG_CACHE
 		printk("cram[%08lx]", page);
 #endif
-		save_and_cli(flags);
+		__save_and_cli(flags);
 		blast_dcache32_page(page);
-		restore_flags(flags);
+		__restore_flags(flags);
 	}
 }
 
@@ -2093,7 +1988,7 @@ r4k_dma_cache_wback_inv_pc(unsigned long addr, unsigned long size)
 		flush_cache_all();
 	} else {
 		/* Workaround for R4600 bug.  See comment above. */
-		save_and_cli(flags);
+		__save_and_cli(flags);
 		*(volatile unsigned long *)KSEG1;
 
 		a = addr & ~(dc_lsize - 1);
@@ -2103,7 +1998,7 @@ r4k_dma_cache_wback_inv_pc(unsigned long addr, unsigned long size)
 			if (a == end) break;
 			a += dc_lsize;
 		}
-		restore_flags(flags);
+		__restore_flags(flags);
 	}
 	bcops->bc_wback_inv(addr, size);
 }
@@ -2137,7 +2032,7 @@ r4k_dma_cache_inv_pc(unsigned long addr, unsigned long size)
 		flush_cache_all();
 	} else {
 		/* Workaround for R4600 bug.  See comment above. */
-		save_and_cli(flags);
+		__save_and_cli(flags);
 		*(volatile unsigned long *)KSEG1;
 
 		a = addr & ~(dc_lsize - 1);
@@ -2147,7 +2042,7 @@ r4k_dma_cache_inv_pc(unsigned long addr, unsigned long size)
 			if (a == end) break;
 			a += dc_lsize;
 		}
-		restore_flags(flags);
+		__restore_flags(flags);
 	}
 
 	bcops->bc_inv(addr, size);
@@ -2226,7 +2121,7 @@ static inline void r4k_flush_tlb_all(void)
 	printk("[tlball]");
 #endif
 
-	save_and_cli(flags);
+	__save_and_cli(flags);
 	/* Save old context and create impossible VPN2 value */
 	old_ctx = (get_entryhi() & 0xff);
 	set_entryhi(KSEG0);
@@ -2237,7 +2132,7 @@ static inline void r4k_flush_tlb_all(void)
 	entry = get_wired();
 
 	/* Blast 'em all away. */
-	while(entry < NTLB_ENTRIES) {
+	while (entry < NTLB_ENTRIES) {
 		set_index(entry);
 		BARRIER;
 		tlb_write_indexed();
@@ -2246,29 +2141,29 @@ static inline void r4k_flush_tlb_all(void)
 	}
 	BARRIER;
 	set_entryhi(old_ctx);
-	restore_flags(flags);
+	__restore_flags(flags);
 }
 
 static void r4k_flush_tlb_mm(struct mm_struct *mm)
 {
-	if(mm->context != 0) {
+	if (mm->context != 0) {
 		unsigned long flags;
 
 #ifdef DEBUG_TLB
 		printk("[tlbmm<%d>]", mm->context);
 #endif
-		save_and_cli(flags);
+		__save_and_cli(flags);
 		get_new_mmu_context(mm, asid_cache);
-		if(mm == current->mm)
+		if (mm == current->mm)
 			set_entryhi(mm->context & 0xff);
-		restore_flags(flags);
+		__restore_flags(flags);
 	}
 }
 
 static void r4k_flush_tlb_range(struct mm_struct *mm, unsigned long start,
 				unsigned long end)
 {
-	if(mm->context != 0) {
+	if (mm->context != 0) {
 		unsigned long flags;
 		int size;
 
@@ -2276,17 +2171,17 @@ static void r4k_flush_tlb_range(struct mm_struct *mm, unsigned long start,
 		printk("[tlbrange<%02x,%08lx,%08lx>]", (mm->context & 0xff),
 		       start, end);
 #endif
-		save_and_cli(flags);
+		__save_and_cli(flags);
 		size = (end - start + (PAGE_SIZE - 1)) >> PAGE_SHIFT;
 		size = (size + 1) >> 1;
-		if(size <= NTLB_ENTRIES_HALF) {
+		if (size <= NTLB_ENTRIES_HALF) {
 			int oldpid = (get_entryhi() & 0xff);
 			int newpid = (mm->context & 0xff);
 
 			start &= (PAGE_MASK << 1);
 			end += ((PAGE_SIZE << 1) - 1);
 			end &= (PAGE_MASK << 1);
-			while(start < end) {
+			while (start < end) {
 				int idx;
 
 				set_entryhi(start | newpid);
@@ -2299,7 +2194,7 @@ static void r4k_flush_tlb_range(struct mm_struct *mm, unsigned long start,
 				set_entrylo1(0);
 				set_entryhi(KSEG0);
 				BARRIER;
-				if(idx < 0)
+				if (idx < 0)
 					continue;
 				tlb_write_indexed();
 				BARRIER;
@@ -2307,16 +2202,16 @@ static void r4k_flush_tlb_range(struct mm_struct *mm, unsigned long start,
 			set_entryhi(oldpid);
 		} else {
 			get_new_mmu_context(mm, asid_cache);
-			if(mm == current->mm)
+			if (mm == current->mm)
 				set_entryhi(mm->context & 0xff);
 		}
-		restore_flags(flags);
+		__restore_flags(flags);
 	}
 }
 
 static void r4k_flush_tlb_page(struct vm_area_struct *vma, unsigned long page)
 {
-	if(vma->vm_mm->context != 0) {
+	if (vma->vm_mm->context != 0) {
 		unsigned long flags;
 		int oldpid, newpid, idx;
 
@@ -2325,7 +2220,7 @@ static void r4k_flush_tlb_page(struct vm_area_struct *vma, unsigned long page)
 #endif
 		newpid = (vma->vm_mm->context & 0xff);
 		page &= (PAGE_MASK << 1);
-		save_and_cli(flags);
+		__save_and_cli(flags);
 		oldpid = (get_entryhi() & 0xff);
 		set_entryhi(page | newpid);
 		BARRIER;
@@ -2335,7 +2230,7 @@ static void r4k_flush_tlb_page(struct vm_area_struct *vma, unsigned long page)
 		set_entrylo0(0);
 		set_entrylo1(0);
 		set_entryhi(KSEG0);
-		if(idx < 0)
+		if (idx < 0)
 			goto finish;
 		BARRIER;
 		tlb_write_indexed();
@@ -2343,7 +2238,7 @@ static void r4k_flush_tlb_page(struct vm_area_struct *vma, unsigned long page)
 	finish:
 		BARRIER;
 		set_entryhi(oldpid);
-		restore_flags(flags);
+		__restore_flags(flags);
 	}
 }
 
@@ -2357,7 +2252,7 @@ static void r4k_pgd_init(unsigned long page)
 	unsigned long *p = (unsigned long *) page;
 	int i;
 
-	for(i = 0; i < USER_PTRS_PER_PGD; i+=8) {
+	for (i = 0; i < USER_PTRS_PER_PGD; i+=8) {
 		p[i + 0] = (unsigned long) invalid_pte_table;
 		p[i + 1] = (unsigned long) invalid_pte_table;
 		p[i + 2] = (unsigned long) invalid_pte_table;
@@ -2391,13 +2286,13 @@ static void r4k_update_mmu_cache(struct vm_area_struct * vma,
 	pid = (get_entryhi() & 0xff);
 
 #ifdef DEBUG_TLB
-	if((pid != (vma->vm_mm->context & 0xff)) || (vma->vm_mm->context == 0)) {
+	if ((pid != (vma->vm_mm->context & 0xff)) || (vma->vm_mm->context == 0)) {
 		printk("update_mmu_cache: Wheee, bogus tlbpid mmpid=%d tlbpid=%d\n",
 		       (int) (vma->vm_mm->context & 0xff), pid);
 	}
 #endif
 
-	save_and_cli(flags);
+	__save_and_cli(flags);
 	address &= (PAGE_MASK << 1);
 	set_entryhi(address | (pid));
 	pgdp = pgd_offset(vma->vm_mm, address);
@@ -2412,7 +2307,7 @@ static void r4k_update_mmu_cache(struct vm_area_struct * vma,
 	set_entrylo1(pte_val(*ptep) >> 6);
 	set_entryhi(address | (pid));
 	BARRIER;
-	if(idx < 0) {
+	if (idx < 0) {
 		tlb_write_random();
 	} else {
 		tlb_write_indexed();
@@ -2420,7 +2315,7 @@ static void r4k_update_mmu_cache(struct vm_area_struct * vma,
 	BARRIER;
 	set_entryhi(pid);
 	BARRIER;
-	restore_flags(flags);
+	__restore_flags(flags);
 }
 
 #if 0
@@ -2433,7 +2328,7 @@ static void r4k_update_mmu_cache_hwbug(struct vm_area_struct * vma,
 	pte_t *ptep;
 	int idx;
 
-	save_and_cli(flags);
+	__save_and_cli(flags);
 	address &= (PAGE_MASK << 1);
 	set_entryhi(address | (get_entryhi() & 0xff));
 	pgdp = pgd_offset(vma->vm_mm, address);
@@ -2444,12 +2339,12 @@ static void r4k_update_mmu_cache_hwbug(struct vm_area_struct * vma,
 	set_entrylo0(pte_val(*ptep++) >> 6);
 	set_entrylo1(pte_val(*ptep) >> 6);
 	BARRIER;
-	if(idx < 0)
+	if (idx < 0)
 		tlb_write_random();
 	else
 		tlb_write_indexed();
 	BARRIER;
-	restore_flags(flags);
+	__restore_flags(flags);
 }
 #endif
 
@@ -2486,7 +2381,7 @@ static void r4k_add_wired_entry(unsigned long entrylo0, unsigned long entrylo1,
         unsigned long old_pagemask;
         unsigned long old_ctx;
 
-        save_and_cli(flags);
+        __save_and_cli(flags);
         /* Save old context and create impossible VPN2 value */
         old_ctx = (get_entryhi() & 0xff);
         old_pagemask = get_pagemask();
@@ -2506,7 +2401,7 @@ static void r4k_add_wired_entry(unsigned long entrylo0, unsigned long entrylo1,
         BARRIER;    
         set_pagemask (old_pagemask);
         flush_tlb_all();    
-        restore_flags(flags);
+        __restore_flags(flags);
 }
 
 /* Detect and size the various r4k caches. */
@@ -2541,7 +2436,7 @@ __initfunc(static int probe_scache(unsigned long config))
 	int tmp;
 
 	tmp = ((config >> 17) & 1);
-	if(tmp)
+	if (tmp)
 		return 0;
 	tmp = ((config >> 22) & 3);
 	switch(tmp) {
@@ -2566,11 +2461,11 @@ __initfunc(static int probe_scache(unsigned long config))
 	/* This is such a bitch, you'd think they would make it
 	 * easy to do this.  Away you daemons of stupidity!
 	 */
-	save_and_cli(flags);
+	__save_and_cli(flags);
 
 	/* Fill each size-multiple cache line with a valid tag. */
 	pow2 = (64 * 1024);
-	for(addr = begin; addr < end; addr = (begin + pow2)) {
+	for (addr = begin; addr < end; addr = (begin + pow2)) {
 		unsigned long *p = (unsigned long *) addr;
 		__asm__ __volatile__("nop" : : "r" (*p)); /* whee... */
 		pow2 <<= 1;
@@ -2599,18 +2494,18 @@ __initfunc(static int probe_scache(unsigned long config))
 	/* Now search for the wrap around point. */
 	pow2 = (128 * 1024);
 	tmp = 0;
-	for(addr = (begin + (128 * 1024)); addr < (end); addr = (begin + pow2)) {
+	for (addr = (begin + (128 * 1024)); addr < (end); addr = (begin + pow2)) {
 		__asm__ __volatile__("\n\t.set noreorder\n\t"
 				     ".set mips3\n\t"
 				     "cache 7, (%0)\n\t"
 				     ".set mips0\n\t"
 				     ".set reorder\n\t" : : "r" (addr));
 		__asm__ __volatile__("nop; nop; nop; nop;"); /* hazard... */
-		if(!get_taglo())
+		if (!get_taglo())
 			break;
 		pow2 <<= 1;
 	}
-	restore_flags(flags);
+	__restore_flags(flags);
 	addr -= begin;
 	printk("Secondary cache sized at %dK linesize %d\n",
 	       (int) (addr >> 10), sc_lsize);
