@@ -1,10 +1,9 @@
-/* $Id: fault.c,v 1.9 1999/01/04 16:03:53 ralf Exp $
- *
+/*
  * This file is subject to the terms and conditions of the GNU General Public
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
  *
- * Copyright (C) 1995, 1996, 1997, 1998 by Ralf Baechle
+ * Copyright (C) 1995, 1996, 1997, 1998, 2002 by Ralf Baechle
  */
 #include <linux/signal.h>
 #include <linux/sched.h>
@@ -48,7 +47,7 @@ asmlinkage void do_page_fault(struct pt_regs *regs, unsigned long writeaccess,
 	struct vm_area_struct * vma;
 	struct task_struct *tsk = current;
 	struct mm_struct *mm = tsk->mm;
-	unsigned long epc, fixup;
+	unsigned long fixup;
 
 	/*
 	 * If we're in an interrupt or have no user
@@ -124,8 +123,7 @@ bad_area:
 
 no_context:
 	/* Are we prepared to handle this kernel fault?  */
-	epc = regs->cp0_epc + delay_slot(regs) ? 4 : 0;
-	fixup = search_exception_table(epc);
+	fixup = search_exception_table(exception_epc(regs));
 	if (fixup) {
 		long new_epc;
 
