@@ -185,13 +185,12 @@ void show_code(unsigned int *pc)
 	}
 }
 
-void die(const char * str, struct pt_regs * regs, int write)
+void die(const char * str, struct pt_regs * regs)
 {
 	if (user_mode(regs))	/* Just return if in user mode.  */
 		return;
 
 	console_verbose();
-	printk("%s: %s\n", str, write ? "write" : "read");
 	show_regs(regs);
 	printk("Process %s (pid: %ld, stackpage=%08lx)\n",
 		current->comm, current->pid, (unsigned long) current);
@@ -202,10 +201,10 @@ void die(const char * str, struct pt_regs * regs, int write)
 	do_exit(SIGSEGV);
 }
 
-void die_if_kernel(const char * str, struct pt_regs * regs, int write)
+void die_if_kernel(const char * str, struct pt_regs * regs)
 {
 	if (!user_mode(regs))
-		die(str, regs, write);
+		die(str, regs);
 }
 
 static void default_be_board_handler(struct pt_regs *regs)

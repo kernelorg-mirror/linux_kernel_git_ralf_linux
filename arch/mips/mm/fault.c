@@ -143,7 +143,7 @@ no_context:
 	printk(KERN_ALERT "Unable to handle kernel paging request at virtual "
 	       "address %08lx, epc == %08lx, ra == %08lx\n",
 	       address, regs->cp0_epc, regs->regs[31]);
-	die("Oops", regs, writeaccess);
+	die("Oops", regs);
 	do_exit(SIGKILL);
 
 /*
