@@ -1,14 +1,13 @@
-/* $Id: delay.h,v 1.3 1998/10/27 21:46:33 ralf Exp $
- *
+/*
  * This file is subject to the terms and conditions of the GNU General Public
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994 by Waldorf Electronics
- * Copyright (C) 1995 - 1998 by Ralf Baechle
+ * Copyright (C) 1995 - 1998, 2000 by Ralf Baechle
  */
-#ifndef __ASM_MIPS_DELAY_H
-#define __ASM_MIPS_DELAY_H
+#ifndef _MIPS_DELAY_H
+#define _MIPS_DELAY_H
 
 extern __inline__ void __delay(int loops)
 {
@@ -37,7 +36,8 @@ extern __inline__ void __udelay(unsigned long usecs, unsigned long lps)
 	__asm__("multu\t%0,%2\n\t"
 		"mfhi\t%0"
 		:"=r" (usecs)
-		:"0" (usecs),"r" (lps));
+		:"0" (usecs),"r" (lps)
+		:"hi", "lo");
 	__delay(usecs);
 }
 
@@ -49,4 +49,4 @@ extern __inline__ void __udelay(unsigned long usecs, unsigned long lps)
 
 #define udelay(usecs) __udelay((usecs),__udelay_val)
 
-#endif /* __ASM_MIPS_DELAY_H */
+#endif /* _MIPS_DELAY_H */
