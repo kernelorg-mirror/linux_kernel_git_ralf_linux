@@ -1,4 +1,4 @@
-/* $Id: sysirix.c,v 1.1 1997/10/23 22:26:16 ralf Exp $
+/* $Id: sysirix.c,v 1.2 2004/07/08 00:47:28 ralf Exp $
  * sysirix.c: IRIX system call emulation.
  *
  * Copyright (C) 1996 David S. Miller
@@ -894,27 +894,6 @@ asmlinkage int irix_socket(int family, int type, int protocol)
 	}
 
 	return sys_socket(family, type, protocol);
-}
-
-asmlinkage int irix_getdomainname(char *name, int len)
-{
-	int error;
-
-	lock_kernel();
-	if(len > (__NEW_UTS_LEN - 1))
-		len = __NEW_UTS_LEN - 1;
-	error = verify_area(VERIFY_WRITE, name, len);
-	if(error)
-		goto out;
-	if(copy_to_user(name, system_utsname.domainname, len)) {
-		error = -EFAULT;
-		goto out;
-	}
-	error = 0;
-
-out:
-	unlock_kernel();
-	return error;
 }
 
 asmlinkage unsigned long irix_getpagesize(void)

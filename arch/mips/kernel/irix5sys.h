@@ -1,4 +1,4 @@
-/* $Id: irix5sys.h,v 1.1 1997/10/23 22:26:07 ralf Exp $
+/* $Id: irix5sys.h,v 1.2 2004/07/08 00:47:28 ralf Exp $
  * irix5sys.h: 32-bit IRIX5 ABI system call table.
  *
  * Copyright (C) 1996 David S. Miller (dm@engr.sgi.com)
@@ -128,7 +128,7 @@ SYS(sys_shutdown, 2)			/* 1106  shutdown()	      ?V*/
 SYS(irix_socket, 3)			/* 1107  socket()	       V*/
 SYS(sys_gethostname, 2)			/* 1108  sys_gethostname()    ?V*/
 SYS(sys_sethostname, 2)			/* 1109  sethostname()	      ?V*/
-SYS(irix_getdomainname, 2)		/* 1110  sys_getdomainname()  ?V*/
+SYS(sys_getdomainname, 2)		/* 1110  sys_getdomainname()  ?V*/
 SYS(sys_setdomainname, 2)		/* 1111  setdomainname()      ?V*/
 SYS(sys_truncate, 2)			/* 1112  truncate()	       V*/
 SYS(sys_ftruncate, 2)			/* 1113  ftruncate()	       V*/
