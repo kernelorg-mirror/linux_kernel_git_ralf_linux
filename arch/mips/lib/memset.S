@@ -1,13 +1,9 @@
 /*
- * include/asm-mips/types.h
- *
  * This file is subject to the terms and conditions of the GNU General Public
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
  *
- * Copyright (C) 1998 by Ralf Baechle
- *
- * $Id: memset.S,v 1.2 1998/04/25 17:01:45 ralf Exp $
+ * Copyright (C) 1998, 2001 by Ralf Baechle
  */
 #include <asm/asm.h>
 #include <asm/offset.h>
@@ -58,6 +54,7 @@ LEAF(memset)
 1:
 
 EXPORT(__bzero)
+	.type	__bzero, @function
 	sltiu	t0, a2, 4			/* very small region? */
 	bnez	t0, small_memset
 	 andi	t0, a0, 3			/* aligned? */
