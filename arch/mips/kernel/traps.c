@@ -1,10 +1,9 @@
-/* $Id: traps.c,v 1.20.2.1 1999/06/23 22:28:29 ralf Exp $
- *
+/*
  * This file is subject to the terms and conditions of the GNU General Public
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
  *
- * Copyright 1994, 1995, 1996, 1997, 1998 by Ralf Baechle
+ * Copyright 1994, 1995, 1996, 1997, 1998, 2001 by Ralf Baechle
  * Modified for R3000 by Paul M. Antoine, 1995, 1996
  * Complete output from die() by Ulf Carlsson, 1998
  */
@@ -311,7 +310,7 @@ static inline int get_insn_opcode(struct pt_regs *regs, unsigned int *opcode)
 
 	epc = (unsigned int *) (unsigned long) regs->cp0_epc;
 	if (regs->cp0_cause & CAUSEF_BD)
-		epc += 4;
+		epc++;
 
 	if (verify_area(VERIFY_READ, epc, 4)) {
 		force_sig(SIGSEGV, current);
