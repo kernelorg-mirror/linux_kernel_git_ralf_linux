@@ -72,6 +72,5 @@ int get_cpuinfo(char *buffer)
 	len += sprintf(buffer + len, "hardware watchpoint\t: %s\n",
 		       watch_available ? "yes" : "no");
 
-
 	return len;
 }
