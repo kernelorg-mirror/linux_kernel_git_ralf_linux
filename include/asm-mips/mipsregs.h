@@ -246,7 +246,7 @@ __BUILD_SET_CP0(config,CP0_CONFIG)
 /*
  * Bits specific to the R4640/R4650
  */
-#define ST0_UM                 <1   <<  4)
+#define ST0_UM                 (1   <<  4)
 #define ST0_IL                 (1   << 23)
 #define ST0_DL                 (1   << 24)
 
