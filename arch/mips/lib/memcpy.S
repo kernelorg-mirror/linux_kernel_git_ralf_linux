@@ -3,8 +3,6 @@
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
  *
- * $Id: memcpy.S,v 1.2 1998/05/04 09:12:53 ralf Exp $
- *
  * Unified implementation of memcpy, memmove and the __copy_user backend.
  * For __rmemcpy and memmove an exception is always a kernel bug, therefore
  * they're not protected.  In order to keep the exception fixup routine
@@ -404,16 +402,20 @@ u_end_bytes:
 
 	.align	5
 LEAF(memmove)
-	sltu	t0, a0, a1			# dst < src -> memcpy
-	bnez	t0, memcpy
-	 addu	v0, a0, a2
-	sltu	t0, v0, a1			# dst + len < src -> non-
-	bnez	t0, __memcpy			# overlapping, can use memcpy
+	addu	t0, a0, a2
+	sltu	t0, a1, t0			# dst + len <= src -> memcpy
+	addu	t1, a1, a2
+	sltu	t1, a0, t1			# dst >= src + len -> memcpy
+	and	t0, t1
+	beqz	t0, __memcpy
 	 move	v0, a0				/* return value */
 	beqz	a2, r_out
 	END(memmove)
 
 LEAF(__rmemcpy)					/* a0=dst a1=src a2=len */
+	sltu	t0, a1, a0
+	beqz	t0, r_end_bytes_up		# src >= dst
+	 nop
 	addu	a0, a2				# dst = dst + len
 	addu	a1, a2				# src = src + len
 
@@ -568,6 +570,17 @@ r_out:
 	jr	ra
 	 move	a2, zero
 
+r_end_bytes_up:
+	lb	t0, (a1)
+	subu	a2, a2, 0x1
+	sb	t0, (a0)
+	addu	a1, a1, 0x1
+	bnez	a2, r_end_bytes_up
+	 addu	a0, a0, 0x1
+
+	jr	ra
+	 move	a2, zero
+
 #if 0 /* Horror fix */
 /* ------------------------------------------------------------------------- */
 
@@ -689,8 +702,8 @@ ru_end_bytes:
 
 	jr	ra
 	 move	a2, zero
-	END(__rmemcpy)
 #endif /* Horror fix */
+	END(__rmemcpy)
 
 l_fixup:					# clear the rest of the buffer
 	lw	t0, THREAD_BUADDR($28)
