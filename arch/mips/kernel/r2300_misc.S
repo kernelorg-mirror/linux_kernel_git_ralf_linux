@@ -1,5 +1,4 @@
-/* $Id: r2300_misc.S,v 1.3.2.1 1999/09/21 08:49:00 raiko Exp $
- *
+/*
  * r2300_misc.S: Misc. exception handling code for R3000/R2000.
  *
  * Copyright (C) 1994, 1995, 1996 by Ralf Baechle and Andreas Busse
@@ -22,7 +21,6 @@
 #include <asm/pgtable.h>
 #include <asm/processor.h>
 #include <asm/regdef.h>
-#include <asm/segment.h>
 #include <asm/stackframe.h>
 
 	.text
