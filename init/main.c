@@ -180,6 +180,8 @@ extern void baycom_setup(char *str, int *ints);
 extern void ipc_init(void);
 #endif
 
+extern int serial_console;
+
 /*
  * Boot command-line arguments
  */
@@ -816,8 +818,10 @@ asmlinkage void start_kernel(void)
 	memory_start = pci_init(memory_start,memory_end);
 #endif
 	memory_start = kmalloc_init(memory_start,memory_end);
+
 	sti();
 	calibrate_delay();
+
 	memory_start = inode_init(memory_start,memory_end);
 	memory_start = file_table_init(memory_start,memory_end);
 	memory_start = name_cache_init(memory_start,memory_end);
@@ -885,7 +889,13 @@ static int do_shell(void * shell)
 {
 	close(0);close(1);close(2);
 	setsid();
-	(void) open("/dev/tty1",O_RDWR,0);
+	if (serial_console == 1) {
+		(void) open("/dev/cua0",O_RDWR,0);
+	} else if(serial_console == 2) {
+		(void) open("/dev/cua1",O_RDWR,0);
+	} else {
+		(void) open("/dev/tty1",O_RDWR,0);
+	}
 	(void) dup(0);
 	(void) dup(0);
 	return execve(shell, argv, envp);
@@ -970,17 +980,14 @@ static int init(void * unused)
 		}
 	}
 #endif
-	
-	/*
-	 *	This keeps serial console MUCH cleaner, but does assume
-	 *	the console driver checks there really is a video device
-	 *	attached (Sparc effectively does).
-	 */
 
-	if ((open("/dev/tty1",O_RDWR,0) < 0) &&
-	    (open("/dev/ttyS0",O_RDWR,0) < 0))
-		printk("Unable to open an initial console.\n");
-			
+	if (serial_console == 1) {
+		(void) open("/dev/cua0",O_RDWR,0);
+	} else if(serial_console == 2) {
+		(void) open("/dev/cua1",O_RDWR,0);
+	} else {
+		(void) open("/dev/tty1",O_RDWR,0);
+	}
 	(void) dup(0);
 	(void) dup(0);
 

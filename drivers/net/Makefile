@@ -404,6 +404,14 @@ else
   endif
 endif
 
+ifeq ($(CONFIG_COBALT_TULIP),y)
+L_OBJS += cobalttulip.o
+else
+  ifeq ($(CONFIG_COBALT_TULIP),m)
+  M_OBJS += cobalttulip.o
+  endif
+endif
+
 ifeq ($(CONFIG_ARCNET),y)
 L_OBJS += arcnet.o
 else

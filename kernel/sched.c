@@ -86,8 +86,13 @@ unsigned long prof_shift = 0;
 
 extern void mem_use(void);
 
+#ifdef __mips__
+unsigned long init_kernel_stack[2048] = { STACK_MAGIC, };
+unsigned long init_user_stack[2048] = { STACK_MAGIC, };
+#else
 static unsigned long init_kernel_stack[1024] = { STACK_MAGIC, };
 unsigned long init_user_stack[1024] = { STACK_MAGIC, };
+#endif
 static struct vm_area_struct init_mmap = INIT_MMAP;
 static struct fs_struct init_fs = INIT_FS;
 static struct files_struct init_files = INIT_FILES;

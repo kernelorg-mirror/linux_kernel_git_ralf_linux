@@ -105,6 +105,9 @@ ethif_probe(struct device *dev)
 #if defined(CONFIG_DEC_ELCP)
 	&& tulip_probe(dev)
 #endif
+#if defined(CONFIG_COBALT_TULIP)
+	&& tulip_probe(dev)
+#endif
 #if defined(CONFIG_HP100)
 	&& hp100_probe(dev)
 #endif	

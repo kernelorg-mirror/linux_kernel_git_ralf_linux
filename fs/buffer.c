@@ -1438,6 +1438,7 @@ void buffer_init(void)
 	hash_table = (struct buffer_head **)vmalloc(NR_HASH*sizeof(struct buffer_head *));
 	if (!hash_table)
 		panic("Failed to allocate buffer hash table\n");
+
 	memset(hash_table,0,NR_HASH*sizeof(struct buffer_head *));
 
 	lru_list[BUF_CLEAN] = 0;

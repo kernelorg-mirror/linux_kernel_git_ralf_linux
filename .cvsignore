@@ -1,0 +1,7 @@
+.config
+.hdepend
+.depend
+.version
+System.map
+vmlinux
+vmlinux.gz

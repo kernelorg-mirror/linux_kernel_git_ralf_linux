@@ -515,7 +515,7 @@ asmlinkage int sys_swapon(const char * specialfile, int swap_flags)
 			p->swap_map[i] = 0x80;
 	}
 	p->swap_map[0] = 0x80;
-	memset(p->swap_lockmap,0,PAGE_SIZE);
+	clear_page(p->swap_lockmap);
 	p->flags = SWP_WRITEOK;
 	p->pages = j;
 	nr_swap_pages += j;

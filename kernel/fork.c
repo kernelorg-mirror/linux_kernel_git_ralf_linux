@@ -22,6 +22,8 @@
 #include <linux/ldt.h>
 #include <linux/smp.h>
 
+#include <asm/pgtable.h>
+#include <asm/mmu_context.h>
 #include <asm/segment.h>
 #include <asm/system.h>
 #include <asm/pgtable.h>
@@ -120,6 +122,7 @@ static inline int copy_mm(unsigned long clone_flags, struct task_struct * tsk)
 		if (!mm)
 			return -1;
 		*mm = *current->mm;
+		init_new_context(mm);
 		mm->count = 1;
 		mm->def_flags = 0;
 		tsk->mm = mm;

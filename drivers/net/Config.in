@@ -99,6 +99,9 @@ if [ "$CONFIG_NET_ETHERNET" = "y" ]; then
     tristate 'Apricot Xen-II on board ethernet' CONFIG_APRICOT
     tristate 'DE425, DE434, DE435, DE450, DE500 support' CONFIG_DE4X5
     tristate 'DECchip Tulip (dc21x4x) PCI support' CONFIG_DEC_ELCP
+    if [ "$CONFIG_COBALT_MICRO_SERVER" = "y" ]; then
+      tristate 'Cobalt DECchip Tulip (dc21x4x) onboard support' CONFIG_COBALT_TULIP
+    fi
     tristate 'Digi Intl. RightSwitch SE-X support' CONFIG_DGRS
     if [ "$CONFIG_EXPERIMENTAL" = "y" ]; then
       bool 'Zenith Z-Note support (EXPERIMENTAL)' CONFIG_ZNET

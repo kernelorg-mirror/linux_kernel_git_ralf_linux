@@ -92,6 +92,9 @@ struct termios tty_std_termios;		/* for the benefit of tty drivers  */
 struct tty_driver *tty_drivers = NULL;	/* linked list of tty drivers */
 struct tty_ldisc ldiscs[NR_LDISCS];	/* line disc dispatch table	*/
 
+extern void rs_cons_hook(int chip, int out, int channel);
+int serial_console;
+
 /*
  * fg_console is the current virtual console,
  * last_console is the last used one,
@@ -1220,6 +1223,11 @@ retry_open:
 		device = current->tty->device;
 		/* noctty = 1; */
 	}
+#ifdef CONFIG_COBALT_SERIAL /* Implies serial console */
+	if (device == CONSOLE_DEV) {
+		device = MKDEV(TTYAUX_MAJOR, 64 + 0);
+	} else
+#endif
 	if (device == CONSOLE_DEV) {
 		device = MKDEV(TTY_MAJOR, fg_console+1);
 		noctty = 1;
@@ -1864,11 +1872,21 @@ long console_init(long kmem_start, long kmem_end)
 	tty_std_termios.c_lflag = ISIG | ICANON | ECHO | ECHOE | ECHOK |
 		ECHOCTL | ECHOKE | IEXTEN;
 
+#ifdef CONFIG_COBALT_SERIAL
+	if (serial_console) {
+		rs_cons_hook(0, 0, serial_console);
+
+		return kmem_start;
+	}
+#endif
+
+#ifndef CONFIG_NO_VIDEO_CONSOLE
 	/*
 	 * set up the console device so that later boot sequences can 
 	 * inform about problems etc..
 	 */
 	return con_init(kmem_start);
+#endif
 }
 
 static struct tty_driver dev_tty_driver, dev_console_driver;
@@ -1906,8 +1924,13 @@ int tty_init(void)
 	if (tty_register_driver(&dev_console_driver))
 		panic("Couldn't register /dev/console driver\n");
 	
+#ifndef CONFIG_NO_KEYBOARD
 	kbd_init();
+#endif
 #ifdef CONFIG_SERIAL
+	rs_init();
+#endif
+#ifdef CONFIG_COBALT_SERIAL
 	rs_init();
 #endif
 #ifdef CONFIG_SCC

@@ -5,6 +5,7 @@
  */
 
 #include <linux/config.h>
+#include <asm/ide.h>
 
 /*
  * This is the multiple IDE interface driver, as evolved from hd.c.  
@@ -137,7 +138,7 @@ typedef unsigned char	byte;	/* used everywhere */
 #define PARTN_MASK	((1<<PARTN_BITS)-1)	/* a useful bit mask */
 #define MAX_DRIVES	2	/* per interface; 2 assumed by lots of code */
 #ifndef MAX_HWIFS
-#define MAX_HWIFS	4	/* an arbitrary, but realistic limit */
+#error "MAX_HWIFS is not defined!"
 #endif
 #define SECTOR_WORDS	(512 / 4)	/* number of 32bit words per sector */
 
@@ -416,8 +417,8 @@ typedef enum {	ide_unknown,	ide_generic,	ide_triton,
 typedef struct hwif_s {
 	struct hwif_s	*next;		/* for linked-list in ide_hwgroup_t */
 	void		*hwgroup;	/* actually (ide_hwgroup_t *) */
-	unsigned short	io_base;	/* base io port addr */
-	unsigned short	ctl_port;	/* usually io_base+0x206 */
+	ide_ioreg_t	io_base;	/* base io port addr */
+	ide_ioreg_t	ctl_port;	/* usually io_base+0x206 */
 	ide_drive_t	drives[MAX_DRIVES];	/* drive info */
 	struct gendisk	*gd;		/* gendisk structure */
 	ide_tuneproc_t	*tuneproc;	/* routine to tune PIO mode for drives */

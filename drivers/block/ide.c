@@ -25,8 +25,8 @@
  *	Define some new major numbers (in major.h), and insert them into
  *	the ide_hwif_to_major table in ide.c.
  *
- *	Fill in the extra values for the new interfaces into the two tables
- *	inside ide.c:  default_io_base[]  and  default_irqs[].
+ *	Fill in the extra values for the new interfaces into the two functions
+ *	inside <asm/ide.h>:  ide_default_io_base() and ide_default_irq().
  *
  *	Create the new request handlers by cloning "do_ide3_request()"
  *	for each new interface, and add them to the switch statement
@@ -307,8 +307,6 @@
 #endif /* CONFIG_BLK_DEV_PROMISE */
 
 static const byte	ide_hwif_to_major[MAX_HWIFS] = {IDE0_MAJOR, IDE1_MAJOR, IDE2_MAJOR, IDE3_MAJOR};
-static const unsigned short default_io_base[MAX_HWIFS] = {0x1f0, 0x170, 0x1e8, 0x168};
-static const byte	default_irqs[MAX_HWIFS]     = {14, 15, 11, 10};
 static int	idebus_parameter; /* holds the "idebus=" parameter */
 static int	system_bus_speed; /* holds what we think is VESA/PCI bus speed */
 
@@ -368,7 +366,7 @@ static void init_hwif_data (unsigned int index)
 	/* fill in any non-zero initial values */
 	hwif->index     = index;
 	hwif->noprobe	= (index > 1);
-	hwif->io_base	= default_io_base[index];
+	hwif->io_base	= ide_default_io_base(index);
 	hwif->ctl_port	= hwif->io_base ? hwif->io_base+0x206 : 0x000;
 #ifdef CONFIG_BLK_DEV_HD
 	if (hwif->io_base == HD_DATA)
@@ -460,7 +458,7 @@ int ide_system_bus_speed (void)
  * of the sector count register location, with interrupts disabled
  * to ensure that the reads all happen together.
  */
-static inline void do_vlb_sync (unsigned short port) {
+static inline void do_vlb_sync (ide_ioreg_t port) {
 	(void) inb (port);
 	(void) inb (port);
 	(void) inb (port);
@@ -472,8 +470,8 @@ static inline void do_vlb_sync (unsigned short port) {
  */
 void ide_input_data (ide_drive_t *drive, void *buffer, unsigned int wcount)
 {
-	unsigned short io_base  = HWIF(drive)->io_base;
-	unsigned short data_reg = io_base+IDE_DATA_OFFSET;
+	ide_ioreg_t io_base  = HWIF(drive)->io_base;
+	ide_ioreg_t data_reg = io_base+IDE_DATA_OFFSET;
 	byte io_32bit = drive->io_32bit;
 
 	if (io_32bit) {
@@ -506,8 +504,8 @@ void ide_input_data (ide_drive_t *drive, void *buffer, unsigned int wcount)
  */
 void ide_output_data (ide_drive_t *drive, void *buffer, unsigned int wcount)
 {
-	unsigned short io_base  = HWIF(drive)->io_base;
-	unsigned short data_reg = io_base+IDE_DATA_OFFSET;
+	ide_ioreg_t io_base  = HWIF(drive)->io_base;
+	ide_ioreg_t data_reg = io_base+IDE_DATA_OFFSET;
 	byte io_32bit = drive->io_32bit;
 
 	if (io_32bit) {
@@ -1346,7 +1344,7 @@ test:
 static inline void do_rw_disk (ide_drive_t *drive, struct request *rq, unsigned long block)
 {
 	ide_hwif_t *hwif = HWIF(drive);
-	unsigned short io_base = hwif->io_base;
+	ide_ioreg_t io_base = hwif->io_base;
 #ifdef CONFIG_BLK_DEV_PROMISE
 	int use_promise_io = 0;
 #endif /* CONFIG_BLK_DEV_PROMISE */
@@ -3242,6 +3240,8 @@ static int init_irq (ide_hwif_t *hwif)
 		hwgroup = match->hwgroup;
 	} else {
 		hwgroup = kmalloc(sizeof(ide_hwgroup_t), GFP_KERNEL);
+		if (!hwgroup)
+			return NULL;
 		hwgroup->hwif 	 = hwgroup->next_hwif = hwif->next = hwif;
 		hwgroup->rq      = NULL;
 		hwgroup->handler = NULL;
@@ -3375,7 +3375,7 @@ static int hwif_init (int h)
 	if (!hwif->present)
 		return 0;
 	if (!hwif->irq) {
-		if (!(hwif->irq = default_irqs[h])) {
+		if (!(hwif->irq = ide_default_irq(h))) {
 			printk("%s: DISABLED, NO IRQ\n", hwif->name);
 			return (hwif->present = 0);
 		}
@@ -3446,7 +3446,7 @@ int ide_init (void)
 }
 
 #ifdef CONFIG_BLK_DEV_IDE_PCMCIA
-int ide_register(int io_base, int ctl_port, int irq)
+int ide_register(ide_ioreg_t io_base, ide_ioreg_t ctl_port, int irq)
 {
 	int index, i, rc = -1;
 	ide_hwif_t *hwif;

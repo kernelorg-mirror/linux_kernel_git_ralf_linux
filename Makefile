@@ -2,7 +2,7 @@ VERSION = 2
 PATCHLEVEL = 0
 SUBLEVEL = 30
 
-ARCH = i386
+ARCH = mips
 
 #
 # For SMP kernels, set this. We don't want to have this in the config file
@@ -26,8 +26,8 @@ TOPDIR	:= $(shell if [ "$$PWD" != "" ]; then echo $$PWD; else pwd; fi)
 HPATH   	= $(TOPDIR)/include
 FINDHPATH	= $(HPATH)/asm $(HPATH)/linux $(HPATH)/scsi $(HPATH)/net
 
-HOSTCC  	=gcc -I$(HPATH)
-HOSTCFLAGS	=-O2 -fomit-frame-pointer
+HOSTCC  	= gcc
+HOSTCFLAGS	= -O2 -fomit-frame-pointer
 
 CROSS_COMPILE 	=
 
