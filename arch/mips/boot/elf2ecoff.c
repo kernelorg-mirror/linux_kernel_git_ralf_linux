@@ -100,7 +100,7 @@ main (int argc, char **argv, char **envp)
     {
     usage:
       fprintf (stderr,
-	       "usage: elf2aout <elf executable> <a.out executable> [-a]\n");
+	       "usage: elf2ecoff <elf executable> <ecoff executable> [-a]\n");
       exit (1);
     }
   if (argc == 4)
