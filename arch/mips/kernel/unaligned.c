@@ -83,6 +83,7 @@
 #include <asm/byteorder.h>
 #include <asm/inst.h>
 #include <asm/uaccess.h>
+#include <asm/system.h>
 
 #define STR(x)  __STR(x)
 #define __STR(x)  #x
@@ -407,6 +408,7 @@ asmlinkage void do_ade(struct pt_regs *regs)
 	return;
 
 sigbus:
+	die_if_kernel ("Unhandled kernel unaligned access", regs, 0);
 	lock_kernel();
 	force_sig(SIGBUS, current);
 	unlock_kernel();

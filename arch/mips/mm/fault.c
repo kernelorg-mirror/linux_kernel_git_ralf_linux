@@ -29,8 +29,6 @@
 
 #define development_version (LINUX_VERSION_CODE & 0x100)
 
-extern void die(char *, struct pt_regs *, unsigned long write);
-
 unsigned long asid_cache;
 
 /*

@@ -197,4 +197,9 @@ __xchg(unsigned long x, volatile void * ptr, int size)
 
 extern void set_except_vector(int n, void *addr);
 
+struct pt_regs;
+
+extern void die(const char * str, struct pt_regs * regs, int write);
+extern void die_if_kernel(const char * str, struct pt_regs * regs, int write);
+
 #endif /* __ASM_MIPS_SYSTEM_H */
