@@ -8,6 +8,7 @@
  * Copyright (C) 1994, 1995, 1996, 1997, 1998, 2001 Ralf Baechle
  * Copyright (C) 1996 David S. Miller
  */
+#include <linux/config.h>
 #include <linux/kernel.h>
 #include <linux/sched.h>
 #include <linux/mm.h>
@@ -292,7 +293,7 @@ asmlinkage int sys_ptrace(long request, long pid, long addr, long data)
 	struct task_struct *child;
 	unsigned int flags;
 	int res;
-	extern void (*save_fp)(struct sigcontext *);
+	extern void (*save_fp)(struct task_struct *);
 
 	lock_kernel();
 #if 0
@@ -398,13 +399,27 @@ asmlinkage int sys_ptrace(long request, long pid, long addr, long data)
 			break;
 		case FPR_BASE ... FPR_BASE + 31:
 			if (child->used_math) {
+				unsigned long long *fregs =
+					(void *)  child->tss.fpu.hard.fp_regs;
+
 				if (last_task_used_math == child) {
 					enable_cp1();
 					save_fp(child);
 					disable_cp1();
 					last_task_used_math = NULL;
+					regs->cp0_status &= ~ST0_CU1;
 				}
-				tmp = child->tss.fpu.hard.fp_regs[addr - 32];
+				/*
+				 * The odd registers are actually the high
+				 * order bits of the values stored in the even
+				 * registers - unless we're using r3k_switch.S.
+				 */
+#ifdef CONFIG_CPU_R3000
+				tmp = *(unsigned long *)(fpregs + addr)
+#else
+				if (addr & 1)
+					tmp = (unsigned long) (fregs[((addr & ~1) - 32)] >> 32);
+#endif
 			} else {
 				tmp = -1;	/* FP not yet used  */
 			}
@@ -463,7 +478,9 @@ asmlinkage int sys_ptrace(long request, long pid, long addr, long data)
 			regs->regs[addr] = data;
 			break;
 		case FPR_BASE ... FPR_BASE + 31: {
-			unsigned int *fregs;
+			unsigned long long *fregs =
+				(void *)  child->tss.fpu.hard.fp_regs;
+
 			if (child->used_math) {
 				if (last_task_used_math == child) {
 					enable_cp1();
@@ -478,8 +495,22 @@ asmlinkage int sys_ptrace(long request, long pid, long addr, long data)
 				       sizeof(child->tss.fpu.hard));
 				child->tss.fpu.hard.control = 0;
 			}
-			fregs = child->tss.fpu.hard.fp_regs;
-			fregs[addr - FPR_BASE] = data;
+			/*
+			 * The odd registers are actually the high order bits
+			 * of the values stored in the even registers - unless
+			 * we're using r2k_switch.S.
+			 */
+#ifdef CONFIG_CPU_R3000
+			*(unsigned long *)(fregs + addr) = data;
+#else
+			if (addr & 1) {
+				fregs[(addr & ~1) - FPR_BASE] &= 0xffffffff;
+				fregs[(addr & ~1) - FPR_BASE] |= ((unsigned long long) data) << 32;
+			} else {
+				fregs[addr - FPR_BASE] &= ~0xffffffffLL;
+				fregs[addr - FPR_BASE] |= data;
+			}
+#endif
 			break;
 		}
 		case PC:
