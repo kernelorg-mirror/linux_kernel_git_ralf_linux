@@ -357,6 +357,8 @@ void do_tr(struct pt_regs *regs)
 
 void do_ri(struct pt_regs *regs)
 {
+	die_if_kernel("Reserved instruction in kernel code", regs);
+
 	if (compute_return_epc(regs))
 		return;
 
