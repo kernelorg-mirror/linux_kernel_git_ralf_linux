@@ -1,10 +1,10 @@
-#ifndef __ASM_MIPS_PGTABLE_H
-#define __ASM_MIPS_PGTABLE_H
+#ifndef _ASM_PGTABLE_H
+#define _ASM_PGTABLE_H
 
 #include <asm/addrspace.h>
 #include <asm/mipsconfig.h>
 
-#ifndef __LANGUAGE_ASSEMBLY__
+#if !(defined(__LANGUAGE_ASSEMBLY__) || defined(__ASSEMBLY__))
 
 #include <linux/linkage.h>
 #include <asm/cachectl.h>
@@ -52,7 +52,7 @@ extern void (*flush_tlb_page)(struct vm_area_struct *vma, unsigned long page);
  * works even with the cache aliasing problem the R4k and above have.
  */
 
-#endif /* !defined (__LANGUAGE_ASSEMBLY__) */
+#endif /* !(defined(__LANGUAGE_ASSEMBLY__) || defined(__ASSEMBLY__)) */
 
 /* PMD_SHIFT determines the size of the area a second-level page table can map */
 #define PMD_SHIFT	22
@@ -154,7 +154,7 @@ extern void (*flush_tlb_page)(struct vm_area_struct *vma, unsigned long page);
 #define __S110	PAGE_SHARED
 #define __S111	PAGE_SHARED
 
-#if !defined (__LANGUAGE_ASSEMBLY__)
+#if !(defined(__LANGUAGE_ASSEMBLY__) || defined(__ASSEMBLY__))
 
 /*
  * BAD_PAGETABLE is used when we need a bogus page-table, while
@@ -774,6 +774,6 @@ extern inline void free_kernel_stack(unsigned long stack)
 	free_pages(stack, 1);
 }
 
-#endif /* !defined (__LANGUAGE_ASSEMBLY__) */
+#endif /* !(defined(__LANGUAGE_ASSEMBLY__) || defined(__ASSEMBLY__)) */
 
-#endif /* __ASM_MIPS_PGTABLE_H */
+#endif /* _ASM_PGTABLE_H */

@@ -1,16 +1,12 @@
 /*
- * include/asm-mips/string.h
- *
  * This file is subject to the terms and conditions of the GNU General Public
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
  *
  * Copyright (c) 1994, 1995, 1996, 1997 by Ralf Baechle
- *
- * $Id: string.h,v 1.3 1997/08/11 04:11:53 ralf Exp $
  */
-#ifndef __ASM_MIPS_STRING_H
-#define __ASM_MIPS_STRING_H
+#ifndef _ASM_STRING_H
+#define _ASM_STRING_H
 
 #define __HAVE_ARCH_STRCPY
 extern __inline__ char *strcpy(char *__dest, __const__ char *__src)
@@ -130,7 +126,7 @@ extern void *memmove(void *__dest, __const__ void *__src, size_t __n);
 #define __HAVE_ARCH_BCOPY
 extern __inline__ char * bcopy(const char * src, char * dest, int count)
 {
-	memmove(dest, src, count);
+	return memmove(dest, src, count);
 }
 
 #define __HAVE_ARCH_MEMSCAN
@@ -138,26 +134,18 @@ extern __inline__ void *memscan(void *__addr, int __c, size_t __size)
 {
 	char *__end = (char *)__addr + __size;
 
-	if (!__size)
-		return __addr;
-	__asm__(".set\tnoreorder\n\t"
-		".set\tnoat\n"
-		"1:\tlbu\t$1,(%0)\n\t"
-#if _MIPS_ISA == _MIPS_ISA_MIPS1
-		"nop\n\t"
-#endif
-		"beq\t$1,%3,2f\n\t"
+	__asm__(".set\tpush\n\t"
+		".set\tnoat\n\t"
+		".set\treorder\n\t"
+		"1:\tbeq\t%0,%1,2f\n\t"
 		"addiu\t%0,1\n\t"
-		"bne\t%0,%2,1b\n\t"
-		"nop\n\t"
-		".set\tat\n\t"
-		".set\treorder\n"
-		"2:"
-		: "=r" (__addr)
-		: "0" (__addr), "1" (__end), "r" (__c)
-		: "$1");
+		"lb\t$1,-1(%0)\n\t"
+		"bne\t$1,%4,1b\n"
+		"2:\t.set\tpop"
+		: "=r" (__addr), "=r" (__end)
+		: "0" (__addr), "1" (__end), "r" (__c));
 
 	return __addr;
 }
 
-#endif /* __ASM_MIPS_STRING_H */
+#endif /* _ASM_STRING_H */

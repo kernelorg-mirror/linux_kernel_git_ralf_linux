@@ -9,9 +9,9 @@
 #
 
 .S.s:
-	$(CPP) $(CFLAGS) $< -o $*.s
+	$(CPP) $(CFLAGS) -D__ASSEMBLY__ $< -o $*.s
 .S.o:
-	$(CC) $(CFLAGS) -c $< -o $*.o
+	$(CC) $(CFLAGS) -D__ASSEMBLY__ -c $< -o $*.o
 
 L_TARGET = lib.a
 L_OBJS	= beep.o checksum.o csum.o csum_partial_copy.o dump_tlb.o memset.o \

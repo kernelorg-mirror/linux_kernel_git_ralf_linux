@@ -1,4 +1,3 @@
-OUTPUT_FORMAT("elf32-littlemips")
 OUTPUT_ARCH(mips)
 ENTRY(kernel_entry)
 SECTIONS

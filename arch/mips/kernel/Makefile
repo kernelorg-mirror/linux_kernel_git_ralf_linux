@@ -5,13 +5,12 @@
 # removes any old dependencies. DON'T put your own dependencies here
 # unless it's something special (ie not a .c file).
 #
-# $Id:$
-#
 
 .S.o:
-	$(CC) $(CFLAGS) -c $< -o $*.o
+	$(CC) $(CFLAGS) -D__ASSEMBLY__ -c $< -o $*.o
 
 all:	kernel.o head.o
+
 EXTRA_ASFLAGS = -mips3 -mcpu=r4000
 O_TARGET := kernel.o
 O_OBJS	:= branch.o process.o signal.o entry.o traps.o ptrace.o vm86.o \

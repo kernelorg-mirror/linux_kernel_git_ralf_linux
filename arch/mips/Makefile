@@ -13,8 +13,6 @@
 # Copyright (C) 1994, 1995, 1996 by Ralf Baechle
 # DECStation modifications by Paul M. Antoine, 1996
 #
-# $Id: Makefile,v 1.9 1997/09/19 08:34:54 ralf Exp $
-#
 
 #
 # Select the object file format to substitute into the linker script.
@@ -155,11 +153,7 @@ endif
 # none has been choosen above.
 #
 ifndef LINKSCRIPT
-ifndef CONFIG_CPU_LITTLE_ENDIAN
-LINKSCRIPT    = arch/mips/ld.script.big
-else
-LINKSCRIPT    = arch/mips/ld.script.little
-endif
+LINKSCRIPT    = arch/mips/ld.script
 endif
 LINKFLAGS     += -T $(word 1,$(LINKSCRIPT))
 

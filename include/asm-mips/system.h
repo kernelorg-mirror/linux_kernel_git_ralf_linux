@@ -117,13 +117,13 @@ __asm__ __volatile__(					\
 	: /* no input */				\
 	: "memory")
 
-#if !defined (__LANGUAGE_ASSEMBLY__)
+#if !(defined(__LANGUAGE_ASSEMBLY__) || defined(__ASSEMBLY__))
 /*
  * switch_to(n) should switch tasks to task nr n, first
  * checking that n isn't the current task, in which case it does nothing.
  */
 extern asmlinkage void (*resume)(void *tsk);
-#endif /* !defined (__LANGUAGE_ASSEMBLY__) */
+#endif /* !(defined(__LANGUAGE_ASSEMBLY__) || defined(__ASSEMBLY__)) */
 
 #define switch_to(prev,next) \
 do { \

@@ -7,11 +7,9 @@
  *
  * Copyright (C) 1997 Cobalt Microserver
  * Copyright (C) 1997 Ralf Baechle
- *
- * $Id: cobalt.h,v 1.1 1997/10/23 22:28:37 ralf Exp $
  */
-#ifndef __ASM_MIPS_COBALT_H 
-#define __ASM_MIPS_COBALT_H 
+#ifndef _ASM_COBALT_H 
+#define _ASM_COBALT_H 
 
 /*
  * Base address of I/O ports
@@ -52,7 +50,7 @@
 /*
  * Access the R4030 DMA and I/O Controller
  */
-#ifndef __LANGUAGE_ASSEMBLY__
+#if !(defined(__LANGUAGE_ASSEMBLY__) || defined(__ASSEMBLY__))
 
 extern inline void r4030_delay(void)
 {
@@ -117,4 +115,4 @@ extern inline unsigned int r4030_write_reg32(unsigned addr, unsigned val)
 	    : /* No outputs */					\
 	    : "r" (0xb0000000), "i" (0x0c));
 
-#endif /* __ASM_MIPS_COBALT_H */
+#endif /* _ASM_COBALT_H */

@@ -133,7 +133,7 @@
 
 #define CL_SIZE      (80)
 
-#ifndef __LANGUAGE_ASSEMBLY__
+#if !(defined(__LANGUAGE_ASSEMBLY__) || defined(__ASSEMBLY__))
 
 /*
  * Some machine parameters passed by the bootloaders. 
@@ -303,6 +303,6 @@ extern unsigned long mips_vram_base;
 extern unsigned long mips_dma_cache_size;
 extern unsigned long mips_dma_cache_base;
 
-#endif /* __LANGUAGE_ASSEMBLY__ */
+#endif /* defined(__LANGUAGE_ASSEMBLY__) || defined(__ASSEMBLY__) */
 
 #endif /* __ASM_MIPS_BOOTINFO_H */

@@ -19,7 +19,7 @@
 
 #define STRICT_MM_TYPECHECKS
 
-#ifndef __LANGUAGE_ASSEMBLY__
+#if !(defined(__LANGUAGE_ASSEMBLY__) || defined(__ASSEMBLY__))
 
 extern void (*clear_page)(unsigned long page);
 extern void (*copy_page)(unsigned long to, unsigned long from);
@@ -64,7 +64,7 @@ typedef unsigned long pgprot_t;
 
 #endif /* !defined (STRICT_MM_TYPECHECKS) */
 
-#endif /* __LANGUAGE_ASSEMBLY__ */
+#endif /* !(defined(__LANGUAGE_ASSEMBLY__) || defined(__ASSEMBLY__)) */
 
 /* to align the pointer to the (next) page boundary */
 #define PAGE_ALIGN(addr)	(((addr)+PAGE_SIZE-1)&PAGE_MASK)

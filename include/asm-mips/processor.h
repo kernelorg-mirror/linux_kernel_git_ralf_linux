@@ -4,13 +4,11 @@
  * Copyright (C) 1994  Waldorf Electronics
  * written by Ralf Baechle
  * Modified further for R[236]000 compatibility by Paul M. Antoine
- *
- * $Id: processor.h,v 1.3 1997/09/19 08:36:17 ralf Exp $
  */
 #ifndef __ASM_MIPS_PROCESSOR_H
 #define __ASM_MIPS_PROCESSOR_H
 
-#if !defined (__LANGUAGE_ASSEMBLY__)
+#if !(defined(__LANGUAGE_ASSEMBLY__) || defined(__ASSEMBLY__))
 #include <asm/cachectl.h>
 #include <asm/mipsregs.h>
 #include <asm/reg.h>
@@ -138,7 +136,7 @@ struct thread_struct {
 
 #define KERNEL_STACK_SIZE 8192
 
-#if !defined (__LANGUAGE_ASSEMBLY__)
+#if !(defined(__LANGUAGE_ASSEMBLY__) || defined(__ASSEMBLY__))
 
 /*
  * Return saved PC of a blocked thread.

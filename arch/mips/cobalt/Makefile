@@ -5,13 +5,13 @@
 # removes any old dependencies. DON'T put your own dependencies here
 # unless it's something special (ie not a .c file).
 #
-# $Id: Makefile,v 1.1 1997/10/23 22:25:41 ralf Exp $
+# $Id: Makefile,v 1.2 2002/11/19 03:17:59 ralf Exp $
 #
 
 .S.s:
-	$(CPP) $(CFLAGS) $< -o $*.s
+	$(CPP) $(CFLAGS) -D__ASSEMBLY__ $< -o $*.s
 .S.o:
-	$(CC) $(CFLAGS) -c $< -o $*.o
+	$(CC) $(CFLAGS) -D__ASSEMBLY__ -c $< -o $*.o
 
 all: cobalt.o
 O_TARGET := cobalt.o

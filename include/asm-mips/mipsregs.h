@@ -157,7 +157,7 @@
 #define C_IRQ4          (1<<14)
 #define C_IRQ5          (1<<15)
 
-#ifndef __LANGUAGE_ASSEMBLY__
+#if !(defined(__LANGUAGE_ASSEMBLY__) || defined(__ASSEMBLY__))
 /*
  * Manipulate the status register.
  * Mostly used to access the interrupt bits.
@@ -181,7 +181,7 @@ __BUILD_SET_CP0(status,CP0_STATUS)
 __BUILD_SET_CP0(cause,CP0_CAUSE)
 __BUILD_SET_CP0(config,CP0_CONFIG)
 
-#endif /* defined (__LANGUAGE_ASSEMBLY__) */
+#endif /* !(defined(__LANGUAGE_ASSEMBLY__) || defined(__ASSEMBLY__)) */
 
 /*
  * Inline code for use of the ll and sc instructions
@@ -388,7 +388,7 @@ __BUILD_SET_CP0(config,CP0_CONFIG)
 #define CEB_KERNEL	2	/* Count events in kernel mode EXL = ERL = 0 */
 #define CEB_EXL		1	/* Count events with EXL = 1, ERL = 0 */
 
-#ifndef __LANGUAGE_ASSEMBLY__
+#if !(defined(__LANGUAGE_ASSEMBLY__) || defined(__ASSEMBLY__))
 /*
  * Functions to access the performance counter and control registers
  */
