@@ -1,5 +1,4 @@
-/* $Id: bootinfo.h,v 1.2 1999/04/22 16:44:42 vladimir Exp $
- *
+/*
  * bootinfo.h -- Definition of the Linux/MIPS boot information structure
  *
  * Copyright (C) 1995, 1996 by Ralf Baechle, Andreas Busse,
@@ -149,7 +148,7 @@
         "R6000A", "R8000", "R10000", "R4300", "R4650", "R4700", "R5000",     \
         "R5000A", "R4640", "Nevada" }
 
-#define CL_SIZE      (80)
+#define CL_SIZE      		(256)
 
 #ifndef _LANGUAGE_ASSEMBLY
 
