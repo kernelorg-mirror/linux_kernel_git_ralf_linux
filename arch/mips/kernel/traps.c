@@ -308,17 +308,13 @@ static inline int get_insn_opcode(struct pt_regs *regs, unsigned int *opcode)
 {
 	unsigned int *epc;
 
-	epc = (unsigned int *) (unsigned long) regs->cp0_epc;
-	if (regs->cp0_cause & CAUSEF_BD)
-		epc++;
+	epc = (unsigned int *)regs->cp0_epc +
+	      ((regs->cp0_cause & CAUSEF_BD) != 0);
+	if (!get_user(opcode, epc))
+		return 0;
 
-	if (verify_area(VERIFY_READ, epc, 4)) {
-		force_sig(SIGSEGV, current);
-		return 1;
-	}
-	*opcode = *epc;
-
-	return 0;
+	force_sig(SIGSEGV, current);
+	return 1;
 }
 
 
