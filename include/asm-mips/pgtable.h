@@ -1,10 +1,9 @@
-/* $Id: pgtable.h,v 1.19 1999/06/13 16:35:53 ralf Exp $
- *
+/*
  * This file is subject to the terms and conditions of the GNU General Public
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
  *
- * Copyright (C) 1994 - 1998 by Ralf Baechle at alii
+ * Copyright (C) 1994 - 1998, 2001 by Ralf Baechle
  */
 #ifndef _ASM_PGTABLE_H
 #define _ASM_PGTABLE_H

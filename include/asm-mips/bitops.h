@@ -1,11 +1,10 @@
 /*
- * include/asm-mips/bitops.h
- *
  * This file is subject to the terms and conditions of the GNU General Public
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
  *
- * Copyright (c) 1994 - 1997  Ralf Baechle (ralf@gnu.org)
+ * Copyright (c) 1994 - 1997, 2001  Ralf Baechle (ralf@gnu.org)
+ * Copyright (c) 2001  MIPS Technologies, Inc.
  */
 #ifndef _ASM_BITOPS_H
 #define _ASM_BITOPS_H
@@ -52,8 +51,9 @@ extern __inline__ int find_first_zero_bit (void *addr, unsigned size);
 extern __inline__ int find_next_zero_bit (void * addr, int size, int offset);
 extern __inline__ unsigned long ffz(unsigned long word);
 
-#if (_MIPS_ISA == _MIPS_ISA_MIPS2) || (_MIPS_ISA == _MIPS_ISA_MIPS3) || \
-    (_MIPS_ISA == _MIPS_ISA_MIPS4) || (_MIPS_ISA == _MIPS_ISA_MIPS5)
+#if (_MIPS_ISA == _MIPS_ISA_MIPS2 ) || (_MIPS_ISA == _MIPS_ISA_MIPS3 ) || \
+    (_MIPS_ISA == _MIPS_ISA_MIPS4 ) || (_MIPS_ISA == _MIPS_ISA_MIPS5 ) || \
+    (_MIPS_ISA == _MIPS_ISA_MIPS32) || (_MIPS_ISA == _MIPS_ISA_MIPS64)
 
 /*
  * These functions for MIPS ISA > 1 are interrupt and SMP proof and
@@ -295,8 +295,9 @@ extern __inline__ int find_first_zero_bit (void *addr, unsigned size)
 		"blez\t$1,2f\n\t"
 		"lw\t$1,(%5)\n\t"
 		"addiu\t%5,4\n\t"
-#if (_MIPS_ISA == _MIPS_ISA_MIPS2) || (_MIPS_ISA == _MIPS_ISA_MIPS3) || \
-    (_MIPS_ISA == _MIPS_ISA_MIPS4) || (_MIPS_ISA == _MIPS_ISA_MIPS5)
+#if (_MIPS_ISA == _MIPS_ISA_MIPS2 ) || (_MIPS_ISA == _MIPS_ISA_MIPS3 ) || \
+    (_MIPS_ISA == _MIPS_ISA_MIPS4 ) || (_MIPS_ISA == _MIPS_ISA_MIPS5 ) || \
+    (_MIPS_ISA == _MIPS_ISA_MIPS32) || (_MIPS_ISA == _MIPS_ISA_MIPS64)
 		"beql\t%1,$1,1b\n\t"
 		"addiu\t%0,32\n\t"
 #else

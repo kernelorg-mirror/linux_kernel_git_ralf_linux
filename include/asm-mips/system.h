@@ -1,14 +1,13 @@
-/* $Id: system.h,v 1.9 1999/05/01 10:08:19 harald Exp $
- *
+/*
  * This file is subject to the terms and conditions of the GNU General Public
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
  *
- * Copyright (C) 1994, 1995, 1996, 1997, 1998 by Ralf Baechle
+ * Copyright (C) 1994, 1995, 1996, 1997, 1998, 2001 by Ralf Baechle
  * Modified further for R[236]000 by Paul M. Antoine, 1996
  */
-#ifndef __ASM_MIPS_SYSTEM_H
-#define __ASM_MIPS_SYSTEM_H
+#ifndef __ASM_SYSTEM_H
+#define __ASM_SYSTEM_H
 
 #include <asm/sgidefs.h>
 #include <linux/kernel.h>
@@ -150,8 +149,9 @@ do { \
  */
 extern __inline__ unsigned long xchg_u32(volatile int * m, unsigned long val)
 {
-#if (_MIPS_ISA == _MIPS_ISA_MIPS2) || (_MIPS_ISA == _MIPS_ISA_MIPS3) || \
-    (_MIPS_ISA == _MIPS_ISA_MIPS4) || (_MIPS_ISA == _MIPS_ISA_MIPS5)
+#if (_MIPS_ISA == _MIPS_ISA_MIPS2 ) || (_MIPS_ISA == _MIPS_ISA_MIPS3 ) || \
+    (_MIPS_ISA == _MIPS_ISA_MIPS4 ) || (_MIPS_ISA == _MIPS_ISA_MIPS5 ) || \
+    (_MIPS_ISA == _MIPS_ISA_MIPS32) || (_MIPS_ISA == _MIPS_ISA_MIPS64)
 	unsigned long dummy;
 
 	__asm__ __volatile__(
@@ -202,4 +202,4 @@ struct pt_regs;
 extern void die(const char * str, struct pt_regs * regs, int write);
 extern void die_if_kernel(const char * str, struct pt_regs * regs, int write);
 
-#endif /* __ASM_MIPS_SYSTEM_H */
+#endif /* __ASM_SYSTEM_H */

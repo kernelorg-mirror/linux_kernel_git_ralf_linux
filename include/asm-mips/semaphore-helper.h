@@ -1,5 +1,4 @@
-/* $Id: semaphore-helper.h,v 1.1.2.4 1999/10/20 21:22:43 ralf Exp $
- *
+/*
  * SMP- and interrupt-safe semaphores helper functions.
  *
  * (C) Copyright 1996 Linus Torvalds
@@ -11,6 +10,7 @@
 #define _ASM_SEMAPHORE_HELPER_H
 
 #include <linux/config.h>
+#include <asm/sgidefs.h>
 
 /*
  * These two _must_ execute atomically wrt each other.

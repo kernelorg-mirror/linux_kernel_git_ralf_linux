@@ -1,5 +1,4 @@
-/* $Id: semaphore.h,v 1.5.2.3 1999/10/20 21:22:43 ralf Exp $
- *
+/*
  * SMP- and interrupt-safe semaphores..
  *
  * This file is subject to the terms and conditions of the GNU General Public

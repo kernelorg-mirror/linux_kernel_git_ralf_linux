@@ -4,13 +4,11 @@
  * of Coprocessor 0 registers.
  *
  * Copyright (c) 1998 Harald Koerfgen
- *
- * $Id: $
  */
 #include <asm/sgidefs.h>
 
-#ifndef __ASM_MIPS_ISADEP_H
-#define __ASM_MIPS_ISADEP_H
+#ifndef __ASM_ISADEP_H
+#define __ASM_ISADEP_H
 
 #if (_MIPS_ISA == _MIPS_ISA_MIPS1)
 /*
@@ -24,10 +22,7 @@
 #define	KU_USER 0x08
 #define KU_KERN 0x00
 
-#else
-/*
- * R6000 or higher
- */
+#else /* R6000 or higher */
 
 /*
  * kernel or user mode?
@@ -38,4 +33,4 @@
 
 #endif /* (_MIPS_ISA == _MIPS_ISA_MIPS1) */
 
-#endif /* __ASM_MIPS_ISADEP_H */
+#endif /* __ASM_ISADEP_H */

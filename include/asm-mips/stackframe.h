@@ -1,9 +1,5 @@
 /*
- *  include/asm-mips/stackframe.h
- *
- *  Copyright (C) 1994, 1995, 1996 by Ralf Baechle and Paul M. Antoine.
- *
- * $Id: stackframe.h,v 1.8 1999/05/01 10:08:19 harald Exp $
+ * Copyright (C) 1994, 1995, 1996 by Ralf Baechle and Paul M. Antoine.
  */
 #ifndef _ASM_STACKFRAME_H
 #define _ASM_STACKFRAME_H

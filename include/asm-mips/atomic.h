@@ -1,6 +1,6 @@
 /*
- * Atomic operations that C can't guarantee us.  Useful for
- * resource counting etc..
+ * Atomic operations that C can't guarantee us.  Useful for resource counting
+ * etc..
  *
  * But use these as seldom as possible since they are much more slower
  * than regular operations.
@@ -9,9 +9,8 @@
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
  *
- * Copyright (C) 1996, 1997 by Ralf Baechle
- *
- * $Id: atomic.h,v 1.5 1998/03/04 09:51:21 ralf Exp $
+ * Copyright (C) 1996, 1997, 2001 by Ralf Baechle
+ * Copyright (C) 2001  MIPS Technologies, Inc.
  */
 #ifndef _ASM_ATOMIC_H
 #define _ASM_ATOMIC_H
@@ -142,8 +141,9 @@ extern __inline__ void atomic_clear_mask(unsigned long mask, unsigned long * v)
 
 #endif
 
-#if (_MIPS_ISA == _MIPS_ISA_MIPS2) || (_MIPS_ISA == _MIPS_ISA_MIPS3) || \
-    (_MIPS_ISA == _MIPS_ISA_MIPS4) || (_MIPS_ISA == _MIPS_ISA_MIPS5)
+#if (_MIPS_ISA == _MIPS_ISA_MIPS2 ) || (_MIPS_ISA == _MIPS_ISA_MIPS3 ) || \
+    (_MIPS_ISA == _MIPS_ISA_MIPS4 ) || (_MIPS_ISA == _MIPS_ISA_MIPS5 ) || \
+    (_MIPS_ISA == _MIPS_ISA_MIPS32) || (_MIPS_ISA == _MIPS_ISA_MIPS64)
 /*
  * ... while for MIPS II and better we can use ll/sc instruction.  This
  * implementation is SMP safe ...

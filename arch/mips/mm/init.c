@@ -1,10 +1,10 @@
-/* $Id: init.c,v 1.12 1999/02/25 21:06:44 tsbogend Exp $
- *
+/*
  * This file is subject to the terms and conditions of the GNU General Public
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
  *
- * Copyright (C) 1994 - 1998 by Ralf Baechle
+ * Copyright (C) 1994 - 1998, 2001 by Ralf Baechle
+ * Copyright (C) 2001 MIPS Technologies, Inc.
  */
 #include <linux/config.h>
 #include <linux/init.h>
@@ -178,7 +178,8 @@ pte_t * __bad_pagetable(void)
 	extern char empty_bad_page_table[PAGE_SIZE];
 	unsigned long page;
 	unsigned long dummy1, dummy2;
-#if (_MIPS_ISA == _MIPS_ISA_MIPS3) || (_MIPS_ISA == _MIPS_ISA_MIPS4)
+#if (_MIPS_ISA == _MIPS_ISA_MIPS3 ) || (_MIPS_ISA == _MIPS_ISA_MIPS4) || \
+    (_MIPS_ISA == _MIPS_ISA_MIPS64)
 	unsigned long dummy3;
 #endif
 
@@ -188,7 +189,8 @@ pte_t * __bad_pagetable(void)
 	 * R4000 registers on interrupt we cannot use 64 bit memory accesses
 	 * to the main memory.
 	 */
-#if (_MIPS_ISA == _MIPS_ISA_MIPS3) || (_MIPS_ISA == _MIPS_ISA_MIPS4)
+#if (_MIPS_ISA == _MIPS_ISA_MIPS3 ) || (_MIPS_ISA == _MIPS_ISA_MIPS4) || \
+    (_MIPS_ISA == _MIPS_ISA_MIPS64)
         /*
          * Use 64bit code even for Linux/MIPS 32bit on R4000
          */
@@ -212,7 +214,7 @@ pte_t * __bad_pagetable(void)
 		:"0" (page),
 		 "1" (PAGE_SIZE/8),
 		 "2" (pte_val(BAD_PAGE)));
-#else /* (_MIPS_ISA == _MIPS_ISA_MIPS1) || (_MIPS_ISA == _MIPS_ISA_MIPS2) */
+#else /* Only 32-bit CPU */
 	__asm__ __volatile__(
 		".set\tnoreorder\n"
 		"1:\tsw\t%2,(%0)\n\t"
