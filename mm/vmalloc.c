@@ -130,7 +130,6 @@ int vmalloc_area_pages(unsigned long address, unsigned long size, pgprot_t prot)
 	unsigned long end = address + size;
 
 	dir = pgd_offset_k(address);
-	flush_cache_all();
 	while (address < end) {
 		pmd_t *pmd;
 		pgd_t olddir = *dir;
@@ -145,6 +144,7 @@ int vmalloc_area_pages(unsigned long address, unsigned long size, pgprot_t prot)
 		address = (address + PGDIR_SIZE) & PGDIR_MASK;
 		dir++;
 	}
+	flush_cache_all();
 	flush_tlb_all();
 	return 0;
 }
