@@ -230,8 +230,6 @@ void do_dbe(struct pt_regs *regs)
 
 void do_ov(struct pt_regs *regs)
 {
-	if (compute_return_epc(regs))
-		return;
 	force_sig(SIGFPE, current);
 }
 
@@ -294,6 +292,10 @@ void do_fpe(struct pt_regs *regs, unsigned long fcr31)
 		simfp(insn);
 	}
 
+	/*
+	 * This is is crude.  2.4 will skip over FPU instructions it doesn't
+	 * know how to handle.
+	 */
 	if (compute_return_epc(regs))
 		goto out;
 	//force_sig(SIGFPE, current);
@@ -358,9 +360,6 @@ void do_ri(struct pt_regs *regs)
 {
 	die_if_kernel("Reserved instruction in kernel code", regs);
 
-	if (compute_return_epc(regs))
-		return;
-
 	force_sig(SIGILL, current);
 }
 
@@ -387,7 +386,6 @@ void do_cpu(struct pt_regs *regs)
 	return;
 
 bad_cid:
-	compute_return_epc(regs);
 	force_sig(SIGILL, current);
 }
 
