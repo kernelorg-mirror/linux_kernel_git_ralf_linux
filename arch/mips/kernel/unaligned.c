@@ -164,7 +164,7 @@ emulate_load_store_insn(struct pt_regs *regs,
 			:"r" (addr), "i" (&&fault)
 			:"$1");
 		regs->regs[insn.i_format.rt] = value;
-		return;
+		break;
 
 	case lw_op:
 		check_axs(pc, addr, 4);
@@ -184,7 +184,7 @@ emulate_load_store_insn(struct pt_regs *regs,
 			:"=&r" (value)
 			:"r" (addr), "i" (&&fault));
 			regs->regs[insn.i_format.rt] = value;
-			return;
+			break;
 
 	case lhu_op:
 		check_axs(pc, addr, 2);
@@ -209,7 +209,7 @@ emulate_load_store_insn(struct pt_regs *regs,
 			:"r" (addr), "i" (&&fault)
 			:"$1");
 		regs->regs[insn.i_format.rt] = value;
-		return;
+		break;
 
 	case lwu_op:
 		check_axs(pc, addr, 4);
@@ -230,7 +230,7 @@ emulate_load_store_insn(struct pt_regs *regs,
 			:"r" (addr), "i" (&&fault));
 		value &= 0xffffffff;
 		regs->regs[insn.i_format.rt] = value;
-		return;
+		break;
 
 	case ld_op:
 		check_axs(pc, addr, 8);
@@ -252,7 +252,7 @@ emulate_load_store_insn(struct pt_regs *regs,
 			:"=&r" (value)
 			:"r" (addr), "i" (&&fault));
 		regs->regs[insn.i_format.rt] = value;
-		return;
+		break;
 
 	case sh_op:
 		check_axs(pc, addr, 2);
@@ -279,7 +279,7 @@ emulate_load_store_insn(struct pt_regs *regs,
 			: /* no outputs */
 			:"r" (value), "r" (addr), "i" (&&fault)
 			:"$1");
-		return;
+		break;
 
 	case sw_op:
 		check_axs(pc, addr, 4);
@@ -299,7 +299,7 @@ emulate_load_store_insn(struct pt_regs *regs,
 			".previous"
 			: /* no outputs */
 			:"r" (value), "r" (addr), "i" (&&fault));
-		return;
+		break;
 
 	case sd_op:
 		check_axs(pc, addr, 8);
@@ -321,7 +321,7 @@ emulate_load_store_insn(struct pt_regs *regs,
 			".previous"
 			: /* no outputs */
 			:"r" (value), "r" (addr), "i" (&&fault));
-		return;
+		break;
 
 	case lwc1_op:
 	case ldc1_op:
@@ -350,6 +350,9 @@ emulate_load_store_insn(struct pt_regs *regs,
 		 */
 		goto sigill;
 	}
+
+	compute_return_epc(regs);
+
 	return;
 
 fault:
@@ -395,8 +398,6 @@ asmlinkage void do_ade(struct pt_regs *regs)
 		goto sigbus;
 
 	pc = regs->cp0_epc + ((regs->cp0_cause & CAUSEF_BD) ? 4 : 0);
-	if (compute_return_epc(regs))
-		return;
 	if ((current->tss.mflags & MF_FIXADE) == 0)
 		goto sigbus;
 
