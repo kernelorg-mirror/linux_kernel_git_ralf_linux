@@ -9,10 +9,6 @@
 #ifndef __ARCH_MIPS_POSIX_TYPES_H
 #define __ARCH_MIPS_POSIX_TYPES_H
 
-#define __need_size_t
-#define __need_ptrdiff_t
-#include <stddef.h>
-
 /*
  * This file is generally used by user-level software, so you need to
  * be a little careful about namespace pollution etc.  Also, we cannot
@@ -28,8 +24,8 @@ typedef long		__kernel_pid_t;
 typedef long		__kernel_ipc_pid_t;
 typedef long		__kernel_uid_t;
 typedef long		__kernel_gid_t;
-typedef __SIZE_TYPE__	__kernel_size_t;
-typedef __SSIZE_TYPE__	__kernel_ssize_t;
+typedef unsigned int	__kernel_size_t;
+typedef int		__kernel_ssize_t;
 typedef int		__kernel_ptrdiff_t;
 typedef long		__kernel_time_t;
 typedef long		__kernel_suseconds_t;
