@@ -1,14 +1,11 @@
-/* $Id: head.S,v 1.11.2.1 1999/10/07 07:44:23 raiko Exp $
- *
- * arch/mips/kernel/head.S
- *
+/*
  * This file is subject to the terms and conditions of the GNU General Public
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994, 1995 Waldorf Electronics
  * Written by Ralf Baechle and Andreas Busse
- * Copyright (C) 1995, 1996, 1997, 1998 Ralf Baechle
+ * Copyright (C) 1995, 1996, 1997, 1998, 2001 Ralf Baechle
  * Copyright (C) 1996 Paul M. Antoine
  * Modified for DECStation and hence R3000 support by Paul M. Antoine
  * Further modifications by David S. Miller and Harald Koerfgen
@@ -479,7 +476,7 @@ probe_done:
 
 	/* Disable coprocessors */
 	mfc0	t0, CP0_STATUS
-	li	t1, ~(ST0_CU1|ST0_CU2|ST0_CU3|ST0_KX|ST0_SX)
+	li	t1, ~(ST0_CU1|ST0_CU2|ST0_CU3|ST0_KX|ST0_SX|ST0_FR)
 	and	t0, t1
 	or	t0, ST0_CU0
 	mtc0	t0, CP0_STATUS
