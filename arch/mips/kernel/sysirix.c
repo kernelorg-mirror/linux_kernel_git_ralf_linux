@@ -1,12 +1,10 @@
-/* $Id: sysirix.c,v 1.19 1999/06/13 16:30:33 ralf Exp $
- *
+/*
  * sysirix.c: IRIX system call emulation.
  *
  * Copyright (C) 1996 David S. Miller
  * Copyright (C) 1997 Miguel de Icaza
  * Copyright (C) 1997, 1998 Ralf Baechle
  */
-
 #include <linux/kernel.h>
 #include <linux/sched.h>
 #include <linux/pagemap.h>
@@ -2014,7 +2012,8 @@ static int irix_filldir32(void *__buf, const char *name, int namlen,
 	return 0;
 }
 
-asmlinkage int irix_ngetdents(unsigned int fd, void * dirent, unsigned int count, int *eob)
+asmlinkage int irix_ngetdents(unsigned int fd, void * dirent,
+	unsigned int count, int *eob)
 {
 	struct file *file;
 	struct inode *inode;
@@ -2054,6 +2053,7 @@ asmlinkage int irix_ngetdents(unsigned int fd, void * dirent, unsigned int count
 	up(&inode->i_sem);
 	if (error < 0)
 		goto out_putf;
+
 	error = buf.error;
 	lastdirent = buf.previous;
 	if (lastdirent) {
@@ -2062,7 +2062,7 @@ asmlinkage int irix_ngetdents(unsigned int fd, void * dirent, unsigned int count
 	}
 
 	if (put_user(0, eob) < 0) {
-		error = EFAULT;
+		error = -EFAULT;
 		goto out_putf;
 	}
 
