@@ -1,10 +1,9 @@
-/* $Id: siginfo.h,v 1.4 1999/06/13 16:35:54 ralf Exp $
- *
+/*
  * This file is subject to the terms and conditions of the GNU General Public
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
  *
- * Copyright (C) 1998, 1999 by Ralf Baechle
+ * Copyright (C) 1998, 1999, 2003 by Ralf Baechle
  */
 #ifndef _ASM_SIGINFO_H
 #define _ASM_SIGINFO_H
@@ -184,25 +183,24 @@ typedef struct siginfo {
 
 /*
  * sigevent definitions
- * 
- * It seems likely that SIGEV_THREAD will have to be handled from 
+ *
+ * It seems likely that SIGEV_THREAD will have to be handled from
  * userspace, libpthread transmuting it to SIGEV_SIGNAL, which the
  * thread manager then catches and does the appropriate nonsense.
  * However, everything is written out here so as to not get lost.
  */
-#define SIGEV_NONE	128	/* other notification: meaningless */
-#define SIGEV_SIGNAL	129	/* notify via signal */
-#define SIGEV_CALLBACK	130	/* ??? */
-#define SIGEV_THREAD	131	/* deliver via thread creation */
+#define SIGEV_SIGNAL	0	/* notify via signal */
+#define SIGEV_NONE	1	/* other notification: meaningless */
+#define SIGEV_THREAD	2	/* deliver via thread creation */
 
 #define SIGEV_MAX_SIZE	64
-#define SIGEV_PAD_SIZE	((SIGEV_MAX_SIZE/sizeof(int)) - 4)
+#define SIGEV_HEAD_SIZE	(sizeof(long) + 2*sizeof(int))
+#define SIGEV_PAD_SIZE	((SIGEV_MAX_SIZE-SIGEV_HEAD_SIZE) / sizeof(int))
 
-/* XXX This one isn't yet IRIX / ABI compatible.  */
 typedef struct sigevent {
-	int sigev_notify;
 	sigval_t sigev_value;
 	int sigev_signo;
+	int sigev_notify;
 	union {
 		int _pad[SIGEV_PAD_SIZE];
 
