@@ -7,7 +7,7 @@
  *
  * Copyright (C) 1996, 1997 by Ralf Baechle
  *
- * $Id: ksyms.c,v 1.1 1997/10/23 22:26:09 ralf Exp $
+ * $Id: ksyms.c,v 1.2 1998/04/13 16:08:30 ralf Exp $
  */
 #include <linux/config.h>
 #include <linux/module.h>
@@ -39,7 +39,6 @@ static struct symbol_table arch_symbol_table = {
 	/*
 	 * String functions
 	 */
-	XNOVERS(bcopy),
 	XNOVERS(memcmp),
 	XNOVERS(memset),
 	XNOVERS(memcpy),
