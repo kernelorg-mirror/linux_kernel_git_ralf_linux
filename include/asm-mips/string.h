@@ -128,7 +128,10 @@ extern void *memcpy(void *__to, __const__ void *__from, size_t __n);
 extern void *memmove(void *__dest, __const__ void *__src, size_t __n);
 
 #define __HAVE_ARCH_BCOPY
-extern char * bcopy(const char * src, char * dest, int count);
+extern __inline__ char * bcopy(const char * src, char * dest, int count)
+{
+	memcpy(dest, src, count);
+}
 
 #define __HAVE_ARCH_MEMSCAN
 extern __inline__ void *memscan(void *__addr, int __c, size_t __size)
