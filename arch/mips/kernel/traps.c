@@ -236,8 +236,12 @@ void do_fpe(struct pt_regs *regs, unsigned int fcr31)
 #ifdef CONF_DEBUG_EXCEPTIONS
 	show_regs(regs);
 #endif
-	printk("Caught floating exception at epc == %08lx, fcr31 == %08x\n",
-	       regs->cp0_epc, fcr31);
+	if (fcr31 & (1 << 17)) {
+		printk(KERN_ERR, "Unimplemented exception in %s at 0x%08lx, "
+		       "fcr31 == 0x%08x\n", current->comm, 
+		       regs->cp0_epc, fcr31);
+		printk(KERN_ERR, "Oh holy shit ...\n");
+	}
 	compute_return_epc(regs);
 	force_sig(SIGFPE, current);
 }
