@@ -1,4 +1,3 @@
-# $Id: Makefile,v 1.8 1999/03/13 12:36:50 tsbogend Exp $
 #
 # This file is subject to the terms and conditions of the GNU General Public
 # License.  See the file "COPYING" in the main directory of this archive
@@ -45,7 +44,7 @@ addinitrd: addinitrd.c
 dep:
 
 clean:
-	rm -f vmlinux.ecoff
+	rm -f elf2ecoff vmlinux.ecoff
 
 dummy:
 
