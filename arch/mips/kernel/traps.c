@@ -357,12 +357,9 @@ void do_tr(struct pt_regs *regs)
 
 void do_ri(struct pt_regs *regs)
 {
-	lock_kernel();
-	printk("[%s:%ld] Illegal instruction at %08lx ra=%08lx\n",
-	       current->comm, current->pid, regs->cp0_epc, regs->regs[31]);
-	unlock_kernel();
 	if (compute_return_epc(regs))
 		return;
+
 	force_sig(SIGILL, current);
 }
 
