@@ -1,12 +1,11 @@
-/* $Id: ptrace.c,v 1.12 1999/06/13 16:30:32 ralf Exp $
- *
+/*
  * This file is subject to the terms and conditions of the GNU General Public
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
  *
  * Copyright (C) 1992 Ross Biro
  * Copyright (C) Linus Torvalds
- * Copyright (C) 1994, 1995, 1996, 1997, 1998 Ralf Baechle
+ * Copyright (C) 1994, 1995, 1996, 1997, 1998, 2001 Ralf Baechle
  * Copyright (C) 1996 David S. Miller
  */
 #include <linux/kernel.h>
@@ -455,7 +454,7 @@ asmlinkage int sys_ptrace(long request, long pid, long addr, long data)
 
 	case PTRACE_POKEUSR: {
 		struct pt_regs *regs;
-		int res = 0;
+		res = 0;
 		regs = (struct pt_regs *) ((unsigned long) child +
 		       KERNEL_STACK_SIZE - 32 - sizeof(struct pt_regs));
 
