@@ -59,7 +59,6 @@ extern __inline__ unsigned long ffz(unsigned long word);
  * These functions for MIPS ISA > 1 are interrupt and SMP proof and
  * interrupt friendly
  */
-#include <asm/mipsregs.h>
 
 /*
  * The following functions will only work for the R4000!
