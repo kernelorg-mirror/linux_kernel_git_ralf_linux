@@ -1,14 +1,11 @@
 /*
- * memcpy.S: MIPS optimized memcpy based upon SparcLinux code.
- *
  *  Copyright (C) 1995 Linus Torvalds
  *  Copyright (C) 1996 David S. Miller, Eddie C. Dost
  *  Copyright (C) 1998 Ralf Baechle
  *
- * derived from:
- *	e-mail between David and Eddie.
+ *  ``I was a Sparc memcpy''
  *
- * $Id: memcpy.S,v 1.2 1998/04/12 01:25:04 ralf Exp $
+ * $Id: memcpy.S,v 1.3 1998/04/12 14:31:13 ralf Exp $
  */
 #include <asm/asm.h>
 #include <asm/regdef.h>
@@ -30,6 +27,60 @@
 	lw	t1, (offset + 0x04)(src); \
 	sw	t0, (offset + 0x00)(dst); \
 	sw	t1, (offset + 0x04)(dst); \
+
+#define RMOVE_BIGCHUNK(src, dst, offset, t0, t1, t2, t3, t4, t5) \
+	lw	t0, (offset + 0x18)(src); \
+	lw	t1, (offset + 0x1c)(src); \
+	sw	t0, (offset + 0x18)(dst); \
+	lw	t2, (offset + 0x10)(src); \
+	sw	t1, (offset + 0x1c)(dst); \
+	lw	t3, (offset + 0x14)(src); \
+	sw	t2, (offset + 0x10)(dst); \
+	lw	t4, (offset + 0x08)(src); \
+	sw	t3, (offset + 0x14)(dst); \
+	lw	t5, (offset + 0x0c)(src); \
+	sw	t4, (offset + 0x08)(dst); \
+	lw	t0, (offset + 0x00)(src); \
+	sw	t5, (offset + 0x0c)(dst); \
+	lw	t1, (offset + 0x04)(src); \
+	sw	t0, (offset + 0x00)(dst); \
+	sw	t1, (offset + 0x04)(dst); \
+
+#define UMOVE_BIGCHUNK(src, dst, offset, t0, t1, t2, t3, t4, t5) \
+	lw	t0, (offset + 0x18)(src); \
+	lw	t1, (offset + 0x1c)(src); \
+	usw	t0, (offset + 0x18)(dst); \
+	lw	t2, (offset + 0x10)(src); \
+	usw	t1, (offset + 0x1c)(dst); \
+	lw	t3, (offset + 0x14)(src); \
+	usw	t2, (offset + 0x10)(dst); \
+	lw	t4, (offset + 0x08)(src); \
+	usw	t3, (offset + 0x14)(dst); \
+	lw	t5, (offset + 0x0c)(src); \
+	usw	t4, (offset + 0x08)(dst); \
+	lw	t0, (offset + 0x00)(src); \
+	usw	t5, (offset + 0x0c)(dst); \
+	lw	t1, (offset + 0x04)(src); \
+	usw	t0, (offset + 0x00)(dst); \
+	usw	t1, (offset + 0x04)(dst); \
+
+#define RUMOVE_BIGCHUNK(src, dst, offset, t0, t1, t2, t3, t4, t5) \
+	lw	t0, (offset + 0x18)(src); \
+	lw	t1, (offset + 0x1c)(src); \
+	usw	t0, (offset + 0x18)(dst); \
+	lw	t2, (offset + 0x10)(src); \
+	usw	t1, (offset + 0x1c)(dst); \
+	lw	t3, (offset + 0x14)(src); \
+	usw	t2, (offset + 0x10)(dst); \
+	lw	t4, (offset + 0x08)(src); \
+	usw	t3, (offset + 0x14)(dst); \
+	lw	t5, (offset + 0x0c)(src); \
+	usw	t4, (offset + 0x08)(dst); \
+	lw	t0, (offset + 0x00)(src); \
+	usw	t5, (offset + 0x0c)(dst); \
+	lw	t1, (offset + 0x04)(src); \
+	usw	t0, (offset + 0x00)(dst); \
+	usw	t1, (offset + 0x04)(dst); \
 
 	.text
 	.set	noreorder
@@ -187,24 +238,6 @@ out:
 
 /* ------------------------------------------------------------------------- */
 
-#define UMOVE_BIGCHUNK(src, dst, offset, t0, t1, t2, t3, t4, t5) \
-	lw	t0, (offset + 0x18)(src); \
-	lw	t1, (offset + 0x1c)(src); \
-	usw	t0, (offset + 0x18)(dst); \
-	lw	t2, (offset + 0x10)(src); \
-	usw	t1, (offset + 0x1c)(dst); \
-	lw	t3, (offset + 0x14)(src); \
-	usw	t2, (offset + 0x10)(dst); \
-	lw	t4, (offset + 0x08)(src); \
-	usw	t3, (offset + 0x14)(dst); \
-	lw	t5, (offset + 0x0c)(src); \
-	usw	t4, (offset + 0x08)(dst); \
-	lw	t0, (offset + 0x00)(src); \
-	usw	t5, (offset + 0x0c)(dst); \
-	lw	t1, (offset + 0x04)(src); \
-	usw	t0, (offset + 0x00)(dst); \
-	usw	t1, (offset + 0x04)(dst); \
-
 /* Bad, bad.  At least try to align the source  */
 
 memcpy_u_src:
@@ -326,27 +359,287 @@ u_end_bytes:
 	 move	v0, t7
 	END(memcpy)
 
-/*
- * Just for the correctness of things.  The backwards case is still
- * unoptimized.
- */
+	.align	5
 LEAF(memmove)
-	j	memcpy;nop
 	sltu	t0, a0, a1			# dst < src -> memcpy
 	bnez	t0, memcpy
 	 addu	v0, a0, a2
-	beqz	a2, 2f				# len != 0 -> done
-	 sltu	t0, v0, a1			# dst + len < src -> non-
+	sltu	t0, v0, a1			# dst + len < src -> non-
 	bnez	t0, memcpy			# overlapping, can use memcpy
-	addu	v1, a1, a2
-
-	/* Ok, really have to use this ...  */
-1:	lb	t2, (v1)			# copy backwards
-	subu	t1, 1
-	sb	t2, (v0)
-	bne	t0, a0, 1b
-	 subu	t0, 1
-
-2:	jr	ra
-	 nop					# return dst ptr
+	 nop
 	END(memmove)
+
+LEAF(__rmemcpy)					/* a0=dst a1=src a2=len */
+	addu	a0, a2				# dst = dst + len
+	addu	a1, a2				# src = src + len
+
+	xor	t0, a0, a1
+	andi	t0, t0, 0x3
+	move	t7, a0
+	beqz	t0, r_can_align
+	 sltiu	t8, a2, 0x8
+
+	b	r_memcpy_u_src			# bad alignment
+	 move	t2, a2
+
+r_can_align:
+	bnez	t8, r_small_memcpy		# < 8 bytes to copy
+	 move	t2, a2
+
+	beqz	a2, r_out
+	 andi	t8, a1, 0x1
+
+r_hword_align:
+	beqz	t8, r_word_align
+	 andi	t8, a1, 0x2
+
+	lb	t0, -1(a1)
+	subu	a2, a2, 0x1
+	sb	t0, -1(a0)
+	subu	a1, a1, 0x1
+	subu	a0, a0, 0x1
+	andi	t8, a1, 0x2
+
+r_word_align:
+	beqz	t8, r_dword_align
+	 sltiu	t8, a2, 56
+	
+	lh	t0, -2(a1)
+	subu	a2, a2, 0x2
+	sh	t0, -2(a0)
+	sltiu	t8, a2, 56
+	subu	a0, a0, 0x2
+	subu	a1, a1, 0x2
+
+r_dword_align:
+	bnez	t8, r_do_end_words
+	 move	t8, a2
+
+	andi	t8, a1, 0x4
+	beqz	t8, r_qword_align
+	 andi	t8, a1, 0x8
+
+	lw	t0, -4(a1)
+	subu	a2, a2, 0x4
+	sw	t0, -4(a0)
+	subu	a1, a1, 0x4
+	subu	a0, a0, 0x4
+	andi	t8, a1, 0x8
+
+r_qword_align:
+	beqz	t8, r_oword_align
+	 andi	t8, a1, 0x10
+
+	subu	a1, a1, 0x8
+	lw	t0, 0x04(a1)
+	lw	t1, 0x00(a1)
+	subu	a0, a0, 0x8
+	sw	t0, 0x04(a0)
+	sw	t1, 0x00(a0)
+	subu	a2, a2, 0x8
+
+	andi	t8, a1, 0x10
+
+r_oword_align:
+	beqz	t8, r_begin_movement
+	 srl	t8, a2, 0x7
+
+	subu	a1, a1, 0x10
+	lw	t3, 0x08(a1)			# assumes subblock ordering
+	lw	t4, 0x0c(a1)
+	lw	t0, 0x00(a1)
+	lw	t1, 0x04(a1)
+	subu	a0, a0, 0x10
+	sw	t3, 0x08(a0)
+	sw	t4, 0x0c(a0)
+	sw	t0, 0x00(a0)
+	sw	t1, 0x04(a0)
+	subu	a2, a2, 0x10
+	srl	t8, a2, 0x7
+
+r_begin_movement:
+	beqz	t8, 0f
+	 andi	t2, a2, 0x40
+
+r_move_128bytes:
+	RMOVE_BIGCHUNK(a1, a0, -0x80, t0, t1, t3, t4, t5, t6)
+	RMOVE_BIGCHUNK(a1, a0, -0x60, t0, t1, t3, t4, t5, t6)
+	RMOVE_BIGCHUNK(a1, a0, -0x40, t0, t1, t3, t4, t5, t6)
+	RMOVE_BIGCHUNK(a1, a0, -0x20, t0, t1, t3, t4, t5, t6)
+	subu	t8, t8, 0x01
+	subu	a1, a1, 0x80
+	bnez	t8, r_move_128bytes
+	 subu	a0, a0, 0x80
+
+0:
+	beqz	t2, 1f
+	 andi	t2, a2, 0x20
+
+r_move_64bytes:
+	subu	a1, a1, 0x40
+	subu	a0, a0, 0x40
+	RMOVE_BIGCHUNK(a1, a0, 0x20, t0, t1, t3, t4, t5, t6)
+	RMOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4, t5, t6)
+
+1:
+	beqz	t2, r_do_end_words
+	 andi	t8, a2, 0x1c
+
+r_move_32bytes:
+	subu	a1, a1, 0x20
+	subu	a0, a0, 0x20
+	RMOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4, t5, t6)
+	andi	t8, a2, 0x1c
+
+r_do_end_words:
+	beqz	t8, r_maybe_end_cruft
+	 srl	t8, t8, 0x2
+
+r_end_words:
+	lw	t0, -4(a1)
+	subu	t8, t8, 0x1
+	sw	t0, -4(a0)
+	subu	a1, a1, 0x4
+	bnez	t8, r_end_words
+	 subu	a0, a0, 0x4
+
+r_maybe_end_cruft:
+	andi	t2, a2, 0x3
+
+r_small_memcpy:
+	beqz	t2, r_out
+	 move	a2, t2
+
+r_end_bytes:
+	lb	t0, -1(a1)
+	subu	a2, a2, 0x1
+	sb	t0, -1(a0)
+	subu	a1, a1, 0x1
+	bnez	a2, r_end_bytes
+	 subu	a0, a0, 0x1
+
+r_out:
+	jr	ra
+	 move	v0, t7
+
+/* ------------------------------------------------------------------------- */
+
+/* Bad, bad.  At least try to align the source  */
+
+r_memcpy_u_src:
+	bnez	t8, r_small_memcpy		# < 8 bytes?
+	 move	t2, a2
+
+	andi	t0, a1, 7			# t0: how much to align
+
+	ulw	t1, -8(a1)			# dword alignment
+	ulw	t2, -4(a1)
+	usw	t1, -8(a0)
+	usw	t2, -4(a0)
+
+	subu	a1, t0				# src
+	subu	a0, t0				# dst
+	subu	a2, t0				# len
+
+	sltiu	t8, a2, 56
+	bnez	t8, ru_do_end_words
+	 andi	t8, a2, 0x3c
+
+	andi	t8, a1, 8			# now qword aligned?
+
+ru_qword_align:
+	beqz	t8, ru_oword_align
+	 andi	t8, a1, 0x10
+
+	subu	a1, a1, 0x8
+	lw	t0, 0x00(a1)
+	lw	t1, 0x04(a1)
+	subu	a0, a0, 0x8
+	usw	t0, 0x00(a0)
+	usw	t1, 0x04(a0)
+	subu	a2, a2, 0x8
+
+	andi	t8, a1, 0x10
+
+ru_oword_align:
+	beqz	t8, ru_begin_movement
+	 srl	t8, a2, 0x7
+
+	subu	a1, a1, 0x10
+	lw	t3, 0x08(a1)			# assumes subblock ordering
+	lw	t4, 0x0c(a1)
+	lw	t0, 0x00(a1)
+	lw	t1, 0x04(a1)
+	subu	a0, a0, 0x10
+	usw	t3, 0x08(a0)
+	usw	t4, 0x0c(a0)
+	usw	t0, 0x00(a0)
+	usw	t1, 0x04(a0)
+	subu	a2, a2, 0x10
+
+	srl	t8, a2, 0x7
+
+ru_begin_movement:
+	beqz	t8, 0f
+	 andi	t2, a2, 0x40
+
+ru_move_128bytes:
+	RUMOVE_BIGCHUNK(a1, a0, -0x80, t0, t1, t3, t4, t5, t6)
+	RUMOVE_BIGCHUNK(a1, a0, -0x60, t0, t1, t3, t4, t5, t6)
+	RUMOVE_BIGCHUNK(a1, a0, -0x40, t0, t1, t3, t4, t5, t6)
+	RUMOVE_BIGCHUNK(a1, a0, -0x20, t0, t1, t3, t4, t5, t6)
+	subu	t8, t8, 0x01
+	subu	a1, a1, 0x80
+	bnez	t8, ru_move_128bytes
+	 subu	a0, a0, 0x80
+
+0:
+	beqz	t2, 1f
+	 andi	t2, a2, 0x20
+
+ru_move_64bytes:
+	subu	a1, a1, 0x40
+	subu	a0, a0, 0x40
+	RUMOVE_BIGCHUNK(a1, a0, 0x20, t0, t1, t3, t4, t5, t6)
+	RUMOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4, t5, t6)
+
+1:
+	beqz	t2, ru_do_end_words
+	 andi	t8, a2, 0x1c
+
+ru_move_32bytes:
+	subu	a1, a1, 0x20
+	subu	a0, a0, 0x20
+	RUMOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4, t5, t6)
+	andi	t8, a2, 0x1c
+
+ru_do_end_words:
+	beqz	t8, ru_maybe_end_cruft
+	 srl	t8, t8, 0x2
+
+ru_end_words:
+	lw	t0, -4(a1)
+	usw	t0, -4(a0)
+	subu	t8, t8, 0x1
+	subu	a1, a1, 0x4
+	bnez	t8, ru_end_words
+	 subu	a0, a0, 0x4
+
+ru_maybe_end_cruft:
+	andi	t2, a2, 0x3
+
+ru_cannot_optimize:
+	beqz	t2, r_out
+	 move	a2, t2
+
+ru_end_bytes:
+	lb	t0, -1(a1)
+	subu	a2, a2, 0x1
+	sb	t0, -1(a0)
+	subu	a1, a1, 0x1
+	bnez	a2, ru_end_bytes
+	 subu	a0, a0, 0x1
+
+	jr	ra
+	 move	v0, t7
+	END(__rmemcpy)
