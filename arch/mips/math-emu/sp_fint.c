@@ -43,7 +43,7 @@ ieee754sp ieee754sp_fint(int x)
 
     if(x == 0)
       return ieee754sp_zero(0);
-    if (x == 1 | x == -1)
+    if (x == 1 || x == -1)
       return ieee754sp_one(x < 0);      
     if (x == 10 || x == -10)
       return ieee754sp_ten(x < 0);
