@@ -5,82 +5,86 @@
  *
  *  ``I was a Sparc memcpy''
  *
- * $Id: memcpy.S,v 1.3 1998/04/12 14:31:13 ralf Exp $
+ * $Id: memcpy.S,v 1.4 1998/04/12 15:41:10 ralf Exp $
  */
 #include <asm/asm.h>
 #include <asm/regdef.h>
 
-#define MOVE_BIGCHUNK(src, dst, offset, t0, t1, t2, t3, t4, t5) \
-	lw	t0, (offset + 0x18)(src); \
-	lw	t1, (offset + 0x1c)(src); \
-	sw	t0, (offset + 0x18)(dst); \
-	lw	t2, (offset + 0x10)(src); \
-	sw	t1, (offset + 0x1c)(dst); \
-	lw	t3, (offset + 0x14)(src); \
-	sw	t2, (offset + 0x10)(dst); \
-	lw	t4, (offset + 0x08)(src); \
-	sw	t3, (offset + 0x14)(dst); \
-	lw	t5, (offset + 0x0c)(src); \
-	sw	t4, (offset + 0x08)(dst); \
+/* ascending order, destination aligned  */
+#define MOVE_BIGCHUNK(src, dst, offset, t0, t1, t2, t3) \
 	lw	t0, (offset + 0x00)(src); \
-	sw	t5, (offset + 0x0c)(dst); \
 	lw	t1, (offset + 0x04)(src); \
+	lw	t2, (offset + 0x08)(src); \
+	lw	t3, (offset + 0x0c)(src); \
 	sw	t0, (offset + 0x00)(dst); \
 	sw	t1, (offset + 0x04)(dst); \
+	sw	t2, (offset + 0x08)(dst); \
+	sw	t3, (offset + 0x0c)(dst); \
+	lw	t0, (offset + 0x10)(src); \
+	lw	t1, (offset + 0x14)(src); \
+	lw	t2, (offset + 0x18)(src); \
+	lw	t3, (offset + 0x1c)(src); \
+	sw	t0, (offset + 0x10)(dst); \
+	sw	t1, (offset + 0x14)(dst); \
+	sw	t2, (offset + 0x18)(dst); \
+	sw	t3, (offset + 0x1c)(dst)
 
-#define RMOVE_BIGCHUNK(src, dst, offset, t0, t1, t2, t3, t4, t5) \
-	lw	t0, (offset + 0x18)(src); \
-	lw	t1, (offset + 0x1c)(src); \
-	sw	t0, (offset + 0x18)(dst); \
-	lw	t2, (offset + 0x10)(src); \
-	sw	t1, (offset + 0x1c)(dst); \
-	lw	t3, (offset + 0x14)(src); \
-	sw	t2, (offset + 0x10)(dst); \
-	lw	t4, (offset + 0x08)(src); \
-	sw	t3, (offset + 0x14)(dst); \
-	lw	t5, (offset + 0x0c)(src); \
-	sw	t4, (offset + 0x08)(dst); \
+/* ascending order, destination unaligned  */
+#define UMOVE_BIGCHUNK(src, dst, offset, t0, t1, t2, t3) \
 	lw	t0, (offset + 0x00)(src); \
-	sw	t5, (offset + 0x0c)(dst); \
 	lw	t1, (offset + 0x04)(src); \
+	lw	t2, (offset + 0x08)(src); \
+	lw	t3, (offset + 0x0c)(src); \
+	usw	t0, (offset + 0x00)(dst); \
+	usw	t1, (offset + 0x04)(dst); \
+	usw	t2, (offset + 0x08)(dst); \
+	usw	t3, (offset + 0x0c)(dst); \
+	lw	t0, (offset + 0x10)(src); \
+	lw	t1, (offset + 0x14)(src); \
+	lw	t2, (offset + 0x18)(src); \
+	lw	t3, (offset + 0x1c)(src); \
+	usw	t0, (offset + 0x10)(dst); \
+	usw	t1, (offset + 0x14)(dst); \
+	usw	t2, (offset + 0x18)(dst); \
+	usw	t3, (offset + 0x1c)(dst)
+
+/* descending order, destination aligned  */
+#define RMOVE_BIGCHUNK(src, dst, offset, t0, t1, t2, t3) \
+	lw	t0, (offset + 0x10)(src); \
+	lw	t1, (offset + 0x14)(src); \
+	lw	t2, (offset + 0x18)(src); \
+	lw	t3, (offset + 0x1c)(src); \
+	sw	t0, (offset + 0x10)(dst); \
+	sw	t1, (offset + 0x14)(dst); \
+	sw	t2, (offset + 0x18)(dst); \
+	sw	t3, (offset + 0x1c)(dst); \
+	lw	t0, (offset + 0x00)(src); \
+	lw	t1, (offset + 0x04)(src); \
+	lw	t2, (offset + 0x08)(src); \
+	lw	t3, (offset + 0x0c)(src); \
 	sw	t0, (offset + 0x00)(dst); \
 	sw	t1, (offset + 0x04)(dst); \
+	sw	t2, (offset + 0x08)(dst); \
+	sw	t3, (offset + 0x0c)(dst)
 
-#define UMOVE_BIGCHUNK(src, dst, offset, t0, t1, t2, t3, t4, t5) \
-	lw	t0, (offset + 0x18)(src); \
-	lw	t1, (offset + 0x1c)(src); \
-	usw	t0, (offset + 0x18)(dst); \
-	lw	t2, (offset + 0x10)(src); \
-	usw	t1, (offset + 0x1c)(dst); \
-	lw	t3, (offset + 0x14)(src); \
-	usw	t2, (offset + 0x10)(dst); \
-	lw	t4, (offset + 0x08)(src); \
-	usw	t3, (offset + 0x14)(dst); \
-	lw	t5, (offset + 0x0c)(src); \
-	usw	t4, (offset + 0x08)(dst); \
+/* descending order, destination ununaligned  */
+#define RUMOVE_BIGCHUNK(src, dst, offset, t0, t1, t2, t3) \
+	lw	t0, (offset + 0x10)(src); \
+	lw	t1, (offset + 0x14)(src); \
+	lw	t2, (offset + 0x18)(src); \
+	lw	t3, (offset + 0x1c)(src); \
+	usw	t0, (offset + 0x10)(dst); \
+	usw	t1, (offset + 0x14)(dst); \
+	usw	t2, (offset + 0x18)(dst); \
+	usw	t3, (offset + 0x1c)(dst); \
 	lw	t0, (offset + 0x00)(src); \
-	usw	t5, (offset + 0x0c)(dst); \
 	lw	t1, (offset + 0x04)(src); \
+	lw	t2, (offset + 0x08)(src); \
+	lw	t3, (offset + 0x0c)(src); \
 	usw	t0, (offset + 0x00)(dst); \
 	usw	t1, (offset + 0x04)(dst); \
-
-#define RUMOVE_BIGCHUNK(src, dst, offset, t0, t1, t2, t3, t4, t5) \
-	lw	t0, (offset + 0x18)(src); \
-	lw	t1, (offset + 0x1c)(src); \
-	usw	t0, (offset + 0x18)(dst); \
-	lw	t2, (offset + 0x10)(src); \
-	usw	t1, (offset + 0x1c)(dst); \
-	lw	t3, (offset + 0x14)(src); \
-	usw	t2, (offset + 0x10)(dst); \
-	lw	t4, (offset + 0x08)(src); \
-	usw	t3, (offset + 0x14)(dst); \
-	lw	t5, (offset + 0x0c)(src); \
-	usw	t4, (offset + 0x08)(dst); \
-	lw	t0, (offset + 0x00)(src); \
-	usw	t5, (offset + 0x0c)(dst); \
-	lw	t1, (offset + 0x04)(src); \
-	usw	t0, (offset + 0x00)(dst); \
-	usw	t1, (offset + 0x04)(dst); \
+	usw	t2, (offset + 0x08)(dst); \
+	usw	t3, (offset + 0x0c)(dst)
 
 	.text
 	.set	noreorder
@@ -176,10 +180,10 @@ begin_movement:
 	 andi	t2, a2, 0x40
 
 move_128bytes:
-	MOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4, t5, t6)
-	MOVE_BIGCHUNK(a1, a0, 0x20, t0, t1, t3, t4, t5, t6)
-	MOVE_BIGCHUNK(a1, a0, 0x40, t0, t1, t3, t4, t5, t6)
-	MOVE_BIGCHUNK(a1, a0, 0x60, t0, t1, t3, t4, t5, t6)
+	MOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4)
+	MOVE_BIGCHUNK(a1, a0, 0x20, t0, t1, t3, t4)
+	MOVE_BIGCHUNK(a1, a0, 0x40, t0, t1, t3, t4)
+	MOVE_BIGCHUNK(a1, a0, 0x60, t0, t1, t3, t4)
 	subu	t8, t8, 0x01
 	addu	a1, a1, 0x80
 	bnez	t8, move_128bytes
@@ -190,8 +194,8 @@ move_128bytes:
 	 andi	t2, a2, 0x20
 
 move_64bytes:
-	MOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4, t5, t6)
-	MOVE_BIGCHUNK(a1, a0, 0x20, t0, t1, t3, t4, t5, t6)
+	MOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4)
+	MOVE_BIGCHUNK(a1, a0, 0x20, t0, t1, t3, t4)
 	addu	a1, a1, 0x40
 	addu	a0, a0, 0x40
 
@@ -200,7 +204,7 @@ move_64bytes:
 	 andi	t8, a2, 0x1c
 
 move_32bytes:
-	MOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4, t5, t6)
+	MOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4)
 	andi	t8, a2, 0x1c
 	addu	a1, a1, 0x20
 	addu	a0, a0, 0x20
@@ -299,10 +303,10 @@ u_begin_movement:
 	 andi	t2, a2, 0x40
 
 u_move_128bytes:
-	UMOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4, t5, t6)
-	UMOVE_BIGCHUNK(a1, a0, 0x20, t0, t1, t3, t4, t5, t6)
-	UMOVE_BIGCHUNK(a1, a0, 0x40, t0, t1, t3, t4, t5, t6)
-	UMOVE_BIGCHUNK(a1, a0, 0x60, t0, t1, t3, t4, t5, t6)
+	UMOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4)
+	UMOVE_BIGCHUNK(a1, a0, 0x20, t0, t1, t3, t4)
+	UMOVE_BIGCHUNK(a1, a0, 0x40, t0, t1, t3, t4)
+	UMOVE_BIGCHUNK(a1, a0, 0x60, t0, t1, t3, t4)
 	subu	t8, t8, 0x01
 	addu	a1, a1, 0x80
 	bnez	t8, u_move_128bytes
@@ -313,8 +317,8 @@ u_move_128bytes:
 	 andi	t2, a2, 0x20
 
 u_move_64bytes:
-	UMOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4, t5, t6)
-	UMOVE_BIGCHUNK(a1, a0, 0x20, t0, t1, t3, t4, t5, t6)
+	UMOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4)
+	UMOVE_BIGCHUNK(a1, a0, 0x20, t0, t1, t3, t4)
 	addu	a1, a1, 0x40
 	addu	a0, a0, 0x40
 
@@ -323,7 +327,7 @@ u_move_64bytes:
 	 andi	t8, a2, 0x1c
 
 u_move_32bytes:
-	UMOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4, t5, t6)
+	UMOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4)
 	andi	t8, a2, 0x1c
 	addu	a1, a1, 0x20
 	addu	a0, a0, 0x20
@@ -462,10 +466,10 @@ r_begin_movement:
 	 andi	t2, a2, 0x40
 
 r_move_128bytes:
-	RMOVE_BIGCHUNK(a1, a0, -0x80, t0, t1, t3, t4, t5, t6)
-	RMOVE_BIGCHUNK(a1, a0, -0x60, t0, t1, t3, t4, t5, t6)
-	RMOVE_BIGCHUNK(a1, a0, -0x40, t0, t1, t3, t4, t5, t6)
-	RMOVE_BIGCHUNK(a1, a0, -0x20, t0, t1, t3, t4, t5, t6)
+	RMOVE_BIGCHUNK(a1, a0, -0x80, t0, t1, t3, t4)
+	RMOVE_BIGCHUNK(a1, a0, -0x60, t0, t1, t3, t4)
+	RMOVE_BIGCHUNK(a1, a0, -0x40, t0, t1, t3, t4)
+	RMOVE_BIGCHUNK(a1, a0, -0x20, t0, t1, t3, t4)
 	subu	t8, t8, 0x01
 	subu	a1, a1, 0x80
 	bnez	t8, r_move_128bytes
@@ -478,8 +482,8 @@ r_move_128bytes:
 r_move_64bytes:
 	subu	a1, a1, 0x40
 	subu	a0, a0, 0x40
-	RMOVE_BIGCHUNK(a1, a0, 0x20, t0, t1, t3, t4, t5, t6)
-	RMOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4, t5, t6)
+	RMOVE_BIGCHUNK(a1, a0, 0x20, t0, t1, t3, t4)
+	RMOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4)
 
 1:
 	beqz	t2, r_do_end_words
@@ -488,7 +492,7 @@ r_move_64bytes:
 r_move_32bytes:
 	subu	a1, a1, 0x20
 	subu	a0, a0, 0x20
-	RMOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4, t5, t6)
+	RMOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4)
 	andi	t8, a2, 0x1c
 
 r_do_end_words:
@@ -584,10 +588,10 @@ ru_begin_movement:
 	 andi	t2, a2, 0x40
 
 ru_move_128bytes:
-	RUMOVE_BIGCHUNK(a1, a0, -0x80, t0, t1, t3, t4, t5, t6)
-	RUMOVE_BIGCHUNK(a1, a0, -0x60, t0, t1, t3, t4, t5, t6)
-	RUMOVE_BIGCHUNK(a1, a0, -0x40, t0, t1, t3, t4, t5, t6)
-	RUMOVE_BIGCHUNK(a1, a0, -0x20, t0, t1, t3, t4, t5, t6)
+	RUMOVE_BIGCHUNK(a1, a0, -0x80, t0, t1, t3, t4)
+	RUMOVE_BIGCHUNK(a1, a0, -0x60, t0, t1, t3, t4)
+	RUMOVE_BIGCHUNK(a1, a0, -0x40, t0, t1, t3, t4)
+	RUMOVE_BIGCHUNK(a1, a0, -0x20, t0, t1, t3, t4)
 	subu	t8, t8, 0x01
 	subu	a1, a1, 0x80
 	bnez	t8, ru_move_128bytes
@@ -600,8 +604,8 @@ ru_move_128bytes:
 ru_move_64bytes:
 	subu	a1, a1, 0x40
 	subu	a0, a0, 0x40
-	RUMOVE_BIGCHUNK(a1, a0, 0x20, t0, t1, t3, t4, t5, t6)
-	RUMOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4, t5, t6)
+	RUMOVE_BIGCHUNK(a1, a0, 0x20, t0, t1, t3, t4)
+	RUMOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4)
 
 1:
 	beqz	t2, ru_do_end_words
@@ -610,7 +614,7 @@ ru_move_64bytes:
 ru_move_32bytes:
 	subu	a1, a1, 0x20
 	subu	a0, a0, 0x20
-	RUMOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4, t5, t6)
+	RUMOVE_BIGCHUNK(a1, a0, 0x00, t0, t1, t3, t4)
 	andi	t8, a2, 0x1c
 
 ru_do_end_words:
