@@ -1208,13 +1208,15 @@
 #define _syscall0(type,name) \
 type name(void) \
 { \
-register long __res __asm__ ("$2"); \
-register long __err __asm__ ("$7"); \
+long __res, __err; \
 __asm__ volatile ("li\t$2,%2\n\t" \
-		  "syscall" \
+		  "syscall\n\t" \
+		  "move\t%0, $2\n\t" \
+		  "move\t%1, $7" \
                   : "=r" (__res), "=r" (__err) \
                   : "i" (__NR_##name) \
-                  : "$8","$9","$10","$11","$12","$13","$14","$15","$24"); \
+                  : "$2","$7","$8","$9","$10","$11","$12","$13","$14","$15", \
+		    "$24"); \
 if (__err == 0) \
 	return (type) __res; \
 errno = __res; \
@@ -1228,14 +1230,15 @@ return -1; \
 #define _syscall1(type,name,atype,a) \
 type name(atype a) \
 { \
-register long __res __asm__ ("$2"); \
-register long __err __asm__ ("$7"); \
+long __res, __err; \
 __asm__ volatile ("move\t$4,%3\n\t" \
 		  "li\t$2,%2\n\t" \
-                  "syscall" \
-                  : "=r" (__res), "=r" (__err) \
-                  : "i" (__NR_##name),"r" ((long)(a)) \
-                  : "$4","$8","$9","$10","$11","$12","$13","$14","$15","$24"); \
+		  "syscall\n\t" \
+		  "move\t%0, $2\n\t" \
+		  "move\t%1, $7" \
+		  : "=r" (__res), "=r" (__err) \
+		  : "i" (__NR_##name),"r" ((long)(a)) \
+		  : "$2","$4","$7","$8","$9","$10","$11","$12","$13","$14","$15","$24"); \
 if (__err == 0) \
 	return (type) __res; \
 errno = __res; \
@@ -1245,17 +1248,18 @@ return -1; \
 #define _syscall2(type,name,atype,a,btype,b) \
 type name(atype a,btype b) \
 { \
-register long __res __asm__ ("$2"); \
-register long __err __asm__ ("$7"); \
+long __res, __err; \
 __asm__ volatile ("move\t$4,%3\n\t" \
                   "move\t$5,%4\n\t" \
 		  "li\t$2,%2\n\t" \
-                  "syscall" \
+		  "syscall\n\t" \
+		  "move\t%0, $2\n\t" \
+		  "move\t%1, $7" \
                   : "=r" (__res), "=r" (__err) \
                   : "i" (__NR_##name),"r" ((long)(a)), \
                                       "r" ((long)(b)) \
-                  : "$4","$5","$8","$9","$10","$11","$12","$13","$14","$15", \
-                    "$24"); \
+                  : "$2","$4","$5","$7","$8","$9","$10","$11","$12","$13", \
+		    "$14","$15", "$24"); \
 if (__err == 0) \
 	return (type) __res; \
 errno = __res; \
@@ -1265,19 +1269,20 @@ return -1; \
 #define _syscall3(type,name,atype,a,btype,b,ctype,c) \
 type name (atype a, btype b, ctype c) \
 { \
-register long __res __asm__ ("$2"); \
-register long __err __asm__ ("$7"); \
+long __res, __err; \
 __asm__ volatile ("move\t$4,%3\n\t" \
                   "move\t$5,%4\n\t" \
                   "move\t$6,%5\n\t" \
 		  "li\t$2,%2\n\t" \
-                  "syscall" \
+		  "syscall\n\t" \
+		  "move\t%0, $2\n\t" \
+		  "move\t%1, $7" \
                   : "=r" (__res), "=r" (__err) \
                   : "i" (__NR_##name),"r" ((long)(a)), \
                                       "r" ((long)(b)), \
                                       "r" ((long)(c)) \
-                  : "$4","$5","$6","$8","$9","$10","$11","$12","$13","$14", \
-                    "$15","$24"); \
+                  : "$2","$4","$5","$6","$7","$8","$9","$10","$11","$12", \
+		    "$13","$14","$15","$24"); \
 if (__err == 0) \
 	return (type) __res; \
 errno = __res; \
@@ -1287,21 +1292,22 @@ return -1; \
 #define _syscall4(type,name,atype,a,btype,b,ctype,c,dtype,d) \
 type name (atype a, btype b, ctype c, dtype d) \
 { \
-register long __res __asm__ ("$2"); \
-register long __err __asm__ ("$7"); \
+long __res, __err; \
 __asm__ volatile ("move\t$4,%3\n\t" \
                   "move\t$5,%4\n\t" \
                   "move\t$6,%5\n\t" \
                   "move\t$7,%6\n\t" \
 		  "li\t$2,%2\n\t" \
-                  "syscall" \
+		  "syscall\n\t" \
+		  "move\t%0, $2\n\t" \
+		  "move\t%1, $7" \
                   : "=r" (__res), "=r" (__err) \
                   : "i" (__NR_##name),"r" ((long)(a)), \
                                       "r" ((long)(b)), \
                                       "r" ((long)(c)), \
                                       "r" ((long)(d)) \
-                  : "$4","$5","$6","$8","$9","$10","$11","$12","$13","$14", \
-                    "$15","$24"); \
+                  : "$2","$4","$5","$6","$7","$8","$9","$10","$11","$12", \
+		    "$13","$14","$15","$24"); \
 if (__err == 0) \
 	return (type) __res; \
 errno = __res; \
@@ -1311,8 +1317,7 @@ return -1; \
 #define _syscall5(type,name,atype,a,btype,b,ctype,c,dtype,d,etype,e) \
 type name (atype a,btype b,ctype c,dtype d,etype e) \
 { \
-register long __res __asm__ ("$2"); \
-register long __err __asm__ ("$7"); \
+long __res, __err; \
 __asm__ volatile ("move\t$4,%3\n\t" \
                   "move\t$5,%4\n\t" \
                   "move\t$6,%5\n\t" \
@@ -1321,7 +1326,9 @@ __asm__ volatile ("move\t$4,%3\n\t" \
 		  "subu\t$29,24\n\t" \
 		  "sw\t$2,16($29)\n\t" \
 		  "li\t$2,%2\n\t" \
-                  "syscall\n\t" \
+		  "syscall\n\t" \
+		  "move\t%0, $2\n\t" \
+		  "move\t%1, $7\n\t" \
 		  "addiu\t$29,24" \
                   : "=r" (__res), "=r" (__err) \
                   : "i" (__NR_##name),"r" ((long)(a)), \
@@ -1340,8 +1347,7 @@ return -1; \
 #define _syscall6(type,name,atype,a,btype,b,ctype,c,dtype,d,etype,e,ftype,f) \
 type name (atype a,btype b,ctype c,dtype d,etype e,ftype f) \
 { \
-register long __res __asm__ ("$2"); \
-register long __err __asm__ ("$7"); \
+long __res, __err; \
 __asm__ volatile ("move\t$4,%3\n\t" \
                   "move\t$5,%4\n\t" \
                   "move\t$6,%5\n\t" \
@@ -1352,7 +1358,9 @@ __asm__ volatile ("move\t$4,%3\n\t" \
 		  "sw\t$2,16($29)\n\t" \
 		  "sw\t$3,20($29)\n\t" \
 		  "li\t$2,%2\n\t" \
-                  "syscall\n\t" \
+		  "syscall\n\t" \
+		  "move\t%0, $2\n\t" \
+		  "move\t%1, $7\n\t" \
 		  "addiu\t$29,24" \
                   : "=r" (__res), "=r" (__err) \
                   : "i" (__NR_##name),"r" ((long)(a)), \
@@ -1372,8 +1380,7 @@ return -1; \
 #define _syscall7(type,name,atype,a,btype,b,ctype,c,dtype,d,etype,e,ftype,f,gtype,g) \
 type name (atype a,btype b,ctype c,dtype d,etype e,ftype f,gtype g) \
 { \
-register long __res __asm__ ("$2"); \
-register long __err __asm__ ("$7"); \
+long __res, __err; \
 __asm__ volatile ("move\t$4,%3\n\t" \
                   "move\t$5,%4\n\t" \
                   "move\t$6,%5\n\t" \
@@ -1386,7 +1393,9 @@ __asm__ volatile ("move\t$4,%3\n\t" \
 		  "sw\t$3,20($29)\n\t" \
 		  "sw\t$2,24($29)\n\t" \
 		  "li\t$2,%2\n\t" \
-                  "syscall\n\t" \
+		  "syscall\n\t" \
+		  "move\t%0, $2\n\t" \
+		  "move\t%1, $7\n\t" \
 		  "addiu\t$29,32" \
                   : "=r" (__res), "=r" (__err) \
                   : "i" (__NR_##name),"r" ((long)(a)), \
