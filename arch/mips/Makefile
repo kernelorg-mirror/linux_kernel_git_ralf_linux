@@ -24,6 +24,7 @@ oformat		= elf32-littlemips
 endif
 else
 tool-prefix	= mips-linux-
+unexport tool-prefix
 ifdef CONFIG_MIPS_ECOFF
 oformat		= ecoff-bigmips
 else
