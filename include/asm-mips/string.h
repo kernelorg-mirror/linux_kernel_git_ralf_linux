@@ -130,7 +130,7 @@ extern void *memmove(void *__dest, __const__ void *__src, size_t __n);
 #define __HAVE_ARCH_BCOPY
 extern __inline__ char * bcopy(const char * src, char * dest, int count)
 {
-	memcpy(dest, src, count);
+	memmove(dest, src, count);
 }
 
 #define __HAVE_ARCH_MEMSCAN
