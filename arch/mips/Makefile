@@ -184,6 +184,9 @@ endif
 
 MAKEBOOT = $(MAKE) -C arch/$(ARCH)/boot
 
+vmlinux.ecoff: vmlinux
+	@$(MAKEBOOT) $@
+
 zImage: vmlinux
 	@$(MAKEBOOT) zImage
 
