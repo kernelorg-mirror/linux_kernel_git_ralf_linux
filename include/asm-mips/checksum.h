@@ -1,10 +1,9 @@
-/* $Id: checksum.h,v 1.5 1998/07/10 01:14:54 ralf Exp $
- *
+/*
  * This file is subject to the terms and conditions of the GNU General Public
  * License.  See the file "COPYING" in the main directory of this archive
  * for more details.
  *
- * Copyright (C) 1995, 1996, 1997, 1998 by Ralf Baechle
+ * Copyright (C) 1995, 1996, 1997, 1998, 2001 by Ralf Baechle
  */
 #ifndef __ASM_MIPS_CHECKSUM_H
 #define __ASM_MIPS_CHECKSUM_H
@@ -239,15 +238,10 @@ static __inline__ unsigned short int csum_ipv6_magic(struct in6_addr *saddr,
 		addu	%0,%1
 		sltu	$1,%0,$1
 		.set	noat
-		.set	noreorder"
-		: "=r" (sum),
-		  "=r" (proto)
-		: "r" (saddr),
-		  "r" (daddr),
-		  "0" (htonl((__u32) (len))),
-		  "1" (htonl(proto)),
-		  "r"(sum)
-		: "$1");
+		.set	reorder"
+	: "=r" (sum), "=r" (proto) : "r" (saddr), "r" (daddr),
+	  "0" (htonl((__u32) (len))), "1" (htonl(proto)), "r"(sum)
+	: "$1");
 
 	return csum_fold(sum);
 }
