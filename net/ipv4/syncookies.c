@@ -184,8 +184,10 @@ cookie_v4_check(struct sock *sk, struct sk_buff *skb, struct ip_options *opt)
 			    req->af.v4_req.loc_addr,
 			    sk->ip_tos | RTO_CONN,
 			    0)) { 
-	    tcp_openreq_free(req);
-	    return NULL; 
+		if (req->af.v4_req.opt)
+			kfree(req->af.v4_req.opt);
+		tcp_openreq_free(req);
+		return NULL; 
 	}
 
 	/* Try to redo what tcp_v4_send_synack did. */

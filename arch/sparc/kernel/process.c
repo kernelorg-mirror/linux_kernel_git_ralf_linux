@@ -55,7 +55,6 @@ asmlinkage int sys_idle(void)
 {
 	int ret = -EPERM;
 
-	lock_kernel();
 	if (current->pid != 0)
 		goto out;
 
@@ -100,7 +99,6 @@ asmlinkage int sys_idle(void)
 	}
 	ret = 0;
 out:
-	unlock_kernel();
 	return ret;
 }
 

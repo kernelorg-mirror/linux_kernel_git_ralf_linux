@@ -89,9 +89,14 @@ good_area:
 	 * make sure we exit gracefully rather than endlessly redo
 	 * the fault.
 	 */
-	if (!handle_mm_fault(tsk, vma, address, writeaccess))
-		goto do_sigbus;
-
+survive:
+	{
+		int fault = handle_mm_fault(tsk, vma, address, writeaccess);
+		if (!fault)
+			goto do_sigbus;
+		if (fault < 0)
+			goto out_of_memory;
+	}
 	up(&mm->mmap_sem);
 	return;
 
@@ -147,6 +152,19 @@ no_context:
  * We ran out of memory, or some other thing happened to us that made
  * us unable to handle the page fault gracefully.
  */
+out_of_memory:
+	if (tsk->pid == 1) {
+		tsk->policy |= SCHED_YIELD;
+		schedule();
+		goto survive;
+	}
+	up(&mm->mmap_sem);
+	if (user_mode(regs)) {
+		printk("VM: killing process %s\n", tsk->comm);
+		do_exit(SIGKILL);
+	}
+	goto no_context;
+
 do_sigbus:
 	up(&mm->mmap_sem);
 

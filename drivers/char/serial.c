@@ -63,6 +63,7 @@
  * 		Check the magic number for the async_structure where
  * 		ever possible.
  */
+#include <linux/config.h>
 
 #undef SERIAL_PARANOIA_CHECK
 #define CONFIG_SERIAL_NOPAUSE_IO
@@ -121,7 +122,6 @@
  * End of serial driver configuration section.
  */
 
-#include <linux/config.h>
 #include <linux/module.h>
 #include <linux/errno.h>
 #include <linux/signal.h>

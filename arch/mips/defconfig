@@ -78,7 +78,6 @@ CONFIG_BLK_DEV_LOOP=y
 # CONFIG_BLK_DEV_XD is not set
 CONFIG_PARIDE_PARPORT=m
 # CONFIG_PARIDE is not set
-# CONFIG_BLK_CPQ_DA is not set
 # CONFIG_BLK_DEV_HD is not set
 
 #
@@ -125,6 +124,12 @@ CONFIG_INET=y
 # QoS and/or fair queueing
 #
 # CONFIG_NET_SCHED is not set
+
+#
+# Telephony Support
+#
+# CONFIG_PHONE is not set
+# CONFIG_PHONE_IXJ is not set
 
 #
 # SCSI support
@@ -181,6 +186,11 @@ CONFIG_MOUSE=y
 CONFIG_PSMOUSE=y
 # CONFIG_82C710_MOUSE is not set
 # CONFIG_PC110_PAD is not set
+
+#
+# Joysticks
+#
+# CONFIG_JOYSTICK is not set
 # CONFIG_QIC02_TAPE is not set
 # CONFIG_WATCHDOG is not set
 # CONFIG_NVRAM is not set
@@ -190,11 +200,6 @@ CONFIG_PSMOUSE=y
 # Video For Linux
 #
 # CONFIG_VIDEO_DEV is not set
-
-#
-# Joystick support
-#
-# CONFIG_JOYSTICK is not set
 # CONFIG_DTLK is not set
 
 #
