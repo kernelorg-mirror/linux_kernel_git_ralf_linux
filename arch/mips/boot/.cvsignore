@@ -1,3 +1,0 @@
-.depend
-.*.flags
-mkboot zImage zImage.tmp elf2ecoff

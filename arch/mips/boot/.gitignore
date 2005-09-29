@@ -1,0 +1,6 @@
+.*.flags
+.depend
+elf2ecoff
+mkboot
+zImage
+zImage.tmp

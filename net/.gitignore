@@ -1,0 +1,8 @@
+.config*
+.depend
+.*.cmd
+.*.flags
+.*.o
+.*.S
+.tmp_*
+.version
