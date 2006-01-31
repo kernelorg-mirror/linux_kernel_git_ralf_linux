@@ -129,23 +129,4 @@ extern __inline__ char * bcopy(const char * src, char * dest, int count)
 	return memmove(dest, src, count);
 }
 
-#define __HAVE_ARCH_MEMSCAN
-extern __inline__ void *memscan(void *__addr, int __c, size_t __size)
-{
-	char *__end = (char *)__addr + __size;
-
-	__asm__(".set\tpush\n\t"
-		".set\tnoat\n\t"
-		".set\treorder\n\t"
-		"1:\tbeq\t%0,%1,2f\n\t"
-		"addiu\t%0,1\n\t"
-		"lb\t$1,-1(%0)\n\t"
-		"bne\t$1,%4,1b\n"
-		"2:\t.set\tpop"
-		: "=r" (__addr), "=r" (__end)
-		: "0" (__addr), "1" (__end), "r" (__c));
-
-	return __addr;
-}
-
 #endif /* _ASM_STRING_H */
