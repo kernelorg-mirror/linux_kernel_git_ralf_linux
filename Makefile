@@ -895,7 +895,7 @@ export INSTALL_HDR_PATH
 
 PHONY += headers_install
 headers_install: include/linux/version.h
-	@if [ ! -r include/asm-$(ARCH)/Kbuild ]; then \
+	@if [ ! -r $(srctree)/include/asm-$(ARCH)/Kbuild ]; then \
 	  echo '*** Error: Headers not exportable for this architecture ($(ARCH))'; \
 	  exit 1 ; fi
 	$(Q)unifdef -Ux /dev/null
