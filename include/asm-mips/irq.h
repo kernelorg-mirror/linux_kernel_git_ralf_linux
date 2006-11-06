@@ -81,4 +81,8 @@ extern int setup_irq_smtc(unsigned int irq, struct irqaction * new,
 #define ARCH_HAS_IRQ_PER_CPU
 #endif
 
+extern int allocate_irqno(void);
+extern void alloc_legacy_irqno(void);
+extern void free_irqno(unsigned int irq);
+
 #endif /* _ASM_IRQ_H */
