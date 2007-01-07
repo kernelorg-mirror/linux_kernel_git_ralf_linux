@@ -21,7 +21,7 @@
  * Sead board.
  */
 #include <linux/init.h>
-#include <linux/irq.h>
+#include <linux/interrupt.h>
 
 #include <asm/irq_cpu.h>
 #include <asm/system.h>

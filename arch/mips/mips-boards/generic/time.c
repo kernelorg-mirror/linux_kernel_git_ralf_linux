@@ -49,6 +49,9 @@
 #ifdef CONFIG_MIPS_MALTA
 #include <asm/mips-boards/maltaint.h>
 #endif
+#ifdef CONFIG_MIPS_SEAD
+#include <asm/mips-boards/seadint.h>
+#endif
 
 unsigned long cpu_khz;
 
