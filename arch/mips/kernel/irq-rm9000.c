@@ -18,16 +18,14 @@
 #include <asm/mipsregs.h>
 #include <asm/system.h>
 
-static int irq_base;
-
 static inline void unmask_rm9k_irq(unsigned int irq)
 {
-	set_c0_intcontrol(0x1000 << (irq - irq_base));
+	set_c0_intcontrol(0x1000 << (irq - RM9K_CPU_IRQ_BASE));
 }
 
 static inline void mask_rm9k_irq(unsigned int irq)
 {
-	clear_c0_intcontrol(0x1000 << (irq - irq_base));
+	clear_c0_intcontrol(0x1000 << (irq - RM9K_CPU_IRQ_BASE));
 }
 
 static inline void rm9k_cpu_irq_enable(unsigned int irq)
@@ -129,8 +127,9 @@ unsigned int rm9000_perfcount_irq;
 
 EXPORT_SYMBOL(rm9000_perfcount_irq);
 
-void __init rm9k_cpu_irq_init(int base)
+void __init rm9k_cpu_irq_init(void)
 {
+	int base = RM9K_CPU_IRQ_BASE;
 	int i;
 
 	clear_c0_intcontrol(0x0000f000);		/* Mask all */
@@ -144,6 +143,4 @@ void __init rm9k_cpu_irq_init(int base)
 
 	rm9000_perfcount_irq = base + 1;
 	irq_desc[rm9000_perfcount_irq].chip = &rm9k_perfcounter_irq;
-
-	irq_base = base;
 }

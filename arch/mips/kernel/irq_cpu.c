@@ -25,7 +25,7 @@
  * Don't even think about using this on SMP.  You have been warned.
  *
  * This file exports one global function:
- *	void mips_cpu_irq_init(int irq_base);
+ *	void mips_cpu_irq_init(void);
  */
 #include <linux/init.h>
 #include <linux/interrupt.h>
@@ -36,17 +36,15 @@
 #include <asm/mipsmtregs.h>
 #include <asm/system.h>
 
-static int mips_cpu_irq_base;
-
 static inline void unmask_mips_irq(unsigned int irq)
 {
-	set_c0_status(0x100 << (irq - mips_cpu_irq_base));
+	set_c0_status(0x100 << (irq - MIPS_CPU_IRQ_BASE));
 	irq_enable_hazard();
 }
 
 static inline void mask_mips_irq(unsigned int irq)
 {
-	clear_c0_status(0x100 << (irq - mips_cpu_irq_base));
+	clear_c0_status(0x100 << (irq - MIPS_CPU_IRQ_BASE));
 	irq_disable_hazard();
 }
 
@@ -117,7 +115,7 @@ static unsigned int mips_mt_cpu_irq_startup(unsigned int irq)
 {
 	unsigned int vpflags = dvpe();
 
-	clear_c0_cause(0x100 << (irq - mips_cpu_irq_base));
+	clear_c0_cause(0x100 << (irq - MIPS_CPU_IRQ_BASE));
 	evpe(vpflags);
 	mips_mt_cpu_irq_enable(irq);
 
@@ -133,7 +131,7 @@ static unsigned int mips_mt_cpu_irq_startup(unsigned int irq)
 static void mips_mt_cpu_irq_ack(unsigned int irq)
 {
 	unsigned int vpflags = dvpe();
-	clear_c0_cause(0x100 << (irq - mips_cpu_irq_base));
+	clear_c0_cause(0x100 << (irq - MIPS_CPU_IRQ_BASE));
 	evpe(vpflags);
 	mask_mips_mt_irq(irq);
 }
@@ -150,8 +148,9 @@ static struct irq_chip mips_mt_cpu_irq_controller = {
 	.end		= mips_mt_cpu_irq_end,
 };
 
-void __init mips_cpu_irq_init(int irq_base)
+void __init mips_cpu_irq_init(void)
 {
+	int irq_base = MIPS_CPU_IRQ_BASE;
 	int i;
 
 	/* Mask interrupts. */
@@ -176,6 +175,4 @@ void __init mips_cpu_irq_init(int irq_base)
 		irq_desc[i].depth = 1;
 		irq_desc[i].chip = &mips_cpu_irq_controller;
 	}
-
-	mips_cpu_irq_base = irq_base;
 }

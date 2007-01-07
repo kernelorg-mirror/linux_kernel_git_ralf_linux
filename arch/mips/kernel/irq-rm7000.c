@@ -17,16 +17,14 @@
 #include <asm/mipsregs.h>
 #include <asm/system.h>
 
-static int irq_base;
-
 static inline void unmask_rm7k_irq(unsigned int irq)
 {
-	set_c0_intcontrol(0x100 << (irq - irq_base));
+	set_c0_intcontrol(0x100 << (irq - RM7K_CPU_IRQ_BASE));
 }
 
 static inline void mask_rm7k_irq(unsigned int irq)
 {
-	clear_c0_intcontrol(0x100 << (irq - irq_base));
+	clear_c0_intcontrol(0x100 << (irq - RM7K_CPU_IRQ_BASE));
 }
 
 static inline void rm7k_cpu_irq_enable(unsigned int irq)
@@ -81,8 +79,9 @@ static struct irq_chip rm7k_irq_controller = {
 	.end = rm7k_cpu_irq_end,
 };
 
-void __init rm7k_cpu_irq_init(int base)
+void __init rm7k_cpu_irq_init(void)
 {
+	int base = RM7K_CPU_IRQ_BASE;
 	int i;
 
 	clear_c0_intcontrol(0x00000f00);		/* Mask all */
@@ -93,6 +92,4 @@ void __init rm7k_cpu_irq_init(int base)
 		irq_desc[i].depth = 1;
 		irq_desc[i].chip = &rm7k_irq_controller;
 	}
-
-	irq_base = base;
 }
