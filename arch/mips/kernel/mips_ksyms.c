@@ -38,6 +38,7 @@ EXPORT_SYMBOL(kernel_thread);
  * Userspace access stuff.
  */
 EXPORT_SYMBOL(__copy_user);
+EXPORT_SYMBOL(__copy_user_inatomic);
 EXPORT_SYMBOL(__bzero);
 EXPORT_SYMBOL(__strncpy_from_user_nocheck_asm);
 EXPORT_SYMBOL(__strncpy_from_user_asm);
