@@ -87,16 +87,15 @@ static void timer_irqdispatch(int irq, struct pt_regs *regs)
 
 asmlinkage void plat_irq_dispatch(struct pt_regs *regs)
 {
-	unsigned int pending = read_c0_status() & read_c0_cause();
+	unsigned int pending = read_c0_status() & read_c0_cause() & ST0_IM;
 
 	if (pending & STATUSF_IP2)
 		do_IRQ(2, regs);
 	else if (pending & STATUSF_IP7) {
 		if (read_c0_config7() & 0x01c0)
 			timer_irqdispatch(7, regs);
-	}
-
-	spurious_interrupt(regs);
+	} else
+		spurious_interrupt();
 }
 
 static inline void modify_cp0_intmask(unsigned clr_mask, unsigned set_mask)

@@ -64,7 +64,7 @@ extern void ll_cpci_irq(struct pt_regs *regs);
 
 asmlinkage void plat_irq_dispatch(struct pt_regs *regs)
 {
-	unsigned int pending = read_c0_cause() & read_c0_status();
+	unsigned int pending = read_c0_cause() & read_c0_status() & ST0_IM;
 
 	if (pending & STATUSF_IP0)
 		do_IRQ(0, regs);

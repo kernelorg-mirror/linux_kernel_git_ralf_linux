@@ -578,7 +578,7 @@ static int tx4927_irq_nested(void)
 
 asmlinkage void plat_irq_dispatch(struct pt_regs *regs)
 {
-	unsigned int pending = read_c0_status() & read_c0_cause();
+	unsigned int pending = read_c0_status() & read_c0_cause() & ST0_IM;
 
 	if (pending & STATUSF_IP7)			/* cpu timer */
 		do_IRQ(TX4927_IRQ_CPU_TIMER, regs);

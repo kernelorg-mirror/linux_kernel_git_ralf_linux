@@ -442,7 +442,7 @@ asmlinkage void plat_irq_dispatch(struct pt_regs *regs)
 	 * blasting the high 32 bits.
 	 */
 
-	pending = read_c0_cause() & read_c0_status();
+	pending = read_c0_cause() & read_c0_status() & ST0_IM;
 
 #ifdef CONFIG_SIBYTE_SB1250_PROF
 	if (pending & CAUSEF_IP7) /* Cpu performance counter interrupt */

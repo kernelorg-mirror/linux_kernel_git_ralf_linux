@@ -32,7 +32,7 @@
 
 asmlinkage void plat_irq_dispatch(struct pt_regs *regs)
 {
-	unsigned int pending = read_c0_status() & read_c0_cause();
+	unsigned int pending = read_c0_status() & read_c0_cause() & ST0_IM;
 
 	if (pending & STATUSF_IP7)
 		do_IRQ(WRPPMC_MIPS_TIMER_IRQ, regs);	/* CPU Compare/Count internal timer */

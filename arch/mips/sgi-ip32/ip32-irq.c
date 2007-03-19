@@ -546,7 +546,7 @@ static void ip32_irq5(struct pt_regs *regs)
 
 asmlinkage void plat_irq_dispatch(struct pt_regs *regs)
 {
-	unsigned int pending = read_c0_cause();
+	unsigned int pending = read_c0_status() & read_c0_cause();
 
 	if (likely(pending & IE_IRQ0))
 		ip32_irq0(regs);
