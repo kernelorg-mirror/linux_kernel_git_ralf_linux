@@ -144,7 +144,7 @@ static void ll_local_dev(struct pt_regs *regs)
 
 asmlinkage void plat_irq_dispatch(struct pt_regs *regs)
 {
-	unsigned int pending = read_c0_cause() & read_c0_status() & ST0_IM;
+	unsigned int pending = read_c0_cause() & read_c0_status();
 
 	if (pending & IE_IRQ5)
 		write_c0_compare(0);
