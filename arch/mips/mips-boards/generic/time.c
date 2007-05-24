@@ -278,7 +278,6 @@ void __init plat_timer_setup(struct irqaction *irq)
 		mips_cpu_timer_irq = MIPSCPU_INT_BASE + MIPSCPU_INT_CPUCTR;
 	}
 
-
 	/* we are using the cpu counter for timer interrupts */
 	irq->handler = mips_timer_interrupt;	/* we use our own handler */
 #ifdef CONFIG_MIPS_MT_SMTC
@@ -286,14 +285,6 @@ void __init plat_timer_setup(struct irqaction *irq)
 #else
 	setup_irq(mips_cpu_timer_irq, irq);
 #endif /* CONFIG_MIPS_MT_SMTC */
-
-#ifdef CONFIG_SMP
-	/* irq_desc(riptor) is a global resource, when the interrupt overlaps
-	   on seperate cpu's the first one tries to handle the second interrupt.
-	   The effect is that the int remains disabled on the second cpu.
-	   Mark the interrupt with IRQ_PER_CPU to avoid any confusion */
-	irq_desc[mips_cpu_timer_irq].status |= IRQ_PER_CPU;
-#endif
 
         /* to generate the first timer interrupt */
 	write_c0_compare (read_c0_count() + mips_hpt_frequency/HZ);
