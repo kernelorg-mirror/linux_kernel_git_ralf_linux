@@ -26,7 +26,7 @@ static inline int irq_canonicalize(int irq)
 
 extern asmlinkage unsigned int do_IRQ(unsigned int irq);
 
-#ifdef CONFIG_MIPS_MT_SMTC
+#ifdef CONFIG_MIPS_MT_SMTC_IM_BACKSTOP
 /*
  * Clear interrupt mask handling "backstop" if irq_hwmask
  * entry so indicates. This implies that the ack() or end()
