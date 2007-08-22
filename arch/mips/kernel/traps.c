@@ -646,6 +646,8 @@ asmlinkage void do_ov(struct pt_regs *regs)
  */
 asmlinkage void do_fpe(struct pt_regs *regs, unsigned long fcr31)
 {
+	siginfo_t info;
+
 	die_if_kernel("FP exception in kernel code", regs);
 
 	if (fcr31 & FPU_CSR_UNI_X) {
@@ -681,9 +683,22 @@ asmlinkage void do_fpe(struct pt_regs *regs, unsigned long fcr31)
 			force_sig(sig, current);
 
 		return;
-	}
-
-	force_sig(SIGFPE, current);
+	} else if (fcr31 & FPU_CSR_INV_X)
+		info.si_code = FPE_FLTINV;
+	else if (fcr31 & FPU_CSR_DIV_X)
+		info.si_code = FPE_FLTDIV;
+	else if (fcr31 & FPU_CSR_OVF_X)
+		info.si_code = FPE_FLTOVF;
+	else if (fcr31 & FPU_CSR_UDF_X)
+		info.si_code = FPE_FLTUND;
+	else if (fcr31 & FPU_CSR_INE_X)
+		info.si_code = FPE_FLTRES;
+	else
+		info.si_code = __SI_FAULT;
+	info.si_signo = SIGFPE;
+	info.si_errno = 0;
+	info.si_addr = (void __user *) regs->cp0_epc;
+	force_sig_info(SIGFPE, &info, current);
 }
 
 static void do_trap_or_bp(struct pt_regs *regs, unsigned int code,
