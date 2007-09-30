@@ -14,8 +14,32 @@
 #define lock_fpu_owner()	preempt_disable()
 #define unlock_fpu_owner()	preempt_enable()
 #else
-#define lock_fpu_owner()	pagefault_disable()
-#define unlock_fpu_owner()	pagefault_enable()
+
+static inline void lock_fpu_owner(void)
+{
+	inc_preempt_count();
+	/*
+	 * make sure to have issued the store before a pagefault
+	 * can hit.
+	 */
+	barrier();
+}
+
+static inline void unlock_fpu_owner(void)
+{
+	/*
+	 * make sure to issue those last loads/stores before enabling
+	 * the pagefault handler again.
+	 */
+	barrier();
+	dec_preempt_count();
+	/*
+	 * make sure we do..
+	 */
+	barrier();
+	preempt_check_resched();
+}
+
 #endif
 
 static inline int protected_save_fp_context(struct sigcontext __user *sc)
