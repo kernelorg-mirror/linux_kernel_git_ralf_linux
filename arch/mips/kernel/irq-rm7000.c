@@ -45,7 +45,7 @@ void __init rm7k_cpu_irq_init(int base)
 
 	for (i = base; i < base + 4; i++)
 		set_irq_chip_and_handler(i, &rm7k_irq_controller,
-					 handle_level_irq);
+					 handle_percpu_irq);
 
 	irq_base = base;
 }
