@@ -34,7 +34,7 @@
 		"	.set	mips0				\n"	\
 		"	.section .fixup,\"ax\"			\n"	\
 		"4:	li	%0, %6				\n"	\
-		"	j	2b				\n"	\
+		"	j	3b				\n"	\
 		"	.previous				\n"	\
 		"	.section __ex_table,\"a\"		\n"	\
 		"	"__UA_ADDR "\t1b, 4b			\n"	\
@@ -60,7 +60,7 @@
 		"	.set	mips0				\n"	\
 		"	.section .fixup,\"ax\"			\n"	\
 		"4:	li	%0, %6				\n"	\
-		"	j	2b				\n"	\
+		"	j	3b				\n"	\
 		"	.previous				\n"	\
 		"	.section __ex_table,\"a\"		\n"	\
 		"	"__UA_ADDR "\t1b, 4b			\n"	\
@@ -199,4 +199,4 @@ futex_atomic_cmpxchg_inatomic(int __user *uaddr, int oldval, int newval)
 }
 
 #endif
-#endif
+#endif /* _ASM_FUTEX_H */
