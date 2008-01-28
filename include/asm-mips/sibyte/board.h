@@ -21,9 +21,8 @@
 
 #include <linux/config.h>
 
-#if defined(CONFIG_SIBYTE_SWARM) || defined(CONFIG_SIBYTE_PTSWARM) || \
-    defined(CONFIG_SIBYTE_CRHONE) || defined(CONFIG_SIBYTE_CRHINE) || \
-    defined(CONFIG_SIBYTE_LITTLESUR)
+#if defined(CONFIG_SIBYTE_SWARM) || defined(CONFIG_SIBYTE_CRHONE) || \
+    defined(CONFIG_SIBYTE_CRHINE) || defined(CONFIG_SIBYTE_LITTLESUR)
 #include <asm/sibyte/swarm.h>
 #endif
 
