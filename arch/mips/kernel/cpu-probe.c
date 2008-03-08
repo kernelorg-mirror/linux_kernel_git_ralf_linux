@@ -530,7 +530,7 @@ static inline void cpu_probe_legacy(struct cpuinfo_mips *c)
 	}
 }
 
-static char unknown_isa[] __initdata = KERN_ERR \
+static char unknown_isa[] __cpuinitdata = KERN_ERR \
 	"Unsupported ISA type, c0.config0: %d.";
 
 static inline unsigned int decode_config0(struct cpuinfo_mips *c)
@@ -776,7 +776,7 @@ static inline void cpu_probe_philips(struct cpuinfo_mips *c)
 }
 
 
-__init void cpu_probe(void)
+__cpuinit void cpu_probe(void)
 {
 	struct cpuinfo_mips *c = &current_cpu_data;
 
@@ -825,7 +825,7 @@ __init void cpu_probe(void)
 		c->srsets = 1;
 }
 
-__init void cpu_report(void)
+__cpuinit void cpu_report(void)
 {
 	struct cpuinfo_mips *c = &current_cpu_data;
 
