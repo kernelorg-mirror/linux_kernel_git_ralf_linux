@@ -91,6 +91,7 @@ config MACH_DECSTATION
 	bool "DECstations"
 	select BOOT_ELF32
 	select CEVT_R4K
+	select CSRC_IOASIC
 	select CSRC_R4K
 	select DMA_NONCOHERENT
 	select NO_IOPORT
@@ -775,6 +776,9 @@ config CEVT_TXX9
 	bool
 
 config CSRC_BCM1480
+	bool
+
+config CSRC_IOASIC
 	bool
 
 config CSRC_R4K
