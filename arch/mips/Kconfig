@@ -83,6 +83,7 @@ config MIPS_COBALT
 config MACH_DECSTATION
 	bool "DECstations"
 	select BOOT_ELF32
+	select CEVT_DS1287
 	select CEVT_R4K
 	select CSRC_IOASIC
 	select CSRC_R4K
@@ -783,6 +784,9 @@ config BOOT_RAW
 	bool
 
 config CEVT_BCM1480
+	bool
+
+config CEVT_DS1287
 	bool
 
 config CEVT_GT641XX
