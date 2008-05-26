@@ -575,7 +575,11 @@ load-$(CONFIG_SIBYTE_BIGSUR)	:= 0xffffffff80100000
 #
 core-$(CONFIG_SNI_RM200_PCI)	+= arch/mips/sni/
 cflags-$(CONFIG_SNI_RM200_PCI)	+= -Iinclude/asm-mips/mach-rm200
+ifdef CONFIG_CPU_LITTLE_ENDIAN
 load-$(CONFIG_SNI_RM200_PCI)	+= 0xffffffff80600000
+else
+load-$(CONFIG_SNI_RM200_PCI)	+= 0xffffffff80030000
+endif
 
 #
 # Toshiba JMR-TX3927 board
