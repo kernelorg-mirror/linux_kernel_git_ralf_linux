@@ -62,14 +62,20 @@ void __cpuinit prom_init_secondary(void)
 
 void __cpuinit plat_smp_setup(void)
 {
-	if (read_c0_config3() & (1<<2))
-		mipsmt_build_cpu_map(0);
+	if (read_c0_config3() & (1<<2)) {
+		/*
+		 * we won't get the definitive value until
+		 * we've run smtc_prepare_cpus later, but
+		 * we would appear to need an upper bound now.
+		 */
+		smtc_build_cpu_map(0);
+	}
 }
 
 void __init plat_prepare_cpus(unsigned int max_cpus)
 {
 	if (read_c0_config3() & (1<<2))
-		mipsmt_prepare_cpus();
+		smtc_prepare_cpus(max_cpus);
 }
 
 /*
