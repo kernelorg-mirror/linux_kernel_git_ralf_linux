@@ -1426,7 +1426,7 @@ set_c0_##name(unsigned int set)					\
 {								\
 	unsigned int res;					\
 	unsigned int omt;					\
-	unsigned int flags;					\
+	unsigned long flags;					\
 								\
 	local_irq_save(flags);					\
 	omt = __dmt();						\
@@ -1444,7 +1444,7 @@ clear_c0_##name(unsigned int clear)				\
 {								\
 	unsigned int res;					\
 	unsigned int omt;					\
-	unsigned int flags;					\
+	unsigned long flags;					\
 								\
 	local_irq_save(flags);					\
 	omt = __dmt();						\
@@ -1462,7 +1462,7 @@ change_c0_##name(unsigned int change, unsigned int new)		\
 {								\
 	unsigned int res;					\
 	unsigned int omt;					\
-	unsigned int flags;					\
+	unsigned long flags;					\
 								\
 	local_irq_save(flags);					\
 								\
