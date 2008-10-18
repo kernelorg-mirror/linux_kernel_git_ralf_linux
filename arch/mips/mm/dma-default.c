@@ -306,7 +306,6 @@ void dma_sync_sg_for_cpu(struct device *dev, struct scatterlist *sg, int nelems,
 		if (cpu_is_noncoherent_r10000(dev))
 			__dma_sync((unsigned long)page_address(sg->page),
 			           sg->length, direction);
-		plat_unmap_dma_mem(sg->dma_address);
 	}
 }
 
@@ -324,7 +323,6 @@ void dma_sync_sg_for_device(struct device *dev, struct scatterlist *sg, int nele
 		if (!plat_device_is_coherent(dev))
 			__dma_sync((unsigned long)page_address(sg->page),
 			           sg->length, direction);
-		plat_unmap_dma_mem(sg->dma_address);
 	}
 }
 
