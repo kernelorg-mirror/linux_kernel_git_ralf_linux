@@ -103,7 +103,7 @@ static unsigned int startup_local1_irq(unsigned int irq)
 	return 0;		/* Never anything pending  */
 }
 
-void disable_local1_irq(unsigned int irq)
+static void disable_local1_irq(unsigned int irq)
 {
 	unsigned long flags;
 
@@ -147,7 +147,7 @@ static unsigned int startup_local2_irq(unsigned int irq)
 	return 0;		/* Never anything pending  */
 }
 
-void disable_local2_irq(unsigned int irq)
+static void disable_local2_irq(unsigned int irq)
 {
 	unsigned long flags;
 
@@ -193,7 +193,7 @@ static unsigned int startup_local3_irq(unsigned int irq)
 	return 0;		/* Never anything pending  */
 }
 
-void disable_local3_irq(unsigned int irq)
+static void disable_local3_irq(unsigned int irq)
 {
 	unsigned long flags;
 
@@ -448,6 +448,6 @@ void __init arch_init_irq(void)
 
 #ifdef CONFIG_EISA
 	if (ip22_is_fullhouse())	/* Only Indigo-2 has EISA stuff */
-	        ip22_eisa_init ();
+		ip22_eisa_init();
 #endif
 }
