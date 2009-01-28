@@ -424,7 +424,7 @@ config SGI_IP27
 	select ARC
 	select ARC64
 	select BOOT_ELF64
-	select DMA_IP27
+	select DMA_COHERENT
 	select SYS_HAS_EARLY_PRINTK
 	select HW_HAS_PCI
 	select NR_CPUS_DEFAULT_64
@@ -792,9 +792,6 @@ config CFE
 	bool
 
 config DMA_COHERENT
-	bool
-
-config DMA_IP27
 	bool
 
 config DMA_IP32
