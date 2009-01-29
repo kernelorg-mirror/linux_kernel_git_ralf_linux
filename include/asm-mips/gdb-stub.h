@@ -47,7 +47,7 @@ struct gdb_regs {
 	long	hi;
 	long	lo;
 #ifdef CONFIG_CPU_HAS_SMARTMIPS
-	long	acx
+	long	acx;
 #endif
 	long	cp0_badvaddr;
 	long	cp0_cause;
