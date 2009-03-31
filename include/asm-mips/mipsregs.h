@@ -1482,14 +1482,15 @@ static inline unsigned int					\
 set_c0_##name(unsigned int set)					\
 {								\
 	unsigned int res;					\
+	unsigned int new;					\
 	unsigned int omt;					\
 	unsigned long flags;					\
 								\
 	local_irq_save(flags);					\
 	omt = __dmt();						\
 	res = read_c0_##name();					\
-	res |= set;						\
-	write_c0_##name(res);					\
+	new = res | set;					\
+	write_c0_##name(new);					\
 	__emt(omt);						\
 	local_irq_restore(flags);				\
 								\
@@ -1500,14 +1501,15 @@ static inline unsigned int					\
 clear_c0_##name(unsigned int clear)				\
 {								\
 	unsigned int res;					\
+	unsigned int new;					\
 	unsigned int omt;					\
 	unsigned long flags;					\
 								\
 	local_irq_save(flags);					\
 	omt = __dmt();						\
 	res = read_c0_##name();					\
-	res &= ~clear;						\
-	write_c0_##name(res);					\
+	new = res & ~clear;					\
+	write_c0_##name(new);					\
 	__emt(omt);						\
 	local_irq_restore(flags);				\
 								\
@@ -1515,9 +1517,10 @@ clear_c0_##name(unsigned int clear)				\
 }								\
 								\
 static inline unsigned int					\
-change_c0_##name(unsigned int change, unsigned int new)		\
+change_c0_##name(unsigned int change, unsigned int newbits)	\
 {								\
 	unsigned int res;					\
+	unsigned int new;					\
 	unsigned int omt;					\
 	unsigned long flags;					\
 								\
@@ -1525,9 +1528,9 @@ change_c0_##name(unsigned int change, unsigned int new)		\
 								\
 	omt = __dmt();						\
 	res = read_c0_##name();					\
-	res &= ~change;						\
-	res |= (new & change);					\
-	write_c0_##name(res);					\
+	new = res & ~change;					\
+	new |= (newbits & change);				\
+	write_c0_##name(new);					\
 	__emt(omt);						\
 	local_irq_restore(flags);				\
 								\
