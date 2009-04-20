@@ -1817,10 +1817,6 @@ config MIPS_INSANE_LARGE
 
 endmenu
 
-config RWSEM_GENERIC_SPINLOCK
-	bool
-	default y
-
 config LOCKDEP_SUPPORT
 	bool
 	default y
