@@ -368,17 +368,17 @@ fault:
 	}
 
 	lock_kernel();
-	send_sig(SIGSEGV, current, 1);
+	force_sig(SIGSEGV, current);
 	unlock_kernel();
 	return;
 sigbus:
 	lock_kernel();
-	send_sig(SIGBUS, current, 1);
+	force_sig(SIGBUS, current);
 	unlock_kernel();
 	return;
 sigill:
 	lock_kernel();
-	send_sig(SIGILL, current, 1);
+	force_sig(SIGILL, current);
 	unlock_kernel();
 	return;
 }
