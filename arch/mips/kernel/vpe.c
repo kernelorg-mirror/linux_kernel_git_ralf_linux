@@ -1379,7 +1379,7 @@ static ssize_t store_ntcs(struct class_device *dev, const char *buf, size_t len)
 	return len;
 
 out_einval:
-	return -EINVAL;;
+	return -EINVAL;
 }
 
 static struct class_device_attribute vpe_class_attributes[] = {
