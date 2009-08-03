@@ -154,10 +154,9 @@ struct {
 };
 
 static void release_progmem(void *ptr);
-extern void save_gp_address(unsigned int secbase, unsigned int rel);
 
 /* get the vpe associated with this minor */
-struct vpe *get_vpe(int minor)
+static struct vpe *get_vpe(int minor)
 {
 	struct vpe *v;
 
@@ -173,7 +172,7 @@ struct vpe *get_vpe(int minor)
 }
 
 /* get the vpe associated with this minor */
-struct tc *get_tc(int index)
+static struct tc *get_tc(int index)
 {
 	struct tc *t;
 
@@ -198,7 +197,7 @@ struct tc *get_tc_unused(void)
 }
 
 /* allocate a vpe and associate it with this minor (or index) */
-struct vpe *alloc_vpe(int minor)
+static struct vpe *alloc_vpe(int minor)
 {
 	struct vpe *v;
 
@@ -215,7 +214,7 @@ struct vpe *alloc_vpe(int minor)
 }
 
 /* allocate a tc. At startup only tc0 is running, all other can be halted. */
-struct tc *alloc_tc(int index)
+static struct tc *alloc_tc(int index)
 {
 	struct tc *tc;
 
@@ -231,7 +230,7 @@ out:
 }
 
 /* clean up and free everything */
-void release_vpe(struct vpe *v)
+static void release_vpe(struct vpe *v)
 {
 	list_del(&v->list);
 	if (v->load_addr)
@@ -239,7 +238,7 @@ void release_vpe(struct vpe *v)
 	kfree(v);
 }
 
-void dump_mtregs(void)
+static void dump_mtregs(void)
 {
 	unsigned long val;
 
@@ -550,7 +549,7 @@ static char *rstrs[] = {
 	[R_MIPS_PC16] = "MIPS_PC16"
 };
 
-int apply_relocations(Elf32_Shdr *sechdrs,
+static int apply_relocations(Elf32_Shdr *sechdrs,
 		      const char *strtab,
 		      unsigned int symindex,
 		      unsigned int relsec,
@@ -595,7 +594,7 @@ int apply_relocations(Elf32_Shdr *sechdrs,
 	return 0;
 }
 
-void save_gp_address(unsigned int secbase, unsigned int rel)
+static inline void save_gp_address(unsigned int secbase, unsigned int rel)
 {
 	gp_addr = secbase + rel;
 	gp_offs = gp_addr - (secbase & 0xffff0000);
