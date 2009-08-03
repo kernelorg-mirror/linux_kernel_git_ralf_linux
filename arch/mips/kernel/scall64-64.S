@@ -487,4 +487,9 @@ sys_call_table:
 	PTR	sys_dup3
 	PTR	sys_pipe2
 	PTR	sys_inotify_init1
+	PTR	sys_ni_syscall			/* sys_preadv */
+	PTR	sys_ni_syscall			/* 5390, sys_pwritev */
+	PTR	sys_ni_syscall			/* sys_rt_tgsigqueueinfo */
+	PTR	sys_ni_syscall			/* sys_perf_counter_open */
+	PTR	sys_accept4
 	.size	sys_call_table,.-sys_call_table
