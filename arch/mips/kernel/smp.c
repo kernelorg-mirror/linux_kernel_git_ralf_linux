@@ -31,6 +31,7 @@
 #include <linux/cpumask.h>
 #include <linux/cpu.h>
 #include <linux/err.h>
+#include <linux/smp.h>
 
 #include <asm/atomic.h>
 #include <asm/cpu.h>
@@ -54,7 +55,6 @@ EXPORT_SYMBOL(phys_cpu_present_map);
 EXPORT_SYMBOL(cpu_online_map);
 
 extern void __init calibrate_delay(void);
-extern void cpu_idle(void);
 
 /*
  * First C code run on the secondary CPUs after being started up by
