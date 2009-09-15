@@ -30,6 +30,7 @@
 #include <linux/sched.h>
 #include <linux/cpumask.h>
 #include <linux/cpu.h>
+#include <linux/smp.h>
 
 #include <asm/atomic.h>
 #include <asm/cpu.h>
@@ -62,7 +63,6 @@ static void smp_tune_scheduling (void)
 }
 
 extern void __init calibrate_delay(void);
-extern ATTRIB_NORET void cpu_idle(void);
 
 /*
  * First C code run on the secondary CPUs after being started up by
