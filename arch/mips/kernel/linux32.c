@@ -776,6 +776,12 @@ _sys32_clone(nabi_no_regargs struct pt_regs regs)
 	               parent_tidptr, child_tidptr);
 }
 
+asmlinkage long sys32_lookup_dcookie(u32 a0, u32 a1, char __user *buf,
+	size_t len)
+{
+	return sys_lookup_dcookie(merge_64(a0, a1), buf, len);
+}
+
 /*
  * Implement the event wait interface for the eventpoll file. It is the kernel
  * part of the user space epoll_pwait(2).
