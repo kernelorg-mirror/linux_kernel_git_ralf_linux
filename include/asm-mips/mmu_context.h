@@ -16,6 +16,7 @@
 #include <linux/sched.h>
 #include <linux/slab.h>
 #include <asm/cacheflush.h>
+#include <asm/hazards.h>
 #include <asm/tlbflush.h>
 #ifdef CONFIG_MIPS_MT_SMTC
 #include <asm/mipsmtregs.h>
@@ -35,6 +36,7 @@ extern unsigned long pgd_current[];
 #ifdef CONFIG_32BIT
 #define TLBMISS_HANDLER_SETUP()						\
 	write_c0_context((unsigned long) smp_processor_id() << 25);	\
+	back_to_back_c0_hazard();					\
 	TLBMISS_HANDLER_SETUP_PGD(swapper_pg_dir)
 #endif
 #if defined(CONFIG_64BIT) && !defined(CONFIG_BUILD_ELF64)
@@ -45,6 +47,7 @@ extern unsigned long pgd_current[];
 #if defined(CONFIG_64BIT) && defined(CONFIG_BUILD_ELF64)
 #define TLBMISS_HANDLER_SETUP()						\
 	write_c0_context((unsigned long) smp_processor_id() << 26);	\
+	back_to_back_c0_hazard();					\
 	TLBMISS_HANDLER_SETUP_PGD(swapper_pg_dir)
 #endif
 
