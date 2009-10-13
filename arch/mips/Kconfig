@@ -1082,6 +1082,7 @@ config BOOT_ELF32
 config MIPS_L1_CACHE_SHIFT
 	int
 	default "4" if MACH_DECSTATION || SNI_RM
+	default "6" if MIPS_CPU_SCACHE
 	default "7" if SGI_IP27
 	default "5"
 
