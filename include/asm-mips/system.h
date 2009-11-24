@@ -12,6 +12,7 @@
 #ifndef _ASM_SYSTEM_H
 #define _ASM_SYSTEM_H
 
+#include <linux/kernel.h>
 #include <linux/types.h>
 #include <linux/irqflags.h>
 
