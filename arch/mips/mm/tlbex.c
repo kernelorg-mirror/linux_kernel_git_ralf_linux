@@ -1267,10 +1267,15 @@ static void __cpuinit build_r4000_tlb_refill_handler(void)
 	 * create the plain linear handler
 	 */
 	if (bcm1250_m3_war()) {
-		i_MFC0(&p, K0, C0_BADVADDR);
-		i_MFC0(&p, K1, C0_ENTRYHI);
+		unsigned int segbits = 44;
+
+		i_dmfc0(&p, K0, C0_BADVADDR);
+		i_dmfc0(&p, K1, C0_ENTRYHI);
 		i_xor(&p, K0, K0, K1);
-		i_SRL(&p, K0, K0, PAGE_SHIFT + 1);
+		i_dsrl32(&p, K1, K0, 62 - 32);
+		i_dsrl(&p, K0, K0, 12 + 1);
+		i_dsll32(&p, K0, K0, 64 + 12 + 1 - segbits - 32);
+		i_or(&p, K0, K0, K1);
 		il_bnez(&p, &r, K0, label_leave);
 		/* No need for i_nop */
 	}
@@ -1759,10 +1764,15 @@ static void __cpuinit build_r4000_tlb_load_handler(void)
 	memset(relocs, 0, sizeof(relocs));
 
 	if (bcm1250_m3_war()) {
-		i_MFC0(&p, K0, C0_BADVADDR);
-		i_MFC0(&p, K1, C0_ENTRYHI);
+		unsigned int segbits = 44;
+
+		i_dmfc0(&p, K0, C0_BADVADDR);
+		i_dmfc0(&p, K1, C0_ENTRYHI);
 		i_xor(&p, K0, K0, K1);
-		i_SRL(&p, K0, K0, PAGE_SHIFT + 1);
+		i_dsrl32(&p, K1, K0, 62 - 32);
+		i_dsrl(&p, K0, K0, 12 + 1);
+		i_dsll32(&p, K0, K0, 64 + 12 + 1 - segbits - 32);
+		i_or(&p, K0, K0, K1);
 		il_bnez(&p, &r, K0, label_leave);
 		/* No need for i_nop */
 	}
