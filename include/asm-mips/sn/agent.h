@@ -12,7 +12,6 @@
 #define _ASM_SGI_SN_AGENT_H
 
 #include <linux/config.h>
-#include <linux/topology.h>
 #include <asm/sn/addrs.h>
 #include <asm/sn/arch.h>
 
