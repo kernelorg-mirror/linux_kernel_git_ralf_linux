@@ -363,7 +363,7 @@ struct rq {
 };
 
 static DEFINE_PER_CPU_SHARED_ALIGNED(struct rq, runqueues);
-static DEFINE_MUTEX(sched_hotcpu_mutex);
+DEFINE_MUTEX(sched_hotcpu_mutex);
 
 static inline void check_preempt_curr(struct rq *rq, struct task_struct *p)
 {
