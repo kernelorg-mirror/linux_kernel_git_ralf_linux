@@ -3,6 +3,7 @@
  * Copyright (C) 2005 Mips Technologies, Inc
  */
 #include <linux/cpu.h>
+#include <linux/cpuset.h>
 #include <linux/cpumask.h>
 #include <linux/delay.h>
 #include <linux/kernel.h>
@@ -39,6 +40,7 @@ static inline struct task_struct *find_process_by_pid(pid_t pid)
 	return pid ? find_task_by_pid(pid) : current;
 }
 
+extern struct mutex sched_hotcpu_mutex;
 
 /*
  * mipsmt_sys_sched_setaffinity - set the cpu affinity of a process
@@ -46,11 +48,10 @@ static inline struct task_struct *find_process_by_pid(pid_t pid)
 asmlinkage long mipsmt_sys_sched_setaffinity(pid_t pid, unsigned int len,
 				      unsigned long __user *user_mask_ptr)
 {
-	cpumask_t new_mask;
-	cpumask_t effective_mask;
-	int retval;
-	struct task_struct *p;
+	cpumask_t new_mask, effective_mask;
 	struct thread_info *ti;
+	struct task_struct *p;
+	int retval;
 
 	if (len < sizeof(new_mask))
 		return -EINVAL;
@@ -58,13 +59,13 @@ asmlinkage long mipsmt_sys_sched_setaffinity(pid_t pid, unsigned int len,
 	if (copy_from_user(&new_mask, user_mask_ptr, sizeof(new_mask)))
 		return -EFAULT;
 
-	lock_cpu_hotplug();
+	mutex_lock(&sched_hotcpu_mutex);
 	read_lock(&tasklist_lock);
 
 	p = find_process_by_pid(pid);
 	if (!p) {
 		read_unlock(&tasklist_lock);
-		unlock_cpu_hotplug();
+		mutex_unlock(&sched_hotcpu_mutex);
 		return -ESRCH;
 	}
 
@@ -75,13 +76,12 @@ asmlinkage long mipsmt_sys_sched_setaffinity(pid_t pid, unsigned int len,
 	 * set_cpus_allowed.
 	 */
 	get_task_struct(p);
+	read_unlock(&tasklist_lock);
 
 	retval = -EPERM;
 	if ((current->euid != p->euid) && (current->euid != p->uid) &&
-			!capable(CAP_SYS_NICE)) {
-		read_unlock(&tasklist_lock);
+			!capable(CAP_SYS_NICE))
 		goto out_unlock;
-	}
 
 	retval = security_task_setscheduler(p, 0, NULL);
 	if (retval)
@@ -90,9 +90,6 @@ asmlinkage long mipsmt_sys_sched_setaffinity(pid_t pid, unsigned int len,
 	/* Record new user-specified CPU set for future reference */
 	p->thread.user_cpus_allowed = new_mask;
 
-	/* Unlock the task list */
-	read_unlock(&tasklist_lock);
-
 	/* Compute new global allowed CPU set if necessary */
 	ti = task_thread_info(p);
 	if (test_ti_thread_flag(ti, TIF_FPUBOUND) &&
@@ -100,13 +97,14 @@ asmlinkage long mipsmt_sys_sched_setaffinity(pid_t pid, unsigned int len,
 		cpus_and(effective_mask, new_mask, mt_fpu_cpumask);
 		retval = set_cpus_allowed(p, effective_mask);
 	} else {
+		effective_mask = new_mask;
 		clear_ti_thread_flag(ti, TIF_FPUBOUND);
 		retval = set_cpus_allowed(p, new_mask);
 	}
 
 out_unlock:
 	put_task_struct(p);
-	unlock_cpu_hotplug();
+	mutex_unlock(&sched_hotcpu_mutex);
 	return retval;
 }
 
