@@ -11,6 +11,7 @@
 #include <linux/interrupt.h>
 
 #include <asm/cpu.h>
+#include <linux/cpuset.h>
 #include <asm/processor.h>
 #include <asm/atomic.h>
 #include <asm/system.h>
@@ -54,17 +55,15 @@ static inline task_t *find_process_by_pid(pid_t pid)
 	return pid ? find_task_by_pid(pid) : current;
 }
 
-
 /*
  * mipsmt_sys_sched_setaffinity - set the cpu affinity of a process
  */
 asmlinkage long mipsmt_sys_sched_setaffinity(pid_t pid, unsigned int len,
 				      unsigned long __user *user_mask_ptr)
 {
-	cpumask_t new_mask;
-	cpumask_t effective_mask;
+	cpumask_t new_mask, effective_mask;
+	struct task_struct *p;
 	int retval;
-	task_t *p;
 
 	if (len < sizeof(new_mask))
 		return -EINVAL;
@@ -89,19 +88,15 @@ asmlinkage long mipsmt_sys_sched_setaffinity(pid_t pid, unsigned int len,
 	 * set_cpus_allowed.
 	 */
 	get_task_struct(p);
+	read_unlock(&tasklist_lock);
 
 	retval = -EPERM;
 	if ((current->euid != p->euid) && (current->euid != p->uid) &&
-			!capable(CAP_SYS_NICE)) {
-		read_unlock(&tasklist_lock);
+			!capable(CAP_SYS_NICE))
 		goto out_unlock;
-	}
 
 	/* Record new user-specified CPU set for future reference */
 	p->thread.user_cpus_allowed = new_mask;
-
-	/* Unlock the task list */
-	read_unlock(&tasklist_lock);
 
 	/* Compute new global allowed CPU set if necessary */
 	if( (p->thread.mflags & MF_FPUBOUND)
@@ -109,6 +104,7 @@ asmlinkage long mipsmt_sys_sched_setaffinity(pid_t pid, unsigned int len,
 		cpus_and(effective_mask, new_mask, mt_fpu_cpumask);
 		retval = set_cpus_allowed(p, effective_mask);
 	} else {
+		effective_mask = new_mask;
 		p->thread.mflags &= ~MF_FPUBOUND;
 		retval = set_cpus_allowed(p, new_mask);
 	}
