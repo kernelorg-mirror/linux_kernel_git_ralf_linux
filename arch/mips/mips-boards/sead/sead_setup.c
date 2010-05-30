@@ -36,7 +36,7 @@
 
 extern void mips_reboot_setup(void);
 extern void mips_time_init(void);
-extern void mips_timer_setup(struct irqaction *irq);
+extern void plat_timer_setup(struct irqaction *irq);
 
 static void __init serial_init(void);
 
@@ -54,7 +54,7 @@ void __init plat_setup(void)
 	serial_init ();
 
 	board_time_init = mips_time_init;
-	board_timer_setup = mips_timer_setup;
+	board_timer_setup = plat_timer_setup;
 
 	mips_reboot_setup();
 }
