@@ -354,7 +354,7 @@ static struct irq_chip bridge_irq_type = {
 	.end		= end_bridge_irq,
 };
 
-void __devinit register_bridge_irq(unsigned int irq)
+void register_bridge_irq(unsigned int irq)
 {
 	irq_desc[irq].status	= IRQ_DISABLED;
 	irq_desc[irq].action	= 0;
@@ -362,7 +362,7 @@ void __devinit register_bridge_irq(unsigned int irq)
 	irq_desc[irq].chip	= &bridge_irq_type;
 }
 
-int __devinit request_bridge_irq(struct bridge_controller *bc)
+int request_bridge_irq(struct bridge_controller *bc)
 {
 	int irq = allocate_irqno();
 	int swlevel, cpu;
