@@ -181,7 +181,7 @@ static struct tc *get_tc(int index)
 			return t;
 	}
 
-	return NULL;
+	return res;
 }
 
 /* allocate a vpe and associate it with this minor (or index) */
