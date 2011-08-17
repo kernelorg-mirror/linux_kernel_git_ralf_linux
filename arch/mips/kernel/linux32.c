@@ -828,3 +828,13 @@ asmlinkage long compat_sys_epoll_pwait(int epfd,
 
 	return error;
 }
+
+extern asmlinkage long compat_sys_futex(u32 __user *uaddr, int op, u32 val,
+	struct compat_timespec __user *utime, u32 __user *uaddr2, u32 val3);
+
+asmlinkage long sys32_futex(u32 __user *uaddr, long op, long val,
+	struct compat_timespec __user *utime, u32 __user *uaddr2, long val3)
+{
+	return compat_sys_futex(uaddr, (int) op, (u32) val, utime,
+				uaddr2, (u32) val3);
+}
