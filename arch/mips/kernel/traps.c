@@ -13,6 +13,7 @@
  */
 #include <linux/bug.h>
 #include <linux/init.h>
+#include <linux/kernel.h>
 #include <linux/mm.h>
 #include <linux/module.h>
 #include <linux/sched.h>
@@ -321,14 +322,19 @@ NORET_TYPE void ATTRIB_NORET die(const char * str, struct pt_regs * regs)
 {
 	static int die_counter;
 #ifdef CONFIG_MIPS_MT_SMTC
-	unsigned long dvpret = dvpe();
+	unsigned long dvpret;
 #endif /* CONFIG_MIPS_MT_SMTC */
+
+	oops_enter();
 
 	if (notify_die(DIE_OOPS, str, regs, 0, current->thread.trap_no, SIGSEGV) == NOTIFY_STOP)
 		sig = 0;
 
 	console_verbose();
 	spin_lock_irq(&die_lock);
+#ifdef CONFIG_MIPS_MT_SMTC
+	dvpret = dvpe();
+#endif /* CONFIG_MIPS_MT_SMTC */
 	bust_spinlocks(1);
 #ifdef CONFIG_MIPS_MT_SMTC
 	mips_mt_regdump(dvpret);
@@ -336,6 +342,8 @@ NORET_TYPE void ATTRIB_NORET die(const char * str, struct pt_regs * regs)
 	printk("%s[#%d]:\n", str, ++die_counter);
 	show_registers(regs);
 	spin_unlock_irq(&die_lock);
+
+	oops_exit();
 
 	if (in_interrupt())
 		panic("Fatal exception in interrupt");
