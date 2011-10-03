@@ -202,7 +202,8 @@ void octeon_prepare_cpus(unsigned int max_cpus)
 #endif
 
 	cvmx_write_csr(CVMX_CIU_MBOX_CLRX(cvmx_get_core_num()), 0xffffffff);
-	if (request_irq(OCTEON_IRQ_MBOX0, mailbox_interrupt, IRQF_DISABLED,
+	if (request_irq(OCTEON_IRQ_MBOX0, mailbox_interrupt,
+			IRQF_DISABLED | IRQF_PERCPU | IRQF_NO_THREAD,
 			"mailbox0", mailbox_interrupt)) {
 		panic("Cannot request_irq(OCTEON_IRQ_MBOX0)\n");
 	}
