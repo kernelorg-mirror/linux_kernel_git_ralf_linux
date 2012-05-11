@@ -27,7 +27,7 @@
  * switch_to(n) should switch tasks to task nr n, first
  * checking that n isn't the current task, in which case it does nothing.
  */
-extern asmlinkage void *resume(void *last, void *next, void *next_ti);
+extern asmlinkage void *resume(void *last, void *next, void *next_ti, u32 __usedfpu);
 
 struct task_struct;
 
@@ -62,9 +62,11 @@ do {									\
 #else
 #define switch_to(prev,next,last)					\
 do {									\
+	u32 __usedfpu;							\
+									\
 	if (cpu_has_dsp)						\
 		__save_dsp(prev);					\
-	(last) = resume(prev, next, task_thread_info(next));		\
+	(last) = resume(prev, next, task_thread_info(next), __usedfpu);	\
 } while (0)
 #endif
 
