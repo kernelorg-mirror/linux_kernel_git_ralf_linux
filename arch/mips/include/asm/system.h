@@ -71,6 +71,7 @@ do {									\
 	__mips_mt_fpaff_switch_to(prev);				\
 	if (cpu_has_dsp)						\
 		__save_dsp(prev);					\
+	__usedfpu = test_and_clear_tsk_thread_flag(prev, TIF_USEDFPU);	\
 	(last) = resume(prev, next, task_thread_info(next), __usedfpu);	\
 } while (0)
 
