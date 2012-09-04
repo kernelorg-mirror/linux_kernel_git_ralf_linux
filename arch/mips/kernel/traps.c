@@ -286,9 +286,6 @@ NORET_TYPE void ATTRIB_NORET die(const char * str, struct pt_regs * regs)
 	unsigned long dvpret = dvpe();
 #endif /* CONFIG_MIPS_MT_SMTC */
 
-	if (notify_die(DIE_OOPS, str, regs, 0, current->thread.trap_no, SIGSEGV) == NOTIFY_STOP)
-		sig = 0;
-
 	console_verbose();
 	spin_lock_irq(&die_lock);
 	bust_spinlocks(1);
