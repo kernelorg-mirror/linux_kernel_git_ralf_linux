@@ -183,7 +183,7 @@ static struct tc *get_tc(int index)
 			return t;
 	}
 
-	return res;
+	return NULL;
 }
 
 /* allocate a vpe and associate it with this minor (or index) */
