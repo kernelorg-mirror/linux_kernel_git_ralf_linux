@@ -9,7 +9,6 @@
  */
 #include <linux/config.h>
 #include <linux/cache.h>
-#include <linux/irqflags.h>
 #include <linux/sched.h>
 #include <linux/mm.h>
 #include <linux/personality.h>
@@ -28,6 +27,7 @@
 #include <linux/bitops.h>
 #include <asm/cacheflush.h>
 #include <asm/fpu.h>
+#include <asm/interrupt.h>
 #include <asm/sim.h>
 #include <asm/ucontext.h>
 #include <asm/cpu-features.h>
