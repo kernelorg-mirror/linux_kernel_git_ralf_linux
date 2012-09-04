@@ -170,6 +170,8 @@ struct task_struct;
 
 #define switch_to(prev,next,last)					\
 do {									\
+	u32 __usedfpu;							\
+									\
 	if (cpu_has_fpu &&						\
 	    (prev->thread.mflags & MF_FPUBOUND) &&			\
 	     (!(KSTK_STATUS(prev) & ST0_CU1))) {			\
@@ -179,7 +181,8 @@ do {									\
 	if (cpu_has_dsp)						\
 		__save_dsp(prev);					\
 	next->thread.emulated_fp = 0;					\
-	(last) = resume(prev, next, next->thread_info);			\
+	__usedfpu = test_and_clear_tsk_thread_flag(prev, TIF_USEDFPU);	\
+	(last) = resume(prev, next, next->thread_info, __usedfpu);	\
 } while (0)
 
 #else
@@ -189,6 +192,7 @@ do {									\
 									\
 	if (cpu_has_dsp)						\
 		__save_dsp(prev);					\
+	__usedfpu = test_and_clear_tsk_thread_flag(prev, TIF_USEDFPU);	\
 	(last) = resume(prev, next, task_thread_info(next), __usedfpu);	\
 } while (0)
 #endif
