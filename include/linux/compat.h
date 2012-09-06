@@ -228,5 +228,9 @@ asmlinkage long compat_sys_adjtimex(struct compat_timex __user *utp);
 
 extern int compat_printk(const char *fmt, ...);
 
+asmlinkage long compat_sys_futex(u32 __user *uaddr, int op, u32 val,
+		struct compat_timespec __user *utime, u32 __user *uaddr2,
+		u32 val3);
+
 #endif /* CONFIG_COMPAT */
 #endif /* _LINUX_COMPAT_H */
