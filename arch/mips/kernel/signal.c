@@ -9,7 +9,6 @@
  */
 #include <linux/config.h>
 #include <linux/cache.h>
-#include <linux/irqflags.h>
 #include <linux/sched.h>
 #include <linux/mm.h>
 #include <linux/personality.h>
