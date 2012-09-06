@@ -226,6 +226,9 @@ static inline int compat_timespec_compare(struct compat_timespec *lhs,
 }
 
 asmlinkage long compat_sys_adjtimex(struct compat_timex __user *utp);
+asmlinkage long compat_sys_futex(u32 __user *uaddr, int op, u32 val,
+		struct compat_timespec __user *utime, u32 __user *uaddr2,
+		u32 val3);
 
 #endif /* CONFIG_COMPAT */
 #endif /* _LINUX_COMPAT_H */
