@@ -233,6 +233,9 @@ extern void sigset_from_compat(sigset_t *set, compat_sigset_t *compat);
 asmlinkage long compat_sys_migrate_pages(compat_pid_t pid,
 		compat_ulong_t maxnode, const compat_ulong_t __user *old_nodes,
 		const compat_ulong_t __user *new_nodes);
+asmlinkage long compat_sys_futex(u32 __user *uaddr, int op, u32 val,
+		struct compat_timespec __user *utime, u32 __user *uaddr2,
+		u32 val3);
 
 #endif /* CONFIG_COMPAT */
 #endif /* _LINUX_COMPAT_H */
