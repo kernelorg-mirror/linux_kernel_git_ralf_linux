@@ -88,9 +88,6 @@ struct mips_perf_event {
 #endif
 };
 
-static struct mips_perf_event raw_event;
-static DEFINE_MUTEX(raw_event_mutex);
-
 #define UNSUPPORTED_PERF_EVENT_ID 0xffffffff
 #define C(x) PERF_COUNT_HW_CACHE_##x
 
@@ -107,7 +104,6 @@ struct mips_pmu {
 	void		(*write_counter)(unsigned int idx, u64 val);
 	void		(*enable_event)(struct hw_perf_event *evt, int idx);
 	void		(*disable_event)(int idx);
-	const struct mips_perf_event *(*map_raw_event)(u64 config);
 	const struct mips_perf_event (*general_event_map)[PERF_COUNT_HW_MAX];
 	const struct mips_perf_event (*cache_event_map)
 				[PERF_COUNT_HW_CACHE_MAX]
@@ -413,7 +409,6 @@ static int validate_group(struct perf_event *event)
  * mipsxx/rm9000/loongson2 have different performance counters, they have
  * specific low-level init routines.
  */
-static void reset_counters(void *arg);
 static int __hw_perf_event_init(struct perf_event *event);
 
 static void hw_perf_event_destroy(struct perf_event *event)
@@ -492,8 +487,6 @@ handle_associated_event(struct cpu_hw_events *cpuc,
 	if (perf_event_overflow(event, 0, data, regs))
 		mipspmu->disable_event(idx);
 }
-
-#include "perf_event_mipsxx.c"
 
 /* Callchain handling code. */
 static inline void
