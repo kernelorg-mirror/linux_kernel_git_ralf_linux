@@ -4,6 +4,7 @@
 /*
  * Copyright 1995 Linus Torvalds
  */
+#include <linux/compiler.h>
 #include <linux/mm.h>
 #include <linux/fs.h>
 #include <linux/list.h>
@@ -412,7 +413,7 @@ static inline int fault_in_pages_writeable(char __user *uaddr, int size)
 
 static inline int fault_in_pages_readable(const char __user *uaddr, int size)
 {
-	volatile char c;
+	volatile char c __maybe_unused;
 	int ret;
 
 	if (unlikely(size == 0))
