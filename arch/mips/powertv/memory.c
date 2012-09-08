@@ -48,10 +48,8 @@ void __init prom_meminit(void)
 {
 	char *memsize_str;
 	unsigned long memsize = 0;
-	unsigned int physend;
 	char *ptr;
 	int low_mem;
-	int high_mem;
 
 	/* Check the command line first for a memsize directive */
 	strcpy(cmdline, arcs_cmdline);
@@ -85,13 +83,10 @@ void __init prom_meminit(void)
 		}
 	}
 
-	physend = PFN_ALIGN(&_end) - 0x80000000;
 	if (memsize > LOW_MEM_MAX) {
 		low_mem = LOW_MEM_MAX;
-		high_mem = memsize - low_mem;
 	} else {
 		low_mem = memsize;
-		high_mem = 0;
 	}
 
 /*
