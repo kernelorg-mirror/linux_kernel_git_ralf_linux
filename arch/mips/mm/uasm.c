@@ -333,8 +333,7 @@ Ip_u2u1msbu3(op)					\
 Ip_u2u1msbu3(op)					\
 {							\
 	build_insn(buf, insn##op, b, a, c+d-33, c);	\
-}							\
-UASM_EXPORT_SYMBOL(uasm_i##op);
+}
 
 #define I_u1u2(op)					\
 Ip_u1u2(op)						\
