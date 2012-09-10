@@ -504,7 +504,7 @@ static int au1x_ic_settype(unsigned int irq, unsigned int flow_type)
 asmlinkage void plat_irq_dispatch(void)
 {
 	unsigned int pending = read_c0_status() & read_c0_cause();
-	unsigned long s, off, bit;
+	unsigned long s, off, bit __maybe_unused;
 
 	if (pending & CAUSEF_IP7) {
 		do_IRQ(MIPS_CPU_IRQ_BASE + 7);
@@ -524,7 +524,6 @@ asmlinkage void plat_irq_dispatch(void)
 	} else
 		goto spurious;
 
-	bit = 0;
 	s = au_readl(s);
 	if (unlikely(!s)) {
 spurious:
