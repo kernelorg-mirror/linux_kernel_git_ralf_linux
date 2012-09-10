@@ -219,7 +219,7 @@ static inline int fault_in_pages_writeable(char __user *uaddr, int size)
 
 static inline void fault_in_pages_readable(const char __user *uaddr, int size)
 {
-	volatile char c;
+	volatile char c __attribute__((unused));
 	int ret;
 
 	ret = __get_user(c, uaddr);
