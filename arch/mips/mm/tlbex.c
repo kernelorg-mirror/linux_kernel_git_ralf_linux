@@ -599,6 +599,7 @@ build_get_pgd_vmalloc64(u32 **p, struct uasm_label **l, struct uasm_reloc **r,
 	single_insn_swpd = uasm_in_compat_space_p(swpd) && !uasm_rel_lo(swpd);
 
 #ifdef MODULE_START
+	{
 	long modd = (long)module_pg_dir;
 
 	uasm_l_module_alloc(l, *p);
@@ -639,6 +640,7 @@ build_get_pgd_vmalloc64(u32 **p, struct uasm_label **l, struct uasm_reloc **r,
 		uasm_i_dsll32(p, ptr, ptr, 0);	/* typical case */
 	else
 		UASM_i_LA(p, ptr, VMALLOC_START);
+	}
 #else
 	uasm_l_vmalloc(l, *p);
 	UASM_i_LA(p, ptr, VMALLOC_START);
