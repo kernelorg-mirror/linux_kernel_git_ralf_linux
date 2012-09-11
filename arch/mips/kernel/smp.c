@@ -229,7 +229,8 @@ int smp_call_function_single(int cpu, void (*func) (void *info), void *info,
 				     wait);
 
 	put_cpu();
-	return 0;
+
+	return ret;
 }
 
 static void stop_this_cpu(void *dummy)
