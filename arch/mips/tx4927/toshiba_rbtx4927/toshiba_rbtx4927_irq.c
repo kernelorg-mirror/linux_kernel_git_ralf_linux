@@ -367,17 +367,17 @@ void toshiba_rbtx4927_irq_dump_pics(char *s)
 {
 	u32 level0_m;
 	u32 level0_s;
-	u32 level1_m;
-	u32 level1_s;
+	u32 level1_m __maybe_unused;
+	u32 level1_s __maybe_unused;
 	u32 level2;
-	u32 level2_p;
-	u32 level2_s;
-	u32 level3_m;
-	u32 level3_s;
-	u32 level4_m;
-	u32 level4_s;
-	u32 level5_m;
-	u32 level5_s;
+	u32 level2_p __maybe_unused;
+	u32 level2_s __maybe_unused;
+	u32 level3_m __maybe_unused;
+	u32 level3_s __maybe_unused;
+	u32 level4_m __maybe_unused;
+	u32 level4_s __maybe_unused;
+	u32 level5_m __maybe_unused;
+	u32 level5_s __maybe_unused;
 
 	if (s == NULL)
 		s = "null";
