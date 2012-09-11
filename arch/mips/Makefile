@@ -284,7 +284,11 @@ CHECKFLAGS-$(CONFIG_CPU_R10000)	+= -D_MIPS_ISA=_MIPS_ISA_MIPS4
 
 ifdef CONFIG_CPU_SB1
 ifdef CONFIG_SB1_PASS_1_WORKAROUNDS
-MODFLAGS	+= -msb1-pass1-workarounds
+#
+# -msb1-pass1-workarounds is only supported by Broadcom's Montavista toolchain
+# but not FSF gcc.
+#
+MODFLAGS	+= $(call cc-option,-msb1-pass1-workarounds,)
 endif
 endif
 
