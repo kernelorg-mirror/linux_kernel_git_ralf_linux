@@ -211,8 +211,8 @@ unsigned long save_local_and_disable(int controller)
 
 void restore_local_and_enable(int controller, unsigned long mask)
 {
+	unsigned long flags;
 	int i;
-	unsigned long flags, new_mask;
 
 	spin_lock_irqsave(&irq_lock, flags);
 	for (i=0; i<32; i++) {
@@ -224,9 +224,9 @@ void restore_local_and_enable(int controller, unsigned long mask)
 		}
 	}
 	if (controller)
-		new_mask = au_readl(IC1_MASKSET);
+		au_readl(IC1_MASKSET);
 	else
-		new_mask = au_readl(IC0_MASKSET);
+		au_readl(IC0_MASKSET);
 
 	spin_unlock_irqrestore(&irq_lock, flags);
 }
