@@ -46,7 +46,7 @@ extern void set_cpuspec(void);
 void __init plat_mem_setup(void)
 {
 	struct	cpu_spec *sp;
-	char *argptr;
+	char *argptr __maybe_unused;
 	unsigned long prid, cpufreq, bclk;
 
 	set_cpuspec();
