@@ -29,7 +29,7 @@ device_initcall(ledtrig_power_off_init);
 
 void cobalt_machine_halt(void)
 {
-	int state, last, diff;
+	int last, diff;
 	unsigned long mark;
 
 	/*
@@ -42,7 +42,7 @@ void cobalt_machine_halt(void)
 
 	led_trigger_event(power_off_led_trigger, LED_FULL);
 
-	for (state = 0;;) {
+	while (1) {
 		diff = COBALT_KEY_PORT ^ last;
 		last ^= diff;
 
