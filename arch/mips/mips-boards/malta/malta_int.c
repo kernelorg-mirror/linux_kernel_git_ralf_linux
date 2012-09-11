@@ -395,6 +395,18 @@ static struct gic_intr_map gic_intr_map[] = {
 	{ GIC_EXT_INTR(22), 	3,	GIC_CPU_INT1,	GIC_POL_POS, GIC_TRIG_EDGE,	1 },
 	{ GIC_EXT_INTR(23), 	3,	GIC_CPU_INT2,	GIC_POL_POS, GIC_TRIG_EDGE,	1 },
 };
+
+static void __init fill_ipi_map(void)
+{
+	int i;
+
+	for (i = 0; i < ARRAY_SIZE(gic_intr_map); i++) {
+		if (gic_intr_map[i].ipiflag && (gic_intr_map[i].cpunum != X))
+			ipi_map[gic_intr_map[i].cpunum] |=
+				(1 << (gic_intr_map[i].pin + 2));
+	}
+}
+
 #undef X
 
 /*
@@ -412,17 +424,6 @@ int __init gcmp_probe(unsigned long addr, unsigned long size)
 	if (gcmp_present)
 		printk(KERN_DEBUG "GCMP present\n");
 	return gcmp_present;
-}
-
-void __init fill_ipi_map(void)
-{
-	int i;
-
-	for (i = 0; i < ARRAY_SIZE(gic_intr_map); i++) {
-		if (gic_intr_map[i].ipiflag && (gic_intr_map[i].cpunum != X))
-			ipi_map[gic_intr_map[i].cpunum] |=
-				(1 << (gic_intr_map[i].pin + 2));
-	}
 }
 
 void __init arch_init_irq(void)
