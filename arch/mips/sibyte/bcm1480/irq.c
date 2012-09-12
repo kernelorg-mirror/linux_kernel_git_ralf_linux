@@ -292,7 +292,8 @@ int bcm1480_steal_irq(int irq)
 		desc->depth = 0;
 	}
 	spin_unlock_irqrestore(&desc->lock,flags);
-	return 0;
+
+	return retval;
 }
 
 /*
