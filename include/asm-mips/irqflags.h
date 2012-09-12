@@ -13,6 +13,7 @@
 
 #ifndef __ASSEMBLY__
 
+#include <linux/compiler.h>
 #include <asm/hazards.h>
 
 #if defined(__GENERATING_BOUNDS_H) || defined(__GENERATING_OFFSETS_S)
