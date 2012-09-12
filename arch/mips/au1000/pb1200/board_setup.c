@@ -56,6 +56,7 @@
 
 extern void _board_init_irq(void);
 extern void (*board_init_irq)(void);
+extern char * __init prom_getcmdline(void);
 
 void board_reset (void)
 {
