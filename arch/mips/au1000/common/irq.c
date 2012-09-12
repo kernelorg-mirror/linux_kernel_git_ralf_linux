@@ -414,14 +414,11 @@ static void setup_local_irq(unsigned int irq_nr, int type, int int_req)
 void __init arch_init_irq(void)
 {
 	int i;
-	unsigned long cp0_status;
 	au1xxx_irq_map_t *imp;
 	extern au1xxx_irq_map_t au1xxx_irq_map[];
 	extern au1xxx_irq_map_t au1xxx_ic0_map[];
 	extern int au1xxx_nr_irqs;
 	extern int au1xxx_ic0_nr_irqs;
-
-	cp0_status = read_c0_status();
 
 	/* Initialize interrupt controllers to a safe state.
 	*/
