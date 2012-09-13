@@ -108,7 +108,7 @@ asmlinkage void plat_irq_dispatch(struct pt_regs *regs)
 	if (irq >= 0)
 		do_IRQ(MIPSCPU_INT_BASE + irq, regs);
 	else
-		spurious_interrupt();
+		spurious_interrupt(regs);
 }
 
 void __init arch_init_irq(void)
