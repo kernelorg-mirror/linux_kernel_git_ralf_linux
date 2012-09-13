@@ -275,7 +275,7 @@ int dma_supported(struct device *dev, u64 mask)
 	 * so we can't guarantee allocations that must be
 	 * within a tighter range than GFP_DMA..
 	 */
-	if (mask < DMA_24BIT_MASK)
+	if (mask < 0x0000000000ffffffULL)
 		return 0;
 
 	return 1;
