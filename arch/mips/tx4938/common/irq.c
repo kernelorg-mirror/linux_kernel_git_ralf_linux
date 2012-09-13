@@ -31,6 +31,7 @@
 #include <asm/mipsregs.h>
 #include <asm/system.h>
 #include <asm/tx4938/rbtx4938.h>
+#include <asm/wbflush.h>
 
 /**********************************************************************************/
 /* Forwad definitions for all pic's                                               */
