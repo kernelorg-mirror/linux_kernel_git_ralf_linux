@@ -1099,7 +1099,7 @@ static int vpe_open(struct inode *inode, struct file *filp)
 	/* this of-course trashes what was there before... */
 	v->pbuffer = vmalloc(P_SIZE);
 	if (!v->pbuffer) {
-		pr_warning("VPE loader: unable to allocate memory\n");
+		printk(KERN_WARNING "VPE loader: unable to allocate memory\n");
 		return -ENOMEM;
 	}
 	v->plen = P_SIZE;
