@@ -44,7 +44,7 @@
 #define INTC	IT8172_PCI_INTC_IRQ
 #define INTD	IT8172_PCI_INTD_IRQ
 
-static const int internal_func_irqs[7] __initdata = {
+static int internal_func_irqs[7] __initdata = {
 	IT8172_AC97_IRQ,
 	IT8172_DMA_IRQ,
 	IT8172_CDMA_IRQ,
