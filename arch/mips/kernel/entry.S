@@ -181,3 +181,18 @@ LEAF(spurious_interrupt)
 #endif
 	j	ret_from_irq
 	END(spurious_interrupt)
+
+#if defined(CONFIG_CPU_MIPSR2) || defined(CONFIG_MIPS_MT)
+
+/*
+ * MIPS32R2 Instruction Hazard Barrier - must be called
+ *
+ * For C code use the inline version named instruction_hazard().
+ */
+LEAF(mips_ihb)
+	.set	mips32r2
+	jr.hb	ra
+	nop
+	END(mips_ihb)
+
+#endif /* CONFIG_CPU_MIPSR2 or CONFIG_MIPS_MT */
