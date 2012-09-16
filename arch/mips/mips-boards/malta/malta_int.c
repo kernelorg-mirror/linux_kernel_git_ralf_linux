@@ -259,14 +259,17 @@ asmlinkage void plat_irq_dispatch(struct pt_regs *regs)
 	unsigned int pending = read_c0_cause() & read_c0_status() & ST0_IM;
 	int irq;
 
+	if (unlikely(!pending)) {
+		spurious_interrupt();
+		return;
+	}
+
 	irq = irq_ffs(pending);
 
 	if (irq == MIPSCPU_INT_I8259A)
 		malta_hw0_irqdispatch(regs);
-	else if (irq >= 0)
-		do_IRQ(MIPSCPU_INT_BASE + irq, regs);
 	else
-		spurious_interrupt(regs);
+		do_IRQ(MIPSCPU_INT_BASE + irq, regs);
 }
 
 static struct irqaction i8259irq = {
