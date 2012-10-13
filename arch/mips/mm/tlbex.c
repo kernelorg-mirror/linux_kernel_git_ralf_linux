@@ -445,8 +445,8 @@ enum label_id {
 #endif
 	label_vmalloc,
 	label_vmalloc_done,
-	label_tlbw_hazard,
-	label_split,
+	label_tlbw_hazard_0,
+	label_split = label_tlbw_hazard_0 + 8,
 	label_nopage_tlbl,
 	label_nopage_tlbs,
 	label_nopage_tlbm,
@@ -480,7 +480,7 @@ L_LA(_module_alloc)
 #endif
 L_LA(_vmalloc)
 L_LA(_vmalloc_done)
-L_LA(_tlbw_hazard)
+/* _tlbw_hazard_x is handled differently.  */
 L_LA(_split)
 L_LA(_nopage_tlbl)
 L_LA(_nopage_tlbs)
@@ -716,6 +716,30 @@ il_bgez(u32 **p, struct reloc **r, unsigned int reg, enum label_id l)
 	i_bgez(p, reg, 0);
 }
 
+static int __cpuinitdata hazard_instance;
+
+static void uasm_bgezl_hazard(u32 **p, struct reloc **r, int instance)
+{
+	switch (instance) {
+	case 0 ... 7:
+		il_bgezl(p, r, 0, label_tlbw_hazard_0 + instance);
+		return;
+	default:
+		BUG();
+	}
+}
+
+static void uasm_bgezl_label(struct label **l, u32 **p, int instance)
+{
+	switch (instance) {
+	case 0 ... 7:
+		build_label(l, *p, label_tlbw_hazard_0 + instance);
+		break;
+	default:
+		BUG();
+	}
+}
+
 /* The only general purpose registers allowed in TLB handlers. */
 #define K0		26
 #define K1		27
@@ -874,9 +898,10 @@ static __cpuinit void build_tlb_write_entry(u32 **p, struct label **l,
 		 * This branch uses up a mtc0 hazard nop slot and saves
 		 * two nops after the tlbw instruction.
 		 */
-		il_bgezl(p, r, 0, label_tlbw_hazard);
+		uasm_bgezl_hazard(p, r, hazard_instance);
 		tlbw(p);
-		l_tlbw_hazard(l, *p);
+		uasm_bgezl_label(l, p, hazard_instance);
+		hazard_instance++;
 		i_nop(p);
 		break;
 
@@ -925,9 +950,10 @@ static __cpuinit void build_tlb_write_entry(u32 **p, struct label **l,
 		 * This branch uses up a mtc0 hazard nop slot and saves
 		 * a nop after the tlbw instruction.
 		 */
-		il_bgezl(p, r, 0, label_tlbw_hazard);
+		uasm_bgezl_hazard(p, r, hazard_instance);
 		tlbw(p);
-		l_tlbw_hazard(l, *p);
+		uasm_bgezl_label(l, p, hazard_instance);
+		hazard_instance++;
 		break;
 
 	case CPU_RM7000:
