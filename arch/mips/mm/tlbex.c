@@ -85,8 +85,8 @@ enum label_id {
 #endif
 	label_vmalloc,
 	label_vmalloc_done,
-	label_tlbw_hazard,
-	label_split,
+	label_tlbw_hazard_0,
+	label_split = label_tlbw_hazard_0 + 8,
 	label_nopage_tlbl,
 	label_nopage_tlbs,
 	label_nopage_tlbm,
@@ -102,7 +102,7 @@ UASM_L_LA(_module_alloc)
 #endif
 UASM_L_LA(_vmalloc)
 UASM_L_LA(_vmalloc_done)
-UASM_L_LA(_tlbw_hazard)
+/* _tlbw_hazard_x is handled differently.  */
 UASM_L_LA(_split)
 UASM_L_LA(_nopage_tlbl)
 UASM_L_LA(_nopage_tlbs)
@@ -110,6 +110,30 @@ UASM_L_LA(_nopage_tlbm)
 UASM_L_LA(_smp_pgtable_change)
 UASM_L_LA(_r3000_write_probe_fail)
 UASM_L_LA(_large_segbits_fault)
+
+static int __cpuinitdata hazard_instance;
+
+static void uasm_bgezl_hazard(u32 **p, struct uasm_reloc **r, int instance)
+{
+	switch (instance) {
+	case 0 ... 7:
+		uasm_il_bgezl(p, r, 0, label_tlbw_hazard_0 + instance);
+		return;
+	default:
+		BUG();
+	}
+}
+
+static void uasm_bgezl_label(struct uasm_label **l, u32 **p, int instance)
+{
+	switch (instance) {
+	case 0 ... 7:
+		uasm_build_label(l, *p, label_tlbw_hazard_0 + instance);
+		break;
+	default:
+		BUG();
+	}
+}
 
 /*
  * For debug purposes.
@@ -290,9 +314,10 @@ static void __cpuinit build_tlb_write_entry(u32 **p, struct uasm_label **l,
 		 * This branch uses up a mtc0 hazard nop slot and saves
 		 * two nops after the tlbw instruction.
 		 */
-		uasm_il_bgezl(p, r, 0, label_tlbw_hazard);
+		uasm_bgezl_hazard(p, r, hazard_instance);
 		tlbw(p);
-		uasm_l_tlbw_hazard(l, *p);
+		uasm_bgezl_label(l, p, hazard_instance);
+		hazard_instance++;
 		uasm_i_nop(p);
 		break;
 
@@ -340,13 +365,15 @@ static void __cpuinit build_tlb_write_entry(u32 **p, struct uasm_label **l,
 
 	case CPU_NEVADA:
 		uasm_i_nop(p); /* QED specifies 2 nops hazard */
+		uasm_i_nop(p); /* QED specifies 2 nops hazard */
 		/*
 		 * This branch uses up a mtc0 hazard nop slot and saves
 		 * a nop after the tlbw instruction.
 		 */
-		uasm_il_bgezl(p, r, 0, label_tlbw_hazard);
+		uasm_bgezl_hazard(p, r, hazard_instance);
 		tlbw(p);
-		uasm_l_tlbw_hazard(l, *p);
+		uasm_bgezl_label(l, p, hazard_instance);
+		hazard_instance++;
 		break;
 
 	case CPU_RM7000:
