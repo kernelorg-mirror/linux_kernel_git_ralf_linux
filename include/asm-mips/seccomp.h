@@ -25,7 +25,7 @@
 
 #elif defined(CONFIG_MIPS32_N32)
 
-#define TIF_32BIT _TIF_32BIT_ADDR
+#define TIF_32BIT TIF_32BIT_ADDR
 
 #define __NR_seccomp_read_32		6000
 #define __NR_seccomp_write_32		6001
