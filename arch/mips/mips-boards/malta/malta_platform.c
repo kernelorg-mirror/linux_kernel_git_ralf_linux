@@ -18,6 +18,7 @@
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/serial_8250.h>
+#include <asm/mips-boards/maltaint.h>
 
 #define SMC_PORT(base, int)						\
 {									\
