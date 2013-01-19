@@ -700,8 +700,11 @@ static inline void cpu_probe_mips(struct cpuinfo_mips *c)
 		c->cputype = CPU_20KC;
 		break;
 	case PRID_IMP_24K:
+		c->cputype = CPU_24K;
+		break;
 	case PRID_IMP_24KE:
 		c->cputype = CPU_24K;
+		__cpu_name[cpu] = "MIPS 24KEc";
 		break;
 	case PRID_IMP_25KF:
 		c->cputype = CPU_25KF;
