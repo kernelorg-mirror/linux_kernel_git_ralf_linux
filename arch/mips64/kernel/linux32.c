@@ -2192,7 +2192,7 @@ sys32_ipc (u32 call, int first, int second, int third, u32 ptr, u32 fifth)
 		err = do_sys32_shmctl (first, second, (void *)AA(ptr));
 		break;
 	default:
-		err = -EINVAL;
+		err = -ENOSYS;
 		break;
 	}
 
