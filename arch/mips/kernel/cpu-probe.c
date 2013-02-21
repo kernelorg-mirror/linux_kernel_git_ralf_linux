@@ -321,6 +321,9 @@ static inline void cpu_probe_legacy(struct cpuinfo_mips *c)
 		c->tlbsize = 48;
 		break;
 	case PRID_IMP_VR41XX:
+		c->isa_level = MIPS_CPU_ISA_III;
+		c->options = R4K_OPTS;
+		c->tlbsize = 32;
 		switch (c->processor_id & 0xf0) {
 #ifndef CONFIG_VR4181
 		case PRID_REV_VR4111:
@@ -343,17 +346,16 @@ static inline void cpu_probe_legacy(struct cpuinfo_mips *c)
 		case PRID_REV_VR4130:
 			if ((c->processor_id & 0xf) < 0x4)
 				c->cputype = CPU_VR4131;
-			else
+			else {
 				c->cputype = CPU_VR4133;
+				c->options |= MIPS_CPU_LLSC;
+			}
 			break;
 		default:
 			printk(KERN_INFO "Unexpected CPU of NEC VR4100 series\n");
 			c->cputype = CPU_VR41XX;
 			break;
 		}
-		c->isa_level = MIPS_CPU_ISA_III;
-		c->options = R4K_OPTS;
-		c->tlbsize = 32;
 		break;
 	case PRID_IMP_R4300:
 		c->cputype = CPU_R4300;
