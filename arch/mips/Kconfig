@@ -215,6 +215,7 @@ config MACH_JZ4740
 config LASAT
 	bool "LASAT Networks platforms"
 	select CEVT_R4K
+	select CRC32
 	select CSRC_R4K
 	select DMA_NONCOHERENT
 	select SYS_HAS_EARLY_PRINTK
