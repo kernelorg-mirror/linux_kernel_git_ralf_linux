@@ -248,6 +248,7 @@ config MACH_JAZZ
 
 config LASAT
 	bool "Support for LASAT Networks platforms"
+	select CRC32
 	select DMA_NONCOHERENT
 	select HW_HAS_PCI
 	select MIPS_GT64120
