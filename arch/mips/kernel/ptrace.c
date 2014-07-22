@@ -223,7 +223,8 @@ asmlinkage int sys_ptrace(long request, long pid, long addr, long data)
 			if (!cpu_has_fpu)
 				child->thread.fpu.soft.sr = data;
 			else
-				child->thread.fpu.hard.control = data;
+				child->thread.fpu.hard.control =
+					data & ~FPU_CSR_ALL_X;
 			break;
 		default:
 			/* The rest are not allowed. */
