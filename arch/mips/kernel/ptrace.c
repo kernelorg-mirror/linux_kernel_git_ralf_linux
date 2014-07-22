@@ -523,7 +523,7 @@ asmlinkage int sys_ptrace(long request, long pid, long addr, long data)
 			regs->lo = data;
 			break;
 		case FPC_CSR:
-			child->tss.fpu.hard.control = data;
+			child->tss.fpu.hard.control = data & ~FPU_CSR_ALL_X;
 			break;
 		default:
 			/* The rest are not allowed. */
