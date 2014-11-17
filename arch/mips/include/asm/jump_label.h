@@ -20,9 +20,15 @@
 #define WORD_INSN ".word"
 #endif
 
+#ifdef CONFIG_CPU_MICROMIPS
+#define NOP_INSN "nop32"
+#else
+#define NOP_INSN "nop"
+#endif
+
 #define JUMP_LABEL(key, label)						\
 	do {								\
-		asm goto("1:\tnop\n\t"					\
+		asm goto("1:\t" NOP_INSN "\n\t"				\
 			"nop\n\t"					\
 			".pushsection __jump_table,  \"a\"\n\t"		\
 			WORD_INSN " 1b, %l[" #label "], %0\n\t"		\
