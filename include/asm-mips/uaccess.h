@@ -247,6 +247,8 @@ do {									\
 									\
 	if (likely(access_ok(VERIFY_READ,  __gu_ptr, size)))		\
 		__get_user_common((x), size, __gu_ptr);			\
+	else								\
+		(x) = 0;						\
 									\
 	__gu_err;							\
 })
@@ -260,6 +262,7 @@ do {									\
 	"2:							\n"	\
 	"	.section .fixup,\"ax\"				\n"	\
 	"3:	li	%0, %4					\n"	\
+	"	move	%1, $0					\n"	\
 	"	j	2b					\n"	\
 	"	.previous					\n"	\
 	"	.section __ex_table,\"a\"			\n"	\
