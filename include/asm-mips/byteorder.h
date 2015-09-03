@@ -15,10 +15,15 @@
 
 #ifdef CONFIG_CPU_MIPSR2
 
-static __inline__ __attribute_const__ __u16 ___arch__swab16(__u16 x)
+static __inline__ __attribute_const__ __attribute__((nomips16))
+	__u16 ___arch__swab16(__u16 x)
 {
 	__asm__(
+	"	set	push			\n"
+	"	set	arch=mips32r2		\n"
+	"	set	nomips16		\n"
 	"	wsbh	%0, %1			\n"
+	"	.set	pop			\n"
 	: "=r" (x)
 	: "r" (x));
 
@@ -26,11 +31,16 @@ static __inline__ __attribute_const__ __u16 ___arch__swab16(__u16 x)
 }
 #define __arch__swab16(x)	___arch__swab16(x)
 
-static __inline__ __attribute_const__ __u32 ___arch__swab32(__u32 x)
+static __inline__ __attribute_const__ __attribute__((nomips16))
+	__u32 ___arch__swab32(__u32 x)
 {
 	__asm__(
+	"	set	push			\n"
+	"	set	arch=mips32r2		\n"
+	"	set	nomips16		\n"
 	"	wsbh	%0, %1			\n"
 	"	rotr	%0, %0, 16		\n"
+	"	.set	pop			\n"
 	: "=r" (x)
 	: "r" (x));
 
@@ -40,11 +50,16 @@ static __inline__ __attribute_const__ __u32 ___arch__swab32(__u32 x)
 
 #ifdef CONFIG_CPU_MIPS64_R2
 
-static __inline__ __attribute_const__ __u64 ___arch__swab64(__u64 x)
+static __inline__ __attribute_const__ __attribute__((nomips16))
+	__u64 ___arch__swab64(__u64 x)
 {
 	__asm__(
+	"	set	push			\n"
+	"	set	arch=mips64r2		\n"
+	"	set	nomips16		\n"
 	"	dsbh	%0, %1\n"
-	"	dshd	%0, %0"
+	"	dshd	%0, %0			\n"
+	"	.set	pop			\n"
 	: "=r" (x)
 	: "r" (x));
 
