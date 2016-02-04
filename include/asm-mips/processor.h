@@ -39,7 +39,7 @@ extern unsigned int vced_count, vcei_count;
  * User space process size: 2GB. This is hardcoded into a few places,
  * so don't change it unless you know what you are doing.
  */
-#define TASK_SIZE	0x7fff8000UL
+#define TASK_SIZE	0x80000000UL
 
 /*
  * This decides where the kernel will search for a free chunk of vm
