@@ -543,12 +543,12 @@ static inline int simulate_llsc(struct pt_regs *regs)
 
 asmlinkage void do_ov(struct pt_regs *regs)
 {
-	siginfo_t info;
+	siginfo_t info = {
+		.si_signo = SIGFPE,
+		.si_code = FPE_INTOVF,
+		.si_addr = (void __user *)regs->cp0_epc,
+	};
 
-	info.si_code = FPE_INTOVF;
-	info.si_signo = SIGFPE;
-	info.si_errno = 0;
-	info.si_addr = (void *)regs->cp0_epc;
 	force_sig_info(SIGFPE, &info, current);
 }
 
@@ -598,7 +598,7 @@ asmlinkage void do_fpe(struct pt_regs *regs, unsigned long fcr31)
 asmlinkage void do_bp(struct pt_regs *regs)
 {
 	unsigned int opcode, bcode;
-	siginfo_t info;
+	siginfo_t info = { 0 };
 
 	die_if_kernel("Break instruction in kernel code", regs);
 
@@ -629,7 +629,6 @@ asmlinkage void do_bp(struct pt_regs *regs)
 		else
 			info.si_code = FPE_INTOVF;
 		info.si_signo = SIGFPE;
-		info.si_errno = 0;
 		info.si_addr = (void *)regs->cp0_epc;
 		force_sig_info(SIGFPE, &info, current);
 		break;
