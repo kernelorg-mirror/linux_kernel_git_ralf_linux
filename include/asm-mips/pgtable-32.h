@@ -141,7 +141,8 @@ static inline pte_t mk_pte_phys(phys_t physpage, pgprot_t pgprot)
 
 static inline pte_t pte_modify(pte_t pte, pgprot_t newprot)
 {
-	return __pte((pte_val(pte) & _PAGE_CHG_MASK) | pgprot_val(newprot));
+	return __pte((pte_val(pte) & _PAGE_CHG_MASK) |
+		     (pgprot_val(newprot) & ~_PAGE_CHG_MASK));
 }
 
 /* Certain architectures need to do special things when pte's
