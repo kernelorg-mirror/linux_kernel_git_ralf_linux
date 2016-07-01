@@ -347,7 +347,8 @@ extern inline pte_t mk_pte_phys(unsigned long physpage, pgprot_t pgprot)
 
 extern inline pte_t pte_modify(pte_t pte, pgprot_t newprot)
 {
-	return __pte((pte_val(pte) & _PAGE_CHG_MASK) | pgprot_val(newprot));
+	return __pte((pte_val(pte) & _PAGE_CHG_MASK) |
+		     (pgprot_val(newprot) & ~_PAGE_CHG_MASK));
 }
 
 /* to find an entry in a page-table-directory */
