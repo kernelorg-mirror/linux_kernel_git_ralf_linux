@@ -87,7 +87,7 @@ extern int remap_page_range_high(unsigned long from, phys_t to, unsigned long si
 
 #include <asm/pgtable-bits.h>
 
-#define PAGE_NONE	__pgprot(_PAGE_PRESENT | _CACHE_CACHABLE_NONCOHERENT)
+#define PAGE_NONE	__pgprot(_PAGE_PRESENT | PAGE_CACHABLE_DEFAULT)
 #define PAGE_SHARED     __pgprot(_PAGE_PRESENT | _PAGE_READ | _PAGE_WRITE | \
 			PAGE_CACHABLE_DEFAULT)
 #define PAGE_COPY       __pgprot(_PAGE_PRESENT | _PAGE_READ | \
