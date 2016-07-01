@@ -116,7 +116,7 @@
 
 #include <asm/pgtable-bits.h>
 
-#define PAGE_NONE	__pgprot(_PAGE_PRESENT | _CACHE_CACHABLE_NONCOHERENT)
+#define PAGE_NONE	__pgprot(_PAGE_PRESENT | PAGE_CACHABLE_DEFAULT)
 #define PAGE_SHARED     __pgprot(_PAGE_PRESENT | _PAGE_READ | _PAGE_WRITE | \
 			PAGE_CACHABLE_DEFAULT)
 #define PAGE_COPY       __pgprot(_PAGE_PRESENT | _PAGE_READ | \
@@ -462,7 +462,8 @@ static inline pte_t mk_pte_phys(unsigned long physpage, pgprot_t pgprot)
 
 static inline pte_t pte_modify(pte_t pte, pgprot_t newprot)
 {
-	return __pte((pte_val(pte) & _PAGE_CHG_MASK) | pgprot_val(newprot));
+	return __pte((pte_val(pte) & _PAGE_CHG_MASK) |
+		     (pgprot_val(newprot) & ~_PAGE_CHG_MASK));
 }
 
 #define page_pte(page) page_pte_prot(page, __pgprot(0))
