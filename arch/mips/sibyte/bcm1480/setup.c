@@ -32,6 +32,7 @@ unsigned int sb1_pass;
 unsigned int soc_pass;
 unsigned int soc_type;
 unsigned int periph_rev;
+EXPORT_SYMBOL_GPL(periph_rev);
 unsigned int zbbus_mhz;
 
 static unsigned int part_type;
