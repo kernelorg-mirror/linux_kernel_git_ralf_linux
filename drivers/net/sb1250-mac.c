@@ -3050,3 +3050,4 @@ sbmac_cleanup_module(void)
 
 module_init(sbmac_init_module);
 module_exit(sbmac_cleanup_module);
+MODULE_LICENSE("GPL");
