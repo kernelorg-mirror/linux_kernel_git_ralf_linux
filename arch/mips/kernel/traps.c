@@ -715,7 +715,7 @@ int process_fpemu_return(int sig, void __user *fault_addr)
 		si.si_signo = sig;
 		if (sig == SIGSEGV) {
 			down_read(&current->mm->mmap_sem);
-			find_vma(current->mm, (unsigned long)fault_addr);
+			vma = find_vma(current->mm, (unsigned long)fault_addr);
 			if (vma && (vma->vm_start <= (unsigned long)fault_addr))
 				si.si_code = SEGV_ACCERR;
 			else
